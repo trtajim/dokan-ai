@@ -44,6 +44,11 @@ export interface OrderRecord {
 declare global {
   var __dokan_stores: Map<string, StoreRecord> | undefined
   var __dokan_orders: OrderRecord[] | undefined
+  var __dokan_deleted_slugs: Set<string> | undefined
+}
+
+if (!globalThis.__dokan_deleted_slugs) {
+  globalThis.__dokan_deleted_slugs = new Set<string>()
 }
 
 if (!globalThis.__dokan_stores) {
@@ -125,8 +130,13 @@ if (!globalThis.__dokan_orders) {
 }
 
 export const memoryStore = {
-  getStore: (slug: string) => globalThis.__dokan_stores?.get(slug) || null,
+  isDeleted: (slug: string) => globalThis.__dokan_deleted_slugs?.has(slug) || false,
+  getStore: (slug: string) => {
+    if (globalThis.__dokan_deleted_slugs?.has(slug)) return null
+    return globalThis.__dokan_stores?.get(slug) || null
+  },
   setStore: (slug: string, data: StoreRecord) => {
+    globalThis.__dokan_deleted_slugs?.delete(slug)
     globalThis.__dokan_stores?.set(slug, data)
     return data
   },
@@ -147,9 +157,13 @@ export const memoryStore = {
     return null
   },
   deleteStore: (slug: string) => {
+    globalThis.__dokan_deleted_slugs?.add(slug)
     return globalThis.__dokan_stores?.delete(slug) || false
   },
-  getAllStores: () => Array.from(globalThis.__dokan_stores?.values() || []),
+  getAllStores: () => {
+    const all = Array.from(globalThis.__dokan_stores?.values() || [])
+    return all.filter(s => !globalThis.__dokan_deleted_slugs?.has(s.slug))
+  },
   getOrders: (slug?: string) => {
     if (!slug) return globalThis.__dokan_orders || []
     return (globalThis.__dokan_orders || []).filter(o => o.store_slug === slug)

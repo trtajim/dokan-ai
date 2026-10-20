@@ -581,7 +581,20 @@ const refreshData = async () => {
       $fetch('/api/stores'),
       $fetch('/api/orders')
     ])
-    stores.value = storesRes?.stores || []
+    let loadedStores = storesRes?.stores || []
+    
+    // Filter out client-side deleted stores
+    if (import.meta.client) {
+      try {
+        const deletedList = JSON.parse(localStorage.getItem('dokan_deleted_stores') || '[]')
+        if (Array.isArray(deletedList) && deletedList.length > 0) {
+          const delSet = new Set(deletedList)
+          loadedStores = loadedStores.filter(s => !delSet.has(s.slug))
+        }
+      } catch (e) {}
+    }
+
+    stores.value = loadedStores
     orders.value = ordersRes?.orders || []
   } catch (err) {
     console.error('Failed to load dashboard data:', err)
@@ -705,6 +718,18 @@ const confirmDeleteStore = async () => {
       method: 'DELETE',
       body: { slug: st.slug }
     })
+    
+    // Persist deleted state locally in browser as well
+    if (import.meta.client) {
+      try {
+        const deletedList = JSON.parse(localStorage.getItem('dokan_deleted_stores') || '[]')
+        if (!deletedList.includes(st.slug)) {
+          deletedList.push(st.slug)
+          localStorage.setItem('dokan_deleted_stores', JSON.stringify(deletedList))
+        }
+      } catch (e) {}
+    }
+
     stores.value = stores.value.filter(s => s.slug !== st.slug)
     if (selectedStoreFilter.value === st.slug) {
       selectedStoreFilter.value = 'all'
