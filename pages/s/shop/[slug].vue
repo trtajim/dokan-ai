@@ -22,15 +22,17 @@
     <!-- TOP NOTIFICATION BANNER (Urgency & Real Stock Counter) -->
     <div 
       v-if="showUrgencyBar"
-      class="text-white text-xs font-black py-2.5 px-3 text-center sticky top-0 z-40 shadow-sm flex items-center justify-center gap-2 transition-colors"
-      :class="currentStock <= 0 ? 'bg-red-600' : 'bg-gradient-to-r from-red-600 via-amber-600 to-red-600'"
+      class="text-white text-xs sm:text-[13px] font-extrabold py-2 px-3 text-center sticky top-0 z-40 shadow-sm flex items-center justify-center gap-2 backdrop-blur-md transition-all"
+      :class="currentStock <= 0 ? 'bg-rose-700' : 'bg-gradient-to-r from-rose-600 via-orange-600 to-rose-600'"
     >
-      <Flame class="w-4 h-4 animate-bounce shrink-0" />
-      <span v-if="currentStock > 0" class="tracking-wide">
-        অফারটি সীমিত সময়ের জন্য! আর মাত্র <strong class="underline decoration-white/60">{{ currentStock }} টি</strong> স্টক বাকি আছে!
+      <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/20 shrink-0">
+        <Flame class="w-3.5 h-3.5 text-white" />
       </span>
-      <span v-else>
-        ⚠️ দুঃখিত! আজকের মতো এই প্রডাক্টের সব স্টক শেষ হয়ে গেছে।
+      <span v-if="currentStock > 0" class="tracking-normal">
+        অফারটি সীমিত সময়ের জন্য! আর মাত্র <strong class="bg-white/20 px-1.5 py-0.5 rounded-md font-black">{{ currentStock }} টি</strong> স্টক বাকি আছে
+      </span>
+      <span v-else class="font-bold">
+        ⚠️ আজকের মতো এই প্রডাক্টের স্টক শেষ হয়ে গেছে
       </span>
     </div>
 
@@ -53,31 +55,31 @@
           </div>
         </div>
 
-        <!-- Action Items (Dashboard & AI edit visible only to owner) -->
-        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          <NuxtLink 
-            v-if="isStoreOwner"
-            to="/dashboard"
-            class="px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 flex items-center gap-1.5 transition-all active:scale-95 border border-slate-200/80"
-            title="মার্চেন্ট ড্যাশবোর্ডে যান"
-          >
-            <LayoutDashboard class="w-3.5 h-3.5 text-emerald-600" />
-            <span class="hidden xs:inline">ড্যাশবোর্ড</span>
-          </NuxtLink>
+        <!-- Action Items (Dashboard & AI edit visible to owner, or direct Order button for customers) -->
+        <div class="flex items-center gap-2 shrink-0">
+          <template v-if="isStoreOwner">
+            <NuxtLink 
+              to="/dashboard"
+              class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 flex items-center justify-center transition-all active:scale-95 border border-slate-200/80 shadow-2xs"
+              title="মার্চেন্ট ড্যাশবোর্ড"
+            >
+              <LayoutDashboard class="w-4 h-4 text-emerald-600" />
+            </NuxtLink>
 
-          <button 
-            v-if="isStoreOwner"
-            @click="isEditingStore = true"
-            class="px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-black bg-slate-900 text-white hover:bg-slate-800 flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer"
-          >
-            <Sparkles class="w-3.5 h-3.5 text-emerald-400" />
-            <span>AI এডিট</span>
-          </button>
+            <button 
+              @click="isEditingStore = true"
+              class="px-3.5 py-2 rounded-xl text-xs font-black bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer border border-slate-800"
+            >
+              <Sparkles class="w-3.5 h-3.5 text-emerald-400" />
+              <span>AI এডিট</span>
+            </button>
+          </template>
 
+          <!-- Customer Order Button: hidden when isStoreOwner is true -->
           <button 
-            v-if="currentStock > 0"
+            v-else-if="currentStock > 0"
             @click="scrollToForm" 
-            class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-black text-white shadow-md active:scale-95 transition-all flex items-center gap-1" 
+            class="px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-black text-white shadow-md active:scale-95 transition-all flex items-center gap-1" 
             :class="primaryBgClass"
           >
             <span>অর্ডার করুন</span>
@@ -103,9 +105,6 @@
                 :alt="store.product_title" 
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
               />
-              <div class="absolute top-2.5 left-2.5 px-3 py-1 bg-gradient-to-r from-red-600 to-amber-600 text-white text-[11px] sm:text-xs font-black rounded-xl shadow-md">
-                স্পেশাল অফার
-              </div>
             </div>
 
             <!-- Thumbnail Carousel if multi-image -->
