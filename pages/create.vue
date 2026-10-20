@@ -1,8 +1,8 @@
 <template>
-  <div class="h-screen h-[100dvh] bg-slate-50 flex flex-col overflow-hidden">
-    <Navbar />
+  <div class="fixed inset-0 flex flex-col bg-slate-50 overflow-hidden select-none">
+    <Navbar class="shrink-0" />
 
-    <main class="flex-1 max-w-3xl w-full mx-auto p-2 sm:p-6 lg:p-8 flex flex-col min-h-0 overflow-hidden">
+    <main class="flex-1 w-full max-w-3xl mx-auto flex flex-col min-h-0 overflow-hidden p-0 sm:p-4">
       
       <!-- Top Title (Hidden on mobile to maximize chat viewport, visible on desktop) -->
       <div class="hidden sm:block mb-3 text-center px-2 shrink-0">
@@ -14,11 +14,11 @@
         </p>
       </div>
 
-      <!-- Pure Chat Container (Locked to viewport without outer scroll) -->
-      <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-md sm:shadow-xl overflow-hidden flex flex-col flex-1 min-h-0">
+      <!-- Pure Chat Container (Locked strictly inside the flexbox, only message feed scrolls) -->
+      <div class="bg-white sm:rounded-3xl border-y sm:border border-slate-200/90 shadow-none sm:shadow-xl overflow-hidden flex flex-col flex-1 min-h-0">
         
-        <!-- Chat Header Bar -->
-        <div class="px-3 py-2.5 sm:p-4 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
+        <!-- Chat Header Bar (Fixed / non-scrolling header) -->
+        <div class="shrink-0 px-3 py-2 sm:px-4 sm:py-3 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
           <div class="flex items-center gap-2 sm:gap-3">
             <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-bold shadow-sm">
               <Bot class="w-4 h-4 sm:w-5 sm:h-5" />
@@ -36,8 +36,8 @@
           </button>
         </div>
 
-        <!-- Scrollable Messages Feed -->
-        <div ref="chatScrollContainer" class="flex-1 p-3 sm:p-6 overflow-y-auto space-y-3 sm:space-y-4">
+        <!-- Scrollable Messages Feed (The ONLY element that can scroll) -->
+        <div ref="chatScrollContainer" class="flex-1 p-3 sm:p-6 overflow-y-auto overscroll-contain space-y-3 sm:space-y-4">
           
           <div v-for="(msg, idx) in messages" :key="idx" class="flex flex-col" :class="msg.role === 'user' ? 'items-end' : 'items-start'">
             
@@ -98,7 +98,7 @@
         </div>
 
         <!-- Mobile Optimized Chat Input Area -->
-        <div class="p-2 sm:p-3.5 border-t border-slate-100 bg-white">
+        <div class="shrink-0 p-2 sm:p-3.5 border-t border-slate-100 bg-white">
           <form @submit.prevent="sendMessage" class="bg-slate-50 border border-slate-200 rounded-2xl p-1.5 sm:p-2 focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-all">
             
             <!-- Pre-send attached image thumbnails -->
