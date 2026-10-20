@@ -166,12 +166,12 @@ Respond ONLY with a strictly valid JSON matching this schema:
   generatedConfig.stock = initialStock
   generatedConfig.variants = normalizedVariants
   generatedConfig.video_reel_url = cleanVideoEmbed
-  generatedConfig.user_id = user_id || 'guest_merchant_demo'
+  generatedConfig.user_id = user_id || null
 
   const storeData = {
     id: 'store_' + Date.now(),
     slug,
-    user_id: user_id || 'guest_merchant_demo',
+    user_id: user_id || null,
     product_title: product_title || 'এক্সক্লুসিভ প্রোডাক্ট',
     price: productPrice,
     regular_price: oldPrice,
@@ -192,10 +192,14 @@ Respond ONLY with a strictly valid JSON matching this schema:
       await supabase.from('stores').insert({
         id: storeData.id,
         slug: storeData.slug,
+        user_id: storeData.user_id,
         product_title: storeData.product_title,
         price: storeData.price,
         regular_price: storeData.regular_price,
         image_url: storeData.image_url,
+        images: storeData.images,
+        delivery_fee_inside: storeData.delivery_fee_inside,
+        delivery_fee_outside: storeData.delivery_fee_outside,
         theme_color: storeData.theme_color,
         config: storeData.config
       })
