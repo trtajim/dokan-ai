@@ -93,7 +93,7 @@
             @click="scrollToForm" 
             class="px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold border border-white/40 hover:bg-white/10 active:scale-95 transition-all flex items-center gap-1 cursor-pointer" 
           >
-            <span>অর্ডার করুন</span>
+            <span>{{ store.config?.cta_button_text || 'অর্ডার করুন' }}</span>
             <ArrowDown class="w-3.5 h-3.5 text-amber-300" />
           </button>
         </div>
@@ -406,7 +406,7 @@
         class="px-5 py-2.5 rounded-xl font-bold text-sm shadow-md active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer font-sans-bn"
       >
         <ShoppingBag class="w-4 h-4" />
-        <span>অর্ডার করুন</span>
+        <span>{{ store.config?.cta_button_text || 'অর্ডার করুন' }}</span>
       </button>
     </div>
 
