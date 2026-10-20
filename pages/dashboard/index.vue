@@ -137,17 +137,6 @@
                 <span>{{ st.config?.pixel_id ? 'পিক্সেল অন' : 'পিক্সেল' }}</span>
               </button>
 
-              <!-- Telegram Order Alert Button -->
-              <button 
-                @click="openTelegramModal(st)"
-                class="px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
-                :class="st.config?.telegram_chat_id ? 'bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'"
-                :title="st.config?.telegram_chat_id ? 'টেলিগ্রাম নোটিফিকেশন চালু আছে' : 'টেলিগ্রাম এলার্ট সেটআপ করুন'"
-              >
-                <Send class="w-3.5 h-3.5" :class="st.config?.telegram_chat_id ? 'text-sky-600' : 'text-slate-400'" />
-                <span>{{ st.config?.telegram_chat_id ? 'টেলিগ্রাম অন' : 'টেলিগ্রাম' }}</span>
-              </button>
-
               <NuxtLink 
                 :to="`/s/${st.slug}`" 
                 target="_blank" 
@@ -508,59 +497,53 @@
           </p>
         </div>
 
-        <!-- If bot username configured in env -->
-        <div v-if="telegramBotUsername" class="space-y-3 text-xs">
+        <!-- Telegram Account-Wide Connect Box -->
+        <div class="space-y-3.5 text-xs">
           <!-- Active Status Banner if already connected -->
           <div v-if="userTelegramChatId" class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-900">
             <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0">
               <CheckCircle2 class="w-5 h-5" />
             </div>
             <div>
-              <span class="font-bold text-xs block">টেলিগ্রাম সফলভাবে কানেক্টেড!</span>
-              <span class="text-[11px] text-emerald-700">Chat ID: {{ userTelegramChatId }}</span>
-              <p class="text-[10px] text-slate-500 mt-0.5">আপনার সকল দোকানের অর্ডার এই টেলিগ্রামে আসবে।</p>
+              <span class="font-bold text-xs block">টেলিগ্রাম সক্রিয় আছে!</span>
+              <span class="text-[11px] text-emerald-700 font-mono">Chat ID: {{ userTelegramChatId }}</span>
+              <p class="text-[10px] text-slate-500 mt-0.5">আপনার সকল স্টোরের অর্ডার এই টেলিগ্রামে আসবে।</p>
             </div>
           </div>
 
-          <div v-else class="p-3.5 bg-sky-50/70 border border-sky-100 rounded-2xl space-y-2">
-            <span class="font-bold text-sky-900 block">⚡ ১-ক্লিক অটোমেটিক কানেক্ট:</span>
-            <p class="text-slate-600 leading-relaxed text-[11px]">
-              নিচের বাটনে ক্লিক করে টেলিগ্রাম বটে প্রবেশ করে <strong>START</strong> চাপুন। আপনার অ্যাকাউন্টের <b>সকল দোকানের</b> নতুন অর্ডারের নোটিফিকেশন সরাসরি টেলিগ্রামে চলে আসবে!
+          <!-- Step-by-step easy guide -->
+          <div class="p-4 bg-sky-50/70 border border-sky-100 rounded-2xl space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-sky-600 text-white flex items-center justify-center text-[10px] font-bold">1</span>
+              <span class="font-bold text-slate-900 text-xs">টেলিগ্রাম বটে Start দিন:</span>
+            </div>
+            <p class="text-slate-600 text-[11px] leading-relaxed pl-7">
+              নিচের বাটনে চাপ দিলে আমাদের বট <strong>@{{ telegramBotUsername || 'dokanai_bot' }}</strong> ওপেন হবে। <b>START</b> বাটন চাপলে বট আপনাকে একটি চ্যাট আইডি দেবে।
             </p>
-            <a 
-              :href="`https://t.me/${telegramBotUsername}?start=user_${currentUser?.id || 'demo_judge_account_id'}`"
-              target="_blank"
-              class="w-full py-2.5 px-3 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95 text-center text-xs"
-            >
-              <Send class="w-4 h-4" />
-              <span>টেলিগ্রামে কানেক্ট করুন</span>
-            </a>
-          </div>
+            <div class="pl-7">
+              <a 
+                :href="`https://t.me/${telegramBotUsername || 'dokanai_bot'}`"
+                target="_blank"
+                class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-sky-500 hover:bg-sky-600 active:scale-95 text-white font-bold rounded-xl text-xs shadow-sm transition-all"
+              >
+                <Send class="w-3.5 h-3.5" />
+                <span>টেলিগ্রাম বটের লিংক খুলুন</span>
+              </a>
+            </div>
 
-          <div class="pt-1">
-            <label class="block font-bold text-slate-700 mb-1">অথবা ম্যানুয়ালি Chat ID দিন:</label>
-            <input 
-              type="text"
-              v-model="telegramModal.chatId"
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono text-slate-900 focus:outline-none focus:border-sky-500 bg-slate-50"
-              placeholder="যেমন: 123456789"
-            />
-          </div>
-        </div>
-
-        <!-- Fallback if bot username not in env yet -->
-        <div v-else class="space-y-3 text-xs">
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Telegram Chat ID:</label>
-            <input 
-              type="text"
-              v-model="telegramModal.chatId"
-              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-mono font-bold text-slate-900 focus:outline-none focus:border-sky-500 bg-slate-50"
-              placeholder="যেমন: 123456789"
-            />
-            <p class="text-[11px] text-slate-400 leading-normal mt-1">
-              💡 আপনার টেলিগ্রাম চ্যাট আইডি জানতে টেলিগ্রামে <strong>@userinfobot</strong> সার্চ করে স্টার্ট দিন।
-            </p>
+            <div class="flex items-center gap-2 pt-2 border-t border-sky-200/50">
+              <span class="w-5 h-5 rounded-full bg-sky-600 text-white flex items-center justify-center text-[10px] font-bold">2</span>
+              <span class="font-bold text-slate-900 text-xs">চ্যাট আইডি পেস্ট করুন:</span>
+            </div>
+            <div class="pl-7 space-y-1.5">
+              <p class="text-slate-500 text-[11px]">বট থেকে পাওয়া আইডিটি এখানে দিয়ে সেভ করুন:</p>
+              <input 
+                type="text"
+                v-model="telegramModal.chatId"
+                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-sky-500 bg-white"
+                placeholder="যেমন: 589218492"
+              />
+            </div>
           </div>
         </div>
 
@@ -814,25 +797,16 @@ const refreshData = async () => {
       $fetch('/api/orders')
     ]
 
-    const uid = currentUser.value?.id || 'demo_judge_account_id'
-    promises.push($fetch(`/api/user/settings?user_id=${uid}`))
+    const uid = currentUser.value?.id
+    if (uid) {
+      promises.push($fetch(`/api/user/settings?user_id=${uid}`))
+    }
 
     const [storesRes, ordersRes, userSettingsRes] = await Promise.all(promises)
     let loadedStores = storesRes?.stores || []
     
     if (userSettingsRes?.telegram_chat_id) {
       userTelegramChatId.value = userSettingsRes.telegram_chat_id
-    }
-
-    // Filter out client-side deleted stores
-    if (import.meta.client) {
-      try {
-        const deletedList = JSON.parse(localStorage.getItem('dokan_deleted_stores') || '[]')
-        if (Array.isArray(deletedList) && deletedList.length > 0) {
-          const delSet = new Set(deletedList)
-          loadedStores = loadedStores.filter(s => !delSet.has(s.slug))
-        }
-      } catch (e) {}
     }
 
     stores.value = loadedStores
@@ -848,12 +822,8 @@ const refreshData = async () => {
 // User stores list (supports managing multiple stores)
 const userStores = computed(() => {
   if (!currentUser.value) return []
-  // If demo guest, show all demo/guest stores; if custom user, filter by user_id or show all user stores
-  if (currentUser.value.isGuest) {
-    return stores.value
-  }
   const myStores = stores.value.filter(s => s.user_id === currentUser.value?.id)
-  return myStores.length > 0 ? myStores : stores.value
+  return myStores
 })
 
 const filteredOrdersByStore = computed(() => {
@@ -940,26 +910,6 @@ let telegramPollingTimer = null
 const openAccountTelegramModal = () => {
   telegramModal.chatId = userTelegramChatId.value || ''
   telegramModal.isOpen = true
-
-  // Auto-poll user settings while modal is open
-  if (telegramPollingTimer) clearInterval(telegramPollingTimer)
-  telegramPollingTimer = setInterval(async () => {
-    if (!telegramModal.isOpen) {
-      clearInterval(telegramPollingTimer)
-      return
-    }
-    try {
-      const uid = currentUser.value?.id || 'demo_judge_account_id'
-      const res = await $fetch(`/api/user/settings?user_id=${uid}`)
-      if (res && res.telegram_chat_id) {
-        if (res.telegram_chat_id !== userTelegramChatId.value) {
-          userTelegramChatId.value = res.telegram_chat_id
-          telegramModal.chatId = res.telegram_chat_id
-          toast.success('টেলিগ্রাম কানেকশন সফল হয়েছে!')
-        }
-      }
-    } catch (e) {}
-  }, 2500)
 }
 
 const openTelegramModal = (st) => {
@@ -968,8 +918,12 @@ const openTelegramModal = (st) => {
 
 const confirmTelegramUpdate = async () => {
   const cleanChatId = telegramModal.chatId.trim()
+  if (!currentUser.value?.id) {
+    toast.error('অনুগ্রহ করে প্রথমে লগইন করুন')
+    return
+  }
   telegramModal.isSubmitting = true
-  const uid = currentUser.value?.id || 'demo_judge_account_id'
+  const uid = currentUser.value.id
 
   try {
     await $fetch('/api/user/settings', {

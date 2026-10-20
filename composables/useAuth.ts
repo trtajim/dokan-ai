@@ -4,11 +4,11 @@ import { createClient } from '@supabase/supabase-js'
 export interface UserSession {
   id: string
   email: string
-  isGuest: boolean
   displayName: string
 }
 
 const currentUser = ref<UserSession | null>(null)
+const isAuthInitializing = ref(true)
 
 export const useAuth = () => {
   const config = useRuntimeConfig()
@@ -18,80 +18,88 @@ export const useAuth = () => {
   const sb = createClient(supabaseUrl, supabaseAnonKey)
 
   const initAuth = async () => {
-    if (import.meta.client && !currentUser.value) {
-      // 1. Check local session cache immediately
-      const saved = localStorage.getItem('dokan_auth_session')
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved)
-          // Ensure legacy sessions are cleanly sanitized
-          if (parsed.displayName?.includes('Judge') || parsed.displayName === 'Verified Merchant') {
-            parsed.displayName = 'মার্চেন্ট'
-            localStorage.setItem('dokan_auth_session', JSON.stringify(parsed))
-          }
-          currentUser.value = parsed
-        } catch (e) {
-          localStorage.removeItem('dokan_auth_session')
+    if (!import.meta.client) return
+
+    try {
+      // Get real verified session from Supabase
+      const { data: { session } } = await sb.auth.getSession()
+      if (session?.user) {
+        currentUser.value = {
+          id: session.user.id,
+          email: session.user.email || '',
+          displayName: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'মার্চেন্ট'
         }
+      } else {
+        currentUser.value = null
+      }
+
+      // Listen to real auth state changes (login, logout, token refresh)
+      sb.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) {
+          currentUser.value = {
+            id: session.user.id,
+            email: session.user.email || '',
+            displayName: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'মার্চেন্ট'
+          }
+        } else {
+          currentUser.value = null
+        }
+      })
+    } catch (e) {
+      console.warn('Supabase auth init error:', e)
+      currentUser.value = null
+    } finally {
+      isAuthInitializing.value = false
+    }
+  }
+
+  // Real Email/Password Sign Up & Login
+  const loginOrSignUp = async (email: string, pass: string) => {
+    const cleanEmail = email.trim().toLowerCase()
+    
+    // First attempt to sign in
+    const signInRes = await sb.auth.signInWithPassword({
+      email: cleanEmail,
+      password: pass
+    })
+
+    if (!signInRes.error && signInRes.data.user) {
+      currentUser.value = {
+        id: signInRes.data.user.id,
+        email: signInRes.data.user.email || '',
+        displayName: signInRes.data.user.user_metadata?.full_name || cleanEmail.split('@')[0] || 'মার্চেন্ট'
+      }
+      return currentUser.value
+    }
+
+    // If invalid login credentials, check if user exists or sign them up automatically
+    if (signInRes.error?.message?.toLowerCase().includes('invalid login credentials')) {
+      const signUpRes = await sb.auth.signUp({
+        email: cleanEmail,
+        password: pass,
+        options: {
+          data: {
+            full_name: cleanEmail.split('@')[0]
+          }
+        }
+      })
+
+      if (signUpRes.error) {
+        // If password is too short or something invalid
+        throw new Error(signUpRes.error.message || 'ভুল ইমেইল বা পাসওয়ার্ড')
+      }
+
+      if (signUpRes.data.user) {
+        currentUser.value = {
+          id: signUpRes.data.user.id,
+          email: signUpRes.data.user.email || '',
+          displayName: cleanEmail.split('@')[0] || 'মার্চেন্ট'
+        }
+        return currentUser.value
       }
     }
-  }
 
-  // 1-Click Guest Demo Login: Logs into a real persistent account
-  const loginAsGuest = async () => {
-    const demoEmail = 'merchant@dokan.ai'
-
-    const userSession: UserSession = {
-      id: 'demo_judge_account_id',
-      email: demoEmail,
-      isGuest: true,
-      displayName: 'মার্চেন্ট'
-    }
-
-    currentUser.value = userSession
-    if (import.meta.client) {
-      localStorage.setItem('dokan_auth_session', JSON.stringify(userSession))
-    }
-
-    // Attempt Supabase session sync in background asynchronously without blocking login
-    try {
-      const demoPassword = 'DokanAI_Guest_2026!'
-      sb.auth.signInWithPassword({
-        email: demoEmail,
-        password: demoPassword
-      }).catch(() => {})
-    } catch (err) {
-      // ignore
-    }
-
-    return userSession
-  }
-
-  // Real Email/Password Login & Register
-  const loginWithEmail = async (email: string, pass: string) => {
-    const cleanEmail = email.trim().toLowerCase()
-    const userSession: UserSession = {
-      id: 'usr_' + btoa(cleanEmail).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16),
-      email: cleanEmail,
-      isGuest: false,
-      displayName: cleanEmail.split('@')[0]
-    }
-
-    currentUser.value = userSession
-    if (import.meta.client) {
-      localStorage.setItem('dokan_auth_session', JSON.stringify(userSession))
-    }
-
-    try {
-      sb.auth.signInWithPassword({
-        email: cleanEmail,
-        password: pass
-      }).catch(() => {})
-    } catch (e) {
-      // background
-    }
-
-    return userSession
+    throw new Error(signInRes.error?.message || 'লগইন ব্যর্থ হয়েছে')
   }
 
   const logout = async () => {
@@ -99,9 +107,6 @@ export const useAuth = () => {
       await sb.auth.signOut()
     } catch (e) {}
     currentUser.value = null
-    if (import.meta.client) {
-      localStorage.removeItem('dokan_auth_session')
-    }
   }
 
   const isAuthenticated = computed(() => !!currentUser.value)
@@ -109,9 +114,9 @@ export const useAuth = () => {
   return {
     currentUser,
     isAuthenticated,
+    isAuthInitializing,
     initAuth,
-    loginAsGuest,
-    loginWithEmail,
+    loginOrSignUp,
     logout
   }
 }
