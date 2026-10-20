@@ -11,14 +11,28 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'GET') {
     if (slug) {
+      // 1. Check local/memory store first for freshest in-flight edits
+      const memStore = memoryStore.getStore(slug)
+
       const supabase = getSupabaseClient()
       if (supabase) {
         try {
           const { data } = await supabase.from('stores').select('*').eq('slug', slug).single()
           if (data) {
-            const mem = memoryStore.getStore(slug)
-            data.stock = mem?.stock ?? data.config?.stock ?? 25
-            data.variants = mem?.variants ?? data.config?.variants ?? []
+            // Merge freshest memory updates if available
+            if (memStore) {
+              const merged = {
+                ...data,
+                ...memStore,
+                config: {
+                  ...(data.config || {}),
+                  ...(memStore.config || {})
+                }
+              }
+              return { success: true, store: merged }
+            }
+            data.stock = data.config?.stock ?? 25
+            data.variants = data.config?.variants ?? []
             return { success: true, store: data }
           }
         } catch (err) {
@@ -26,11 +40,11 @@ export default defineEventHandler(async (event) => {
         }
       }
 
-      const store = memoryStore.getStore(slug)
-      if (!store) {
-        throw createError({ statusCode: 404, message: 'Store not found' })
+      if (memStore) {
+        return { success: true, store: memStore }
       }
-      return { success: true, store }
+
+      throw createError({ statusCode: 404, message: 'Store not found' })
     }
 
     // List all stores
@@ -39,12 +53,23 @@ export default defineEventHandler(async (event) => {
       try {
         const { data } = await supabase.from('stores').select('*').order('created_at', { ascending: false })
         if (data && data.length > 0) {
-          data.forEach((s: any) => {
+          const mergedList = data.map((s: any) => {
             const mem = memoryStore.getStore(s.slug)
-            s.stock = mem?.stock ?? s.config?.stock ?? 25
-            s.variants = mem?.variants ?? s.config?.variants ?? []
+            if (mem) {
+              return {
+                ...s,
+                ...mem,
+                config: {
+                  ...(s.config || {}),
+                  ...(mem.config || {})
+                }
+              }
+            }
+            s.stock = s.config?.stock ?? 25
+            s.variants = s.config?.variants ?? []
+            return s
           })
-          return { success: true, stores: data }
+          return { success: true, stores: mergedList }
         }
       } catch (err) {
         console.warn('Supabase all stores error:', err)

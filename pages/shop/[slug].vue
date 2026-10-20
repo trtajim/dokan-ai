@@ -508,6 +508,9 @@ const submitAiEdit = async () => {
     })
 
     if (res && res.success) {
+      if (res.store && data.value) {
+        data.value.store = { ...data.value.store, ...res.store }
+      }
       editLogs.value.push({
         prompt: instruction,
         response: res.reply
