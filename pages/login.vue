@@ -91,13 +91,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Zap, ArrowRight, ArrowLeft, Loader2 } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 
-const { loginAsGuest, loginWithEmail } = useAuth()
+const { currentUser, initAuth, loginAsGuest, loginWithEmail } = useAuth()
 const router = useRouter()
 const route = useRoute()
+
+onMounted(async () => {
+  await initAuth()
+  if (currentUser.value) {
+    const redirect = (route.query.redirect as string) || '/dashboard'
+    router.replace(redirect)
+  }
+})
 
 const email = ref('')
 const password = ref('')

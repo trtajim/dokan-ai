@@ -39,9 +39,9 @@
 
         <!-- If NOT logged in -->
         <template v-else>
-          <NuxtLink to="/login" class="px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-700 hover:text-slate-900 rounded-lg">
+          <button @click="openLogin('/dashboard')" class="px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-700 hover:text-slate-900 rounded-lg cursor-pointer">
             লগইন
-          </NuxtLink>
+          </button>
 
           <NuxtLink to="/create" class="px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all flex items-center gap-1 shadow-sm">
             <span>শুরু করুন</span>
@@ -58,8 +58,10 @@
 import { onMounted } from 'vue'
 import { LayoutDashboard, Plus, User, LogOut, ArrowRight } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
+import { useAuthModal } from '~/composables/useAuthModal'
 
 const { currentUser, initAuth, logout } = useAuth()
+const { openLogin } = useAuthModal()
 const router = useRouter()
 
 onMounted(() => {
@@ -68,6 +70,6 @@ onMounted(() => {
 
 const handleLogout = () => {
   logout()
-  router.push('/login')
+  openLogin('/')
 }
 </script>
