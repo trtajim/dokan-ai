@@ -169,7 +169,7 @@
                 v-model="selectedStoreFilter"
                 class="w-full sm:w-auto px-3 py-1.5 text-xs font-bold rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 focus:outline-none focus:border-emerald-500 cursor-pointer shadow-xs transition-colors"
               >
-                <option value="all">সকল দোকান (All Stores)</option>
+                <option value="all">সকল দোকান</option>
                 <option v-for="st in userStores" :key="st.id" :value="st.slug">
                   {{ st.product_title }} (/s/{{ st.slug }})
                 </option>
@@ -313,11 +313,11 @@
                       'text-red-700 bg-red-50/50 border-red-200': order.status === 'cancelled'
                     }"
                   >
-                    <option value="pending">পেন্ডিং (Pending)</option>
-                    <option value="confirmed">কনফার্মড (Confirmed)</option>
-                    <option value="under_courier">কুরিয়ারে আছে (Under Courier)</option>
-                    <option value="delivered">ডেলিভার্ড (Delivered)</option>
-                    <option value="cancelled">বাতিল (Cancelled)</option>
+                    <option value="pending">পেন্ডিং</option>
+                    <option value="confirmed">কনফার্মড</option>
+                    <option value="under_courier">কুরিয়ারে আছে</option>
+                    <option value="delivered">ডেলিভার্ড</option>
+                    <option value="cancelled">বাতিল</option>
                   </select>
                 </td>
 
@@ -492,11 +492,11 @@
               @change="changeStatus(orderModal.order.id, $event.target.value); orderModal.order.status = $event.target.value"
               class="px-3 py-1.5 text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:border-emerald-500"
             >
-              <option value="pending">পেন্ডিং (Pending)</option>
-              <option value="confirmed">কনফার্মড (Confirmed)</option>
-              <option value="under_courier">কুরিয়ারে আছে (Under Courier)</option>
-              <option value="delivered">ডেলিভার্ড (Delivered)</option>
-              <option value="cancelled">বাতিল (Cancelled)</option>
+              <option value="pending">পেন্ডিং</option>
+              <option value="confirmed">কনফার্মড</option>
+              <option value="under_courier">কুরিয়ারে আছে</option>
+              <option value="delivered">ডেলিভার্ড</option>
+              <option value="cancelled">বাতিল</option>
             </select>
           </div>
         </div>
@@ -651,12 +651,12 @@ const formatTime = (isoString) => {
 }
 
 const statusFilterOptions = [
-  { value: 'all', label: 'সকল অর্ডার (All)' },
-  { value: 'pending', label: 'পেন্ডিং (Pending)' },
-  { value: 'confirmed', label: 'কনফার্মড (Confirmed)' },
-  { value: 'under_courier', label: 'কুরিয়ারে আছে (Under Courier)' },
-  { value: 'delivered', label: 'ডেলিভার্ড (Delivered)' },
-  { value: 'cancelled', label: 'বাতিল (Cancelled)' }
+  { value: 'all', label: 'সকল অর্ডার' },
+  { value: 'pending', label: 'পেন্ডিং' },
+  { value: 'confirmed', label: 'কনফার্মড' },
+  { value: 'under_courier', label: 'কুরিয়ারে আছে' },
+  { value: 'delivered', label: 'ডেলিভার্ড' },
+  { value: 'cancelled', label: 'বাতিল' }
 ]
 
 const openStockPrompt = (st) => {
