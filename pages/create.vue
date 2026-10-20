@@ -2,23 +2,23 @@
   <div class="min-h-screen bg-slate-50 flex flex-col">
     <Navbar />
 
-    <main class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col">
+    <main class="flex-1 max-w-3xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col">
       <!-- Top Title -->
       <div class="mb-4 text-center">
         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
           <Sparkles class="w-3.5 h-3.5 text-emerald-600" />
-          <span>Interactive AI Store Agent</span>
+          <span>Autonomous AI Store Agent</span>
         </div>
         <h1 class="text-2xl sm:text-3xl font-black text-slate-900">
-          প্রোডাক্টের বিবরণ দিন — AI বানিয়ে দেবে সম্পূর্ণ দোকান
+          AI সহকারীর সাথে কথা বলে দোকান তৈরি করুন
         </h1>
-        <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-lg mx-auto">
-          AI সহকারীর সাথে কথা বলুন, ছবি যোগ করুন বা আপলোড করুন। সব তথ্য ঠিক থাকলে চ্যাটের ভেতর থেকেই দোকান চালু করতে পারবেন।
+        <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-md mx-auto">
+          কোনো জটিল ফর্ম ফিলআপ ছাড়াই AI আপনাকে প্রশ্ন করবে। প্রোডাক্টের ছবি আপলোড করুন এবং উত্তর দিয়ে তৈরি করুন সম্পূর্ণ লাইভ স্টোর।
         </p>
       </div>
 
-      <!-- Main Conversational Interface Container -->
-      <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden flex flex-col flex-1 h-[650px]">
+      <!-- Pure Chat Container -->
+      <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden flex flex-col flex-1 h-[620px]">
         
         <!-- Chat Header Bar -->
         <div class="p-4 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
@@ -27,77 +27,16 @@
               <Bot class="w-5 h-5" />
             </div>
             <div>
-              <h3 class="text-sm font-bold text-slate-900">DokanAI সহকারী</h3>
+              <h3 class="text-sm font-bold text-slate-900">DokanAI অনবোর্ডিং স্পেশালিস্ট</h3>
               <span class="inline-flex items-center gap-1.5 text-[11px] text-emerald-600 font-semibold">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> অনলাইন
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> অনলাইন (Follow-up Mode)
               </span>
             </div>
           </div>
 
-          <div class="flex items-center gap-2">
-            <button 
-              type="button" 
-              @click="showCustomDetails = !showCustomDetails" 
-              class="px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors flex items-center gap-1.5"
-              :class="showCustomDetails ? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'"
-            >
-              <Settings2 class="w-3.5 h-3.5" />
-              <span>ডিটেইলস / ছবি ({{ uploadedImages.length }})</span>
-            </button>
-            <button @click="resetChat" class="text-xs text-slate-400 hover:text-slate-600 p-1">
-              রিসেট
-            </button>
-          </div>
-        </div>
-
-        <!-- Optional Collapsible Details & Multi-Image Drawer -->
-        <div v-if="showCustomDetails" class="p-4 bg-slate-50 border-b border-slate-200/80 animate-in slide-in-from-top-2 duration-200 space-y-3 text-xs">
-          <div class="flex items-center justify-between">
-            <span class="font-bold text-slate-800">অতিরিক্ত কনফিগারেশন ও প্রোডাক্টের ছবি:</span>
-            <button @click="showCustomDetails = false" class="text-slate-400 hover:text-slate-600">✕ বন্ধ করুন</button>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label class="block font-bold text-slate-600 mb-1">ঢাকার ভেতরে ডেলিভারি চার্জ (৳):</label>
-              <input v-model.number="extractedData.delivery_fee_inside" type="number" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg font-bold" />
-            </div>
-            <div>
-              <label class="block font-bold text-slate-600 mb-1">ঢাকার বাইরে ডেলিভারি চার্জ (৳):</label>
-              <input v-model.number="extractedData.delivery_fee_outside" type="number" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg font-bold" />
-            </div>
-            <div>
-              <label class="block font-bold text-slate-600 mb-1">স্টোরের থিম কালার:</label>
-              <select v-model="extractedData.theme_color" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg font-bold">
-                <option value="emerald">Emerald (সবুজ)</option>
-                <option value="indigo">Indigo (নীল)</option>
-                <option value="rose">Rose (গোলাপি)</option>
-                <option value="amber">Amber (কমলা)</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Multi-Image Upload & Preview -->
-          <div>
-            <label class="block font-bold text-slate-600 mb-1.5">প্রোডাক্টের ছবি আপলোড করুন বা লিংক দিন:</label>
-            <div class="flex items-center gap-2">
-              <label class="cursor-pointer px-3 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl hover:bg-emerald-100 font-bold flex items-center gap-1.5">
-                <Upload class="w-4 h-4" />
-                <span>কম্পিউটার/মোবাইল থেকে ছবি সিলেক্ট করুন</span>
-                <input type="file" accept="image/*" multiple @change="handleFileUpload" class="hidden" />
-              </label>
-            </div>
-
-            <!-- Uploaded Image Thumbs -->
-            <div v-if="uploadedImages.length > 0" class="flex items-center gap-2 mt-2 overflow-x-auto py-1">
-              <div v-for="(img, iIdx) in uploadedImages" :key="iIdx" class="relative group w-14 h-14 rounded-xl overflow-hidden border border-slate-300 shrink-0">
-                <img :src="img" class="w-full h-full object-cover" />
-                <button @click="removeImage(iIdx)" class="absolute top-0.5 right-0.5 bg-red-600 text-white rounded-full p-0.5 opacity-90 hover:opacity-100">
-                  <X class="w-3 h-3" />
-                </button>
-              </div>
-            </div>
-          </div>
+          <button @click="resetChat" class="text-xs text-slate-400 hover:text-slate-600 p-1">
+            রিসেট
+          </button>
         </div>
 
         <!-- Scrollable Messages Feed -->
@@ -105,31 +44,32 @@
           
           <div v-for="(msg, idx) in messages" :key="idx" class="flex flex-col" :class="msg.role === 'user' ? 'items-end' : 'items-start'">
             <div 
-              class="max-w-[85%] sm:max-w-[75%] rounded-3xl px-4 sm:px-5 py-3 sm:py-3.5 text-xs sm:text-sm leading-relaxed"
+              class="max-w-[88%] sm:max-w-[78%] rounded-3xl px-4 sm:px-5 py-3 sm:py-3.5 text-xs sm:text-sm leading-relaxed"
               :class="msg.role === 'user' 
                 ? 'bg-emerald-600 text-white rounded-br-none shadow-md shadow-emerald-600/10' 
                 : 'bg-slate-100 text-slate-800 rounded-bl-none border border-slate-200/50'"
             >
               <p class="whitespace-pre-line">{{ msg.content }}</p>
 
-              <!-- IN-CHAT ACTION TRIGGER BUTTON -->
+              <!-- IN-CHAT DYNAMIC ACTION CARD (Only shows when all follow-ups are answered) -->
               <div v-if="msg.readyToGenerate" class="mt-4 pt-3 border-t border-slate-200/60 animate-in fade-in zoom-in-95 duration-200">
-                <div class="p-3 bg-white rounded-2xl border border-emerald-200 shadow-sm space-y-2 text-slate-800">
+                <div class="p-3.5 bg-white rounded-2xl border border-emerald-200 shadow-sm space-y-2.5 text-slate-800">
                   <div class="flex items-center gap-2 text-emerald-700 font-bold text-xs">
                     <CheckCircle2 class="w-4 h-4 text-emerald-600" />
-                    <span>সব প্রয়োজনীয় তথ্য সংগ্রহ সম্পন্ন হয়েছে!</span>
+                    <span>সব প্রয়োজনীয় প্রশ্ন ও তথ্য সংগ্রহ সম্পন্ন হয়েছে!</span>
                   </div>
-                  <div class="text-[11px] text-slate-500 font-semibold space-y-0.5">
+                  
+                  <div class="text-[11px] text-slate-600 font-medium space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                     <div>📦 প্রোডাক্ট: <strong>{{ extractedData.product_title || 'এক্সক্লুসিভ কালেকশন' }}</strong></div>
-                    <div>💰 অফার মূল্য: <strong>৳{{ extractedData.price || 1200 }}</strong> (আগে ছিল: ৳{{ extractedData.regular_price || 1800 }})</div>
+                    <div>💰 অফার মূল্য: <strong class="text-emerald-600">৳{{ extractedData.price || 1200 }}</strong> (আগে ছিল: <span class="line-through">৳{{ extractedData.regular_price || 1800 }}</span>)</div>
                     <div>🚚 ডেলিভারি চার্জ: <strong>ঢাকার ভেতরে ৳{{ extractedData.delivery_fee_inside }} | বাইরে ৳{{ extractedData.delivery_fee_outside }}</strong></div>
-                    <div>🖼️ ছবি: <strong>{{ uploadedImages.length }} টি যুক্ত আছে</strong></div>
+                    <div>🖼️ প্রোডাক্ট ইমেজ: <strong>{{ uploadedImages.length }} টি ছবি সিলেক্ট করা হয়েছে</strong></div>
                   </div>
 
                   <button 
                     @click="generateFullStore" 
                     :disabled="isGeneratingStore"
-                    class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black rounded-xl shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 text-xs sm:text-sm mt-2"
+                    class="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black rounded-xl shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 text-xs sm:text-sm"
                   >
                     <Loader2 v-if="isGeneratingStore" class="w-4 h-4 animate-spin" />
                     <Sparkles v-else class="w-4 h-4" />
@@ -152,20 +92,41 @@
           </div>
         </div>
 
-        <!-- Chat Input Bar -->
+        <!-- Attached Images Preview Strip Above Input -->
+        <div v-if="uploadedImages.length > 0" class="px-4 py-2 bg-slate-50/80 border-t border-slate-100 flex items-center gap-2 overflow-x-auto">
+          <span class="text-[11px] font-bold text-slate-500 whitespace-nowrap">যুক্ত ছবি:</span>
+          <div v-for="(img, iIdx) in uploadedImages" :key="iIdx" class="relative group w-10 h-10 rounded-lg overflow-hidden border border-slate-300 shrink-0">
+            <img :src="img" class="w-full h-full object-cover" />
+            <button @click="removeImage(iIdx)" class="absolute top-0.5 right-0.5 bg-red-600 text-white rounded-full p-0.5 opacity-90 hover:opacity-100">
+              <X class="w-2.5 h-2.5" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Conversational Input Bar with Direct Image Upload Icon -->
         <div class="p-3 sm:p-4 border-t border-slate-100 bg-white">
           <form @submit.prevent="sendMessage" class="flex items-center gap-2">
+            
+            <!-- Direct Image Upload Button in Chat -->
+            <label class="cursor-pointer p-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl transition-colors flex items-center justify-center shrink-0" title="প্রোডাক্টের ছবি আপলোড করুন">
+              <ImagePlus class="w-5 h-5 text-emerald-600" />
+              <input type="file" accept="image/*" multiple @change="handleFileUpload" class="hidden" />
+            </label>
+
+            <!-- Text Input -->
             <input 
               v-model="inputMessage" 
               type="text" 
-              placeholder="যেমন: আমি সুন্দরবনের খাঁটি মধু বিক্রি করতে চাই ১০০০ টাকায়..." 
+              placeholder="আপনার প্রোডাক্টের নাম বা বিবরণ লিখে শুরু করুন..." 
               class="flex-1 px-4 py-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-400"
               :disabled="isAiTyping || isGeneratingStore"
             />
+
+            <!-- Send Button -->
             <button 
               type="submit" 
               :disabled="!inputMessage.trim() || isAiTyping || isGeneratingStore"
-              class="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-2xl font-bold transition-all flex items-center justify-center shadow-md shadow-emerald-600/20 active:scale-95"
+              class="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-2xl font-bold transition-all flex items-center justify-center shadow-md shadow-emerald-600/20 active:scale-95 shrink-0"
             >
               <Send class="w-4 h-4" />
             </button>
@@ -179,7 +140,7 @@
 
 <script setup>
 import { ref, reactive, nextTick, onMounted } from 'vue'
-import { Sparkles, Bot, Send, Loader2, CheckCircle2, Settings2, Upload, X } from 'lucide-vue-next'
+import { Sparkles, Bot, Send, Loader2, CheckCircle2, ImagePlus, X } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 
 const router = useRouter()
@@ -189,16 +150,13 @@ const chatScrollContainer = ref(null)
 const isAiTyping = ref(false)
 const isGeneratingStore = ref(false)
 const inputMessage = ref('')
-const showCustomDetails = ref(false)
 
-const uploadedImages = ref([
-  'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80'
-])
+const uploadedImages = ref([])
 
 const messages = ref([
   {
     role: 'model',
-    content: `আসসালামু আলাইকুম! আমি আপনার DokanAI সহকারী।\nআপনার সিঙ্গেল প্রোডাক্টটি কি এবং কত টাকায় অফারে বিক্রি করতে চান? লিখে জানান, আমি এখনই কথা বলে আপনার ক্যাশ অন ডেলিভারি স্টোর তৈরি করে দেব!`
+    content: `আসসালামু আলাইকুম! আমি আপনার DokanAI সহকারী।\nআপনার সিঙ্গেল প্রোডাক্টটি কি এবং কত টাকায় অফারে বিক্রি করতে চান? লিখে জানান, আমি কথা বলে বিস্তারিত জেনে সম্পূর্ণ ক্যাশ অন ডেলিভারি স্টোর তৈরি করে দেব!`
   }
 ])
 
@@ -258,10 +216,10 @@ const sendMessage = async () => {
 
     if (res && res.reply) {
       if (res.extractedData) {
-        if (res.extractedData.product_title && !extractedData.product_title) {
+        if (res.extractedData.product_title) {
           extractedData.product_title = res.extractedData.product_title
         }
-        if (res.extractedData.price && !extractedData.price) {
+        if (res.extractedData.price) {
           extractedData.price = res.extractedData.price
           extractedData.regular_price = res.extractedData.regular_price || Math.round(res.extractedData.price * 1.4)
         }
@@ -286,7 +244,7 @@ const sendMessage = async () => {
     console.error('Onboarding error:', err)
     messages.value.push({
       role: 'model',
-      content: 'আমি আপনার তথ্য বুঝতে পেরেছি। স্টোর তৈরি করতে চাইলে নিচে বাটন চাপুন।',
+      content: 'আমি আপনার তথ্য পেয়েছি। আপনি চাইলে নিচের বাটনে চাপ দিয়ে এখনই দোকান তৈরি করতে পারেন!',
       readyToGenerate: true
     })
   } finally {
@@ -303,12 +261,12 @@ const generateFullStore = async () => {
       method: 'POST',
       body: {
         user_id: currentUser.value?.id || 'guest_merchant_demo',
-        product_title: extractedData.product_title || 'স্পেশাল প্রোডাক্ট',
+        product_title: extractedData.product_title || 'প্রিমিয়াম স্পেশাল প্রোডাক্ট',
         price: extractedData.price || 999,
         regular_price: extractedData.regular_price || 1400,
         delivery_fee_inside: extractedData.delivery_fee_inside || 70,
         delivery_fee_outside: extractedData.delivery_fee_outside || 130,
-        images: uploadedImages.value,
+        images: uploadedImages.value.length > 0 ? uploadedImages.value : ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80'],
         theme_color: extractedData.theme_color || 'emerald',
         description: messages.value.map(m => m.content).join(' ')
       }
@@ -335,6 +293,7 @@ const resetChat = () => {
   extractedData.product_title = ''
   extractedData.price = null
   extractedData.regular_price = null
+  uploadedImages.value = []
 }
 
 onMounted(() => {
