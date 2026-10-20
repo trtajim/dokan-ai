@@ -132,14 +132,14 @@
                 @keydown.enter.exact.prevent="sendMessage"
                 @paste="handlePaste"
                 rows="1"
-                placeholder="উত্তর লিখুন বা ছবি পেস্ট (Ctrl+V) / আপলোড করুন..." 
+                :placeholder="currentUser ? 'উত্তর লিখুন বা ছবি পেস্ট (Ctrl+V) / আপলোড করুন...' : 'চ্যাট করতে প্রথমে লগইন করুন...'" 
                 class="flex-1 max-h-24 min-h-[36px] py-2 px-1 text-xs sm:text-sm bg-transparent border-0 focus:outline-none resize-none placeholder:text-slate-400 text-slate-800 font-medium"
-                :disabled="isAiTyping || isGeneratingStore"
+                :disabled="!currentUser || isAiTyping || isGeneratingStore"
               ></textarea>
 
               <button 
                 type="submit" 
-                :disabled="(!inputMessage.trim() && pendingImages.length === 0) || isAiTyping || isGeneratingStore"
+                :disabled="!currentUser || (!inputMessage.trim() && pendingImages.length === 0) || isAiTyping || isGeneratingStore"
                 class="p-2 sm:p-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white rounded-full font-bold transition-all flex items-center justify-center shadow-sm active:scale-95 shrink-0 mb-0.5"
               >
                 <Send class="w-4 h-4" />
@@ -154,7 +154,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, nextTick, onMounted } from 'vue'
+import { ref, reactive, nextTick, onMounted, watch } from 'vue'
 import { Sparkles, Bot, Send, Loader2, CheckCircle2, Paperclip, X } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 import { useAuthModal } from '~/composables/useAuthModal'
@@ -164,6 +164,13 @@ const router = useRouter()
 const { currentUser, initAuth } = useAuth()
 const { openLogin } = useAuthModal()
 const toast = useAppToast()
+
+// Reactive Auth Guard: If user logs out while on /create, strictly lock with non-dismissible login modal
+watch(currentUser, (user) => {
+  if (!user) {
+    openLogin('/create', false)
+  }
+})
 
 const chatScrollContainer = ref(null)
 const isAiTyping = ref(false)
@@ -271,6 +278,11 @@ const removePendingImage = (index) => {
 }
 
 const sendMessage = async () => {
+  if (!currentUser.value) {
+    openLogin('/create', false)
+    return
+  }
+
   const text = inputMessage.value.trim()
   const attached = [...pendingImages.value]
 

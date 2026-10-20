@@ -63,6 +63,7 @@ import { useAuthModal } from '~/composables/useAuthModal'
 const { currentUser, initAuth, logout } = useAuth()
 const { openLogin } = useAuthModal()
 const router = useRouter()
+const route = useRoute()
 
 onMounted(() => {
   initAuth()
@@ -70,6 +71,10 @@ onMounted(() => {
 
 const handleLogout = () => {
   logout()
-  openLogin('/')
+  if (route.path === '/create' || route.path.startsWith('/dashboard')) {
+    openLogin(route.path, false)
+  } else {
+    openLogin('/', true)
+  }
 }
 </script>
