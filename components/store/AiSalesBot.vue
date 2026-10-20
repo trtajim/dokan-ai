@@ -61,7 +61,18 @@
               ? 'bg-slate-900 text-white rounded-br-none' 
               : 'bg-slate-100 text-slate-800 rounded-bl-none border border-slate-200/50'"
           >
-            {{ msg.text }}
+            <p class="whitespace-pre-line">{{ msg.text }}</p>
+
+            <!-- 1-Click Order Form Shortcut inside AI Bot -->
+            <button
+              v-if="msg.role === 'model'"
+              @click="closeAndScrollToOrder"
+              class="mt-2 w-full py-1.5 px-2.5 text-[11px] font-bold text-white rounded-xl shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+              :class="primaryBgClass"
+            >
+              <ShoppingBag class="w-3.5 h-3.5" />
+              <span>এখানে ক্লিক করে অর্ডার করুন</span>
+            </button>
           </div>
         </div>
 
@@ -96,7 +107,7 @@
 
 <script setup>
 import { ref, computed, nextTick } from 'vue'
-import { Bot, X, Send } from 'lucide-vue-next'
+import { Bot, X, Send, ShoppingBag } from 'lucide-vue-next'
 
 const props = defineProps({
   store: {
@@ -142,6 +153,14 @@ const scrollToBottom = async () => {
 const askQuickChip = (chip) => {
   inputQuery.value = chip
   sendMessage()
+}
+
+const closeAndScrollToOrder = () => {
+  isOpen.value = false
+  const orderSection = document.getElementById('order-form-section')
+  if (orderSection) {
+    orderSection.scrollIntoView({ behavior: 'smooth' })
+  }
 }
 
 const sendMessage = async () => {

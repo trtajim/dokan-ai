@@ -391,8 +391,8 @@
           </div>
         </div>
 
-        <!-- Editor Prompt Input Bar (Sticky at bottom, never pushed down) -->
-        <div class="p-3 border-t border-slate-100 bg-white shrink-0 sticky bottom-0 z-10 shadow-lg">
+        <!-- Editor Prompt Input Bar (Pinned at bottom) -->
+        <div class="p-3 border-t border-slate-100 bg-white shrink-0 shadow-lg">
           <form @submit.prevent="submitAiEdit" class="flex items-center gap-2">
             <input 
               v-model="aiInstruction" 
