@@ -128,7 +128,7 @@
             </div>
 
             <!-- Stock & Actions Row -->
-            <div class="flex items-center justify-between sm:justify-end gap-2.5 shrink-0 pt-2 sm:pt-0 border-t sm:border-0 border-slate-100">
+            <div class="flex items-center gap-2 flex-wrap shrink-0 pt-2.5 sm:pt-0 border-t sm:border-0 border-slate-100">
               <!-- Stock count with clean prompt alert -->
               <button 
                 @click="openStockPrompt(st)"
@@ -147,13 +147,13 @@
                 :title="st.config?.pixel_id ? `Pixel ID: ${st.config.pixel_id}` : 'মেটা পিক্সেল সেটআপ করুন'"
               >
                 <Activity class="w-3.5 h-3.5" :class="st.config?.pixel_id ? 'text-indigo-600' : 'text-slate-400'" />
-                <span>{{ st.config?.pixel_id ? 'পিক্সেল অন' : 'পিক্সেল' }}</span>
+                <span class="whitespace-nowrap">{{ st.config?.pixel_id ? 'পিক্সেল অন' : 'পিক্সেল' }}</span>
               </button>
 
               <NuxtLink 
                 :to="`/s/${st.slug}`" 
                 target="_blank" 
-                class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors"
+                class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 transition-colors whitespace-nowrap"
               >
                 <span>স্টোর ভিজিট</span>
                 <ExternalLink class="w-3.5 h-3.5" />
@@ -161,7 +161,7 @@
 
               <button 
                 @click="copyStoreLink(st.slug)" 
-                class="px-2.5 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                class="px-2.5 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
                 title="লিংক কপি করুন"
               >
                 <Copy class="w-3.5 h-3.5" />
@@ -171,7 +171,7 @@
               <!-- Delete Store Button -->
               <button 
                 @click="deleteStore(st)"
-                class="p-1.5 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                class="p-1.5 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer ml-auto sm:ml-0"
                 title="দোকান মুছে ফেলুন"
               >
                 <Trash2 class="w-4 h-4" />
@@ -981,10 +981,10 @@
           <div v-else-if="orderModal.order.status !== 'cancelled'" class="pt-1">
             <button
               @click="openDispatchModal(orderModal.order)"
-              class="w-full py-2.5 px-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
+              class="w-full py-2.5 px-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-xs transition-all active:scale-95 cursor-pointer"
             >
               <Truck class="w-4 h-4" />
-              <span>🚀 কুরিয়ারে পাঠান (Steadfast / Pathao 1-Click Dispatch)</span>
+              <span>কুরিয়ারে পাঠান</span>
             </button>
           </div>
 
