@@ -92,12 +92,6 @@
               <div class="min-w-0">
                 <div class="flex items-center gap-2">
                   <h3 class="font-bold text-slate-900 text-sm truncate">{{ st.product_title }}</h3>
-                  <span 
-                    class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shrink-0"
-                    :class="getStoreStock(st) > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'"
-                  >
-                    {{ getStoreStock(st) > 0 ? 'ইন স্টক' : 'স্টক শেষ' }}
-                  </span>
                 </div>
                 <p class="text-xs text-slate-400 font-medium truncate mt-0.5">
                   ৳{{ st.price }} · <span class="font-mono text-slate-600">/s/{{ st.slug }}</span>
@@ -171,7 +165,7 @@
               >
                 <option value="all">সকল দোকান</option>
                 <option v-for="st in userStores" :key="st.id" :value="st.slug">
-                  {{ st.product_title }} (/s/{{ st.slug }})
+                  {{ st.product_title }}
                 </option>
               </select>
             </div>
@@ -441,11 +435,19 @@
             <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">গ্রাহক তথ্য</div>
             <div class="font-bold text-slate-900 text-sm sm:text-base">{{ orderModal.order.customer_name }}</div>
             <div class="flex items-center gap-2 pt-0.5">
-              <a :href="`tel:${orderModal.order.customer_phone}`" class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg font-mono font-bold">
+              <a :href="`tel:${orderModal.order.customer_phone}`" class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg font-mono font-bold hover:bg-emerald-100 transition-colors">
                 <PhoneCall class="w-3.5 h-3.5" />
                 <span>{{ orderModal.order.customer_phone }}</span>
               </a>
-              <span class="text-slate-400 text-xs">(কল দিতে ট্যাপ করুন)</span>
+              <button 
+                type="button"
+                @click="copyPhoneNumber(orderModal.order.customer_phone)"
+                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-100 active:scale-95 transition-all shadow-2xs cursor-pointer"
+                title="নম্বর কপি করুন"
+              >
+                <Copy class="w-3.5 h-3.5 text-slate-500" />
+                <span>কপি</span>
+              </button>
             </div>
           </div>
 
@@ -747,6 +749,12 @@ const copyStoreLink = (slug) => {
   const url = `${window.location.origin}/s/${slug}`
   navigator.clipboard.writeText(url)
   toast.success(`স্টোর লিংক কপি হয়েছে:\n${url}`)
+}
+
+const copyPhoneNumber = (phone) => {
+  if (!phone) return
+  navigator.clipboard.writeText(phone)
+  toast.success(`ফোন নম্বর কপি হয়েছে: ${phone}`)
 }
 
 const changeStatus = async (orderId, newStatus) => {

@@ -69,21 +69,18 @@ Theme: ${theme_color || 'emerald'}
 
 Respond ONLY with a strictly valid JSON matching this schema:
 {
-  "headline": "Emotional, curiosity-driven Bengali headline solving customer problem",
-  "subheadline": "2-sentence transformation explanation highlighting benefits and why order now",
-  "urgency_text": "🔥 অফারটি সীমিত সময়ের জন্য! ক্যাশ অন ডেলিভারিতে অর্ডার করুন!",
-  "video_reel_url": "${video_reel_url || ''}",
-  "trust_badges": [
-    "ক্যাশ অন ডেলিভারি (পণ্য চেক করে মূল্য পরিশোধ)",
-    "৭ দিনের সহজ রিপ্লেসমেন্ট পলিসি",
-    "১০০% অরিজিনাল ও প্রিমিয়াম কোয়ালিটি"
-  ],
-  "features": [
-    { "title": "Feature 1 Bengali title", "desc": "Detailed emotional benefit description" },
-    { "title": "Feature 2 Bengali title", "desc": "Detailed emotional benefit description" },
-    { "title": "Feature 3 Bengali title", "desc": "Detailed emotional benefit description" },
-    { "title": "Feature 4 Bengali title", "desc": "Detailed emotional benefit description" }
-  ],
+        "headline": "Emotional, curiosity-driven Bengali headline solving customer problem",
+        "subheadline": "2-sentence transformation explanation highlighting benefits and why order now",
+        "badge_text": "A punchy, relevant 2-4 word Bengali highlight tag directly relevant to this product (e.g. for organic items: origin/purity highlight, for tech: feature highlight)",
+        "seller_tagline": "A relevant, authentic short Bengali line directly specific to this product without any generic words (e.g. for honey: pure wild honey assurance, for watch: original imported guarantee)",
+        "urgency_text": "🔥 অফারটি সীমিত সময়ের জন্য! ক্যাশ অন ডেলিভারিতে অর্ডার করুন!",
+        "video_reel_url": "${video_reel_url || ''}",
+        "features": [
+          { "title": "Feature 1 Bengali title", "desc": "Detailed emotional benefit description" },
+          { "title": "Feature 2 Bengali title", "desc": "Detailed emotional benefit description" },
+          { "title": "Feature 3 Bengali title", "desc": "Detailed emotional benefit description" },
+          { "title": "Feature 4 Bengali title", "desc": "Detailed emotional benefit description" }
+        ],
   "faqs": [
     { "q": "ডেলিভারি ম্যানের সামনে কি খুলে দেখা যাবে?", "a": "হ্যাঁ, সম্পূর্ণ নিশ্চিত হয়ে চেক করে মূল্য পরিশোধ করবেন।" },
     { "q": "ডেলিভারি চার্জ কত এবং কতদিনে পাব?", "a": "ঢাকার ভেতরে ${insideFee} টাকা (২৪-৪৮ ঘণ্টা) এবং ঢাকার বাইরে ${outsideFee} টাকা (২-৩ দিন)।" },
@@ -113,13 +110,10 @@ Respond ONLY with a strictly valid JSON matching this schema:
     generatedConfig = {
       headline: `প্রিমিয়াম কোয়ালিটির ${product_title} - আপনার প্রতিদিনের বিশ্বস্ত সঙ্গী`,
       subheadline: `সেরা কোয়ালিটি, আকর্ষণীয় ফিনিশিং এবং দীর্ঘস্থায়ী পারফরম্যান্সের নিশ্চয়তা। এখনই অর্ডার করুন ক্যাশ অন ডেলিভারি ডিসকাউন্টে!`,
+      badge_text: `অরিজিনাল কোয়ালিটি নিশ্চয়তা`,
+      seller_tagline: `১০০% খাঁটি ও গুণগত মান সম্পন্ন`,
       urgency_text: `🔥 অফারটি সীমিত সময়ের জন্য! ক্যাশ অন ডেলিভারিতে অর্ডার করুন!`,
       video_reel_url: video_reel_url || '',
-      trust_badges: [
-        'ক্যাশ অন ডেলিভারি (পণ্য দেখে মূল্য পরিশোধ)',
-        '৭ দিনের ফ্রি রিপ্লেসমেন্ট সুবিধা',
-        '১০০% অরিজিনাল ও অথেন্টিক প্রোডাক্ট'
-      ],
       features: [
         {
           title: 'সেরা বিল্ড কোয়ালিটি ও ফিনিশিং',

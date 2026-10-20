@@ -53,12 +53,12 @@ Current Store Data:
 - Show FAQs: ${currentStore.config?.show_faqs ?? true}
 - Delivery Fee Inside Dhaka: ${currentStore.config?.delivery_fee_inside ?? 70}
 - Delivery Fee Outside Dhaka: ${currentStore.config?.delivery_fee_outside ?? 130}
-- Badge Text: "${currentStore.config?.badge_text ?? 'প্রিমিয়াম কোয়ালিটি গ্যারান্টিড'}"
+- Badge Text: "${currentStore.config?.badge_text ?? 'অরিজিনাল কোয়ালিটি নিশ্চয়তা'}"
+- Seller Tagline: "${currentStore.config?.seller_tagline ?? '১০০% খাঁটি ও গুণগত মান সম্পন্ন'}"
 - CTA Button Text: "${currentStore.config?.cta_button_text ?? 'এখনই অর্ডার করুন (ক্যাশ অন ডেলিভারি)'}"
 - Headline: "${currentStore.config?.headline ?? ''}"
 - Subheadline: "${currentStore.config?.subheadline ?? ''}"
 - Features: ${JSON.stringify(currentStore.config?.features ?? [])}
-- Trust Badges: ${JSON.stringify(currentStore.config?.trust_badges ?? [])}
 - FAQs: ${JSON.stringify(currentStore.config?.faqs ?? [])}
 - Testimonials: ${JSON.stringify(currentStore.config?.testimonials ?? [])}
 
@@ -83,7 +83,8 @@ RETURN STRICT JSON ONLY:
   "price": number,
   "regular_price": number,
   "stock": number,
-  "badge_text": "string (e.g. প্রিমিয়াম কোয়ালিটি গ্যারান্টিড or custom)",
+  "badge_text": "string (custom badge tag)",
+  "seller_tagline": "string (custom seller short highlight in black)",
   "cta_button_text": "string (e.g. এখনই অর্ডার করুন (ক্যাশ অন ডেলিভারি) or custom)",
   "show_urgency_bar": boolean,
   "show_verified_badge": boolean,
@@ -121,6 +122,7 @@ RETURN STRICT JSON ONLY:
         delivery_fee_inside: parsed.delivery_fee_inside ?? currentStore.config?.delivery_fee_inside,
         delivery_fee_outside: parsed.delivery_fee_outside ?? currentStore.config?.delivery_fee_outside,
         badge_text: parsed.badge_text !== undefined ? parsed.badge_text : currentStore.config?.badge_text,
+        seller_tagline: parsed.seller_tagline !== undefined ? parsed.seller_tagline : currentStore.config?.seller_tagline,
         cta_button_text: parsed.cta_button_text !== undefined ? parsed.cta_button_text : currentStore.config?.cta_button_text,
         video_reel_url: parsed.video_reel_url !== undefined ? parsed.video_reel_url : currentStore.config?.video_reel_url,
         features: parsed.features || currentStore.config?.features,
