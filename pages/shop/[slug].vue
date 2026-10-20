@@ -345,7 +345,7 @@
     <Transition name="slide-right">
       <aside 
         v-if="isEditingStore" 
-        class="fixed top-0 right-0 bottom-0 w-full sm:w-[420px] md:w-[460px] bg-white z-50 shadow-2xl flex flex-col border-l border-slate-200"
+        class="fixed inset-y-0 right-0 w-full sm:w-[420px] md:w-[460px] h-screen h-[100dvh] max-h-screen bg-white z-50 shadow-2xl flex flex-col border-l border-slate-200 overflow-hidden"
       >
         <!-- Editor Drawer Header -->
         <div class="p-3.5 sm:p-4 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white shrink-0">
@@ -363,8 +363,8 @@
           </button>
         </div>
 
-        <!-- Chat / Instruction History Area -->
-        <div ref="editorScroll" class="flex-1 p-3 sm:p-4 overflow-y-auto space-y-3 bg-slate-50/50 text-xs">
+        <!-- Chat / Instruction History Area (Scrollable container strictly pinned) -->
+        <div ref="editorScroll" class="flex-1 min-h-0 p-3 sm:p-4 overflow-y-auto space-y-3 bg-slate-50/50 text-xs overscroll-contain">
           <div class="p-3 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl leading-relaxed shadow-xs">
             👋 <strong>আমি DokanAI এডিটর!</strong><br />
             দোকানের যেকোনো সেকশন বাদ দিতে বা পরিবর্তন করতে বলুন। যেমন:
@@ -407,8 +407,8 @@
           </div>
         </div>
 
-        <!-- Editor Prompt Input Bar -->
-        <div class="p-3 border-t border-slate-100 bg-white shrink-0">
+        <!-- Editor Prompt Input Bar (Sticky at bottom, never pushed down) -->
+        <div class="p-3 border-t border-slate-100 bg-white shrink-0 sticky bottom-0 z-10 shadow-lg">
           <form @submit.prevent="submitAiEdit" class="flex items-center gap-2">
             <input 
               v-model="aiInstruction" 
