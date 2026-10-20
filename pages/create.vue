@@ -7,18 +7,18 @@
       <div class="mb-4 text-center">
         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
           <Sparkles class="w-3.5 h-3.5 text-emerald-600" />
-          <span>Autonomous AI Store Agent</span>
+          <span>Multimodal AI Store Agent</span>
         </div>
         <h1 class="text-2xl sm:text-3xl font-black text-slate-900">
           AI সহকারীর সাথে কথা বলে দোকান তৈরি করুন
         </h1>
         <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-md mx-auto">
-          কোনো জটিল ফর্ম ফিলআপ ছাড়াই AI আপনাকে প্রশ্ন করবে। প্রোডাক্টের ছবি আপলোড করুন এবং উত্তর দিয়ে তৈরি করুন সম্পূর্ণ লাইভ স্টোর।
+          ChatGPT/Gemini-এর মতো ছবি আপলোড করুন ও চ্যাট করুন। সব প্রশ্নের উত্তর দিয়ে তৈরি করুন সম্পূর্ণ লাইভ স্টোর।
         </p>
       </div>
 
       <!-- Pure Chat Container -->
-      <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden flex flex-col flex-1 h-[620px]">
+      <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden flex flex-col flex-1 h-[640px]">
         
         <!-- Chat Header Bar -->
         <div class="p-4 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
@@ -29,7 +29,7 @@
             <div>
               <h3 class="text-sm font-bold text-slate-900">DokanAI অনবোর্ডিং স্পেশালিস্ট</h3>
               <span class="inline-flex items-center gap-1.5 text-[11px] text-emerald-600 font-semibold">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> অনলাইন (Follow-up Mode)
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> অনলাইন (Conversational Mode)
               </span>
             </div>
           </div>
@@ -43,27 +43,35 @@
         <div ref="chatScrollContainer" class="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4">
           
           <div v-for="(msg, idx) in messages" :key="idx" class="flex flex-col" :class="msg.role === 'user' ? 'items-end' : 'items-start'">
+            
             <div 
               class="max-w-[88%] sm:max-w-[78%] rounded-3xl px-4 sm:px-5 py-3 sm:py-3.5 text-xs sm:text-sm leading-relaxed"
               :class="msg.role === 'user' 
                 ? 'bg-emerald-600 text-white rounded-br-none shadow-md shadow-emerald-600/10' 
                 : 'bg-slate-100 text-slate-800 rounded-bl-none border border-slate-200/50'"
             >
+              <!-- Render user-attached images directly inside user message bubble (like ChatGPT/Gemini) -->
+              <div v-if="msg.images && msg.images.length > 0" class="flex flex-wrap gap-2 mb-2.5">
+                <div v-for="(img, imgIdx) in msg.images" :key="imgIdx" class="w-20 h-20 rounded-xl overflow-hidden border border-white/20 shadow-sm">
+                  <img :src="img" class="w-full h-full object-cover" />
+                </div>
+              </div>
+
               <p class="whitespace-pre-line">{{ msg.content }}</p>
 
-              <!-- IN-CHAT DYNAMIC ACTION CARD (Only shows when all follow-ups are answered) -->
+              <!-- IN-CHAT DYNAMIC ACTION CARD (Appears in chat when all follow-ups are answered) -->
               <div v-if="msg.readyToGenerate" class="mt-4 pt-3 border-t border-slate-200/60 animate-in fade-in zoom-in-95 duration-200">
                 <div class="p-3.5 bg-white rounded-2xl border border-emerald-200 shadow-sm space-y-2.5 text-slate-800">
                   <div class="flex items-center gap-2 text-emerald-700 font-bold text-xs">
                     <CheckCircle2 class="w-4 h-4 text-emerald-600" />
-                    <span>সব প্রয়োজনীয় প্রশ্ন ও তথ্য সংগ্রহ সম্পন্ন হয়েছে!</span>
+                    <span>সব প্রয়োজনীয় তথ্য সংগ্রহ সম্পন্ন হয়েছে!</span>
                   </div>
                   
                   <div class="text-[11px] text-slate-600 font-medium space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                     <div>📦 প্রোডাক্ট: <strong>{{ extractedData.product_title || 'এক্সক্লুসিভ কালেকশন' }}</strong></div>
                     <div>💰 অফার মূল্য: <strong class="text-emerald-600">৳{{ extractedData.price || 1200 }}</strong> (আগে ছিল: <span class="line-through">৳{{ extractedData.regular_price || 1800 }}</span>)</div>
                     <div>🚚 ডেলিভারি চার্জ: <strong>ঢাকার ভেতরে ৳{{ extractedData.delivery_fee_inside }} | বাইরে ৳{{ extractedData.delivery_fee_outside }}</strong></div>
-                    <div>🖼️ প্রোডাক্ট ইমেজ: <strong>{{ uploadedImages.length }} টি ছবি সিলেক্ট করা হয়েছে</strong></div>
+                    <div>🖼️ প্রোডাক্ট ফটো: <strong>{{ allUploadedImages.length }} টি ছবি সংযুক্ত আছে</strong></div>
                   </div>
 
                   <button 
@@ -73,7 +81,7 @@
                   >
                     <Loader2 v-if="isGeneratingStore" class="w-4 h-4 animate-spin" />
                     <Sparkles v-else class="w-4 h-4" />
-                    <span>{{ isGeneratingStore ? 'দোকান তৈরি হচ্ছে (কয়েক সেকেন্ড সময় লাগবে)...' : 'দোকানটি তৈরি করুন (Click to Launch Store)' }}</span>
+                    <span>{{ isGeneratingStore ? 'দোকান তৈরি হচ্ছে...' : 'দোকানটি তৈরি করুন (Click to Launch Store)' }}</span>
                   </button>
                 </div>
               </div>
@@ -92,45 +100,58 @@
           </div>
         </div>
 
-        <!-- Attached Images Preview Strip Above Input -->
-        <div v-if="uploadedImages.length > 0" class="px-4 py-2 bg-slate-50/80 border-t border-slate-100 flex items-center gap-2 overflow-x-auto">
-          <span class="text-[11px] font-bold text-slate-500 whitespace-nowrap">যুক্ত ছবি:</span>
-          <div v-for="(img, iIdx) in uploadedImages" :key="iIdx" class="relative group w-10 h-10 rounded-lg overflow-hidden border border-slate-300 shrink-0">
-            <img :src="img" class="w-full h-full object-cover" />
-            <button @click="removeImage(iIdx)" class="absolute top-0.5 right-0.5 bg-red-600 text-white rounded-full p-0.5 opacity-90 hover:opacity-100">
-              <X class="w-2.5 h-2.5" />
-            </button>
-          </div>
-        </div>
-
-        <!-- Conversational Input Bar with Direct Image Upload Icon -->
+        <!-- Chat Input Area (ChatGPT / Gemini Style: Pill Box with Embedded Attachment) -->
         <div class="p-3 sm:p-4 border-t border-slate-100 bg-white">
-          <form @submit.prevent="sendMessage" class="flex items-center gap-2">
+          <form @submit.prevent="sendMessage" class="bg-slate-50 border border-slate-200 rounded-3xl p-2 sm:p-2.5 focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-all">
             
-            <!-- Direct Image Upload Button in Chat -->
-            <label class="cursor-pointer p-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl transition-colors flex items-center justify-center shrink-0" title="প্রোডাক্টের ছবি আপলোড করুন">
-              <ImagePlus class="w-5 h-5 text-emerald-600" />
-              <input type="file" accept="image/*" multiple @change="handleFileUpload" class="hidden" />
-            </label>
+            <!-- Pre-send attached image thumbnails (Inside the input card, just like ChatGPT/Gemini) -->
+            <div v-if="pendingImages.length > 0" class="flex items-center gap-2 px-2 pt-1 pb-2 overflow-x-auto">
+              <div v-for="(img, pIdx) in pendingImages" :key="pIdx" class="relative group w-14 h-14 rounded-xl overflow-hidden border border-slate-300 shrink-0">
+                <img :src="img" class="w-full h-full object-cover" />
+                <button 
+                  type="button"
+                  @click="removePendingImage(pIdx)" 
+                  class="absolute top-1 right-1 bg-slate-900/80 hover:bg-red-600 text-white rounded-full p-0.5 transition-colors"
+                >
+                  <X class="w-3 h-3" />
+                </button>
+              </div>
+            </div>
 
-            <!-- Text Input -->
-            <input 
-              v-model="inputMessage" 
-              type="text" 
-              placeholder="আপনার প্রোডাক্টের নাম বা বিবরণ লিখে শুরু করুন..." 
-              class="flex-1 px-4 py-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-400"
-              :disabled="isAiTyping || isGeneratingStore"
-            />
+            <!-- Input row: Clip button + Textarea + Send button -->
+            <div class="flex items-end gap-2">
+              <!-- Paperclip / Image Attachment Button -->
+              <label 
+                class="cursor-pointer p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-slate-200/60 rounded-full transition-colors flex items-center justify-center shrink-0 mb-0.5" 
+                title="ছবি আপলোড করুন (Attach photo)"
+              >
+                <Paperclip class="w-5 h-5" />
+                <input type="file" accept="image/*" multiple @change="handleFileUpload" class="hidden" />
+              </label>
 
-            <!-- Send Button -->
-            <button 
-              type="submit" 
-              :disabled="!inputMessage.trim() || isAiTyping || isGeneratingStore"
-              class="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-2xl font-bold transition-all flex items-center justify-center shadow-md shadow-emerald-600/20 active:scale-95 shrink-0"
-            >
-              <Send class="w-4 h-4" />
-            </button>
+              <!-- Growing Textarea -->
+              <textarea 
+                v-model="inputMessage" 
+                @keydown.enter.exact.prevent="sendMessage"
+                rows="1"
+                placeholder="প্রোডাক্টের বিবরণ লিখুন বা ছবি যুক্ত করুন..." 
+                class="flex-1 max-h-32 min-h-[38px] py-2 px-1 text-xs sm:text-sm bg-transparent border-0 focus:outline-none resize-none placeholder:text-slate-400 text-slate-800 font-medium"
+                :disabled="isAiTyping || isGeneratingStore"
+              ></textarea>
+
+              <!-- Send Button -->
+              <button 
+                type="submit" 
+                :disabled="(!inputMessage.trim() && pendingImages.length === 0) || isAiTyping || isGeneratingStore"
+                class="p-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white rounded-full font-bold transition-all flex items-center justify-center shadow-sm active:scale-95 shrink-0 mb-0.5"
+              >
+                <Send class="w-4 h-4" />
+              </button>
+            </div>
           </form>
+          <div class="text-[11px] text-slate-400 text-center mt-2 font-medium">
+            Shift + Enter দিয়ে নতুন লাইন লিখুন। ছবি যুক্ত করতে ক্লিপ বাটনে চাপ দিন।
+          </div>
         </div>
 
       </div>
@@ -140,7 +161,7 @@
 
 <script setup>
 import { ref, reactive, nextTick, onMounted } from 'vue'
-import { Sparkles, Bot, Send, Loader2, CheckCircle2, ImagePlus, X } from 'lucide-vue-next'
+import { Sparkles, Bot, Send, Loader2, CheckCircle2, Paperclip, X } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 
 const router = useRouter()
@@ -151,12 +172,15 @@ const isAiTyping = ref(false)
 const isGeneratingStore = ref(false)
 const inputMessage = ref('')
 
-const uploadedImages = ref([])
+// Pre-send images attached to current prompt
+const pendingImages = ref([])
+// All images collected throughout the chat
+const allUploadedImages = ref([])
 
 const messages = ref([
   {
     role: 'model',
-    content: `আসসালামু আলাইকুম! আমি আপনার DokanAI সহকারী।\nআপনার সিঙ্গেল প্রোডাক্টটি কি এবং কত টাকায় অফারে বিক্রি করতে চান? লিখে জানান, আমি কথা বলে বিস্তারিত জেনে সম্পূর্ণ ক্যাশ অন ডেলিভারি স্টোর তৈরি করে দেব!`
+    content: `আসসালামু আলাইকুম! আমি আপনার DokanAI সহকারী।\nআপনার সিঙ্গেল প্রোডাক্টটি কি এবং কত টাকায় অফারে বিক্রি করতে চান? প্রোডাক্টের ছবি যুক্ত করতে পারেন বা লিখে জানাতে পারেন!`
   }
 ])
 
@@ -184,23 +208,37 @@ const handleFileUpload = (e) => {
     const reader = new FileReader()
     reader.onload = (uploadEvent) => {
       if (uploadEvent.target?.result) {
-        uploadedImages.value.push(uploadEvent.target.result)
+        pendingImages.value.push(uploadEvent.target.result)
       }
     }
     reader.readAsDataURL(files[i])
   }
 }
 
-const removeImage = (index) => {
-  uploadedImages.value.splice(index, 1)
+const removePendingImage = (index) => {
+  pendingImages.value.splice(index, 1)
 }
 
 const sendMessage = async () => {
   const text = inputMessage.value.trim()
-  if (!text) return
+  const attached = [...pendingImages.value]
 
-  messages.value.push({ role: 'user', content: text })
+  if (!text && attached.length === 0) return
+
+  // Push user message with any attached images (like ChatGPT/Gemini)
+  messages.value.push({ 
+    role: 'user', 
+    content: text || 'প্রোডাক্টের ছবি যুক্ত করেছি',
+    images: attached
+  })
+
+  // Add to global store image repository
+  if (attached.length > 0) {
+    allUploadedImages.value.push(...attached)
+  }
+
   inputMessage.value = ''
+  pendingImages.value = []
   scrollToBottom()
 
   isAiTyping.value = true
@@ -210,7 +248,7 @@ const sendMessage = async () => {
       method: 'POST',
       body: {
         messages: messages.value,
-        userMessage: text
+        userMessage: text || 'আমি প্রোডাক্টের ছবি আপলোড করেছি'
       }
     })
 
@@ -244,7 +282,7 @@ const sendMessage = async () => {
     console.error('Onboarding error:', err)
     messages.value.push({
       role: 'model',
-      content: 'আমি আপনার তথ্য পেয়েছি। আপনি চাইলে নিচের বাটনে চাপ দিয়ে এখনই দোকান তৈরি করতে পারেন!',
+      content: 'আমি আপনার তথ্য বুঝতে পেরেছি। স্টোর তৈরি করতে চাইলে নিচের বাটনে চাপ দিন!',
       readyToGenerate: true
     })
   } finally {
@@ -266,7 +304,7 @@ const generateFullStore = async () => {
         regular_price: extractedData.regular_price || 1400,
         delivery_fee_inside: extractedData.delivery_fee_inside || 70,
         delivery_fee_outside: extractedData.delivery_fee_outside || 130,
-        images: uploadedImages.value.length > 0 ? uploadedImages.value : ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80'],
+        images: allUploadedImages.value.length > 0 ? allUploadedImages.value : ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80'],
         theme_color: extractedData.theme_color || 'emerald',
         description: messages.value.map(m => m.content).join(' ')
       }
@@ -287,13 +325,14 @@ const resetChat = () => {
   messages.value = [
     {
       role: 'model',
-      content: `আসসালামু আলাইকুম! আমি আপনার DokanAI সহকারী। আপনার প্রোডাক্টের বিবরণ দিন!`
+      content: `আসসালামু আলাইকুম! আমি আপনার DokanAI সহকারী। আপনার প্রোডাক্টের বিবরণ দিন বা ছবি যুক্ত করুন!`
     }
   ]
   extractedData.product_title = ''
   extractedData.price = null
   extractedData.regular_price = null
-  uploadedImages.value = []
+  pendingImages.value = []
+  allUploadedImages.value = []
 }
 
 onMounted(() => {
