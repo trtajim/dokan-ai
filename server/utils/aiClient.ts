@@ -89,10 +89,11 @@ async function callGroqContent(apiKey: string, options: AiTextOptions): Promise<
   messages.push({ role: 'user', content: options.prompt })
 
   const model = process.env.GROQ_MODEL || 'qwen/qwen3.8-27b'
+  const isQwen = model.includes('qwen')
   const completion = await groq.chat.completions.create({
     model,
     messages,
-    response_format: options.jsonMode ? { type: 'json_object' } : undefined,
+    response_format: (options.jsonMode && !isQwen) ? { type: 'json_object' } : undefined,
     temperature: 0.6,
     max_tokens: 1500
   })
@@ -114,10 +115,15 @@ async function callGroqChat(apiKey: string, options: AiChatOptions): Promise<str
   })
 
   const model = process.env.GROQ_MODEL || 'qwen/qwen3.8-27b'
+  
+  // Notice: For Qwen on Groq, strict response_format: json_object can reject valid non-Latin JSON generations
+  // with a 400 json_validate_failed. We use json_object for other models, but for Qwen we let it generate
+  // and clean/parse the JSON cleanly.
+  const isQwen = model.includes('qwen')
   const completion = await groq.chat.completions.create({
     model,
     messages,
-    response_format: options.jsonMode ? { type: 'json_object' } : undefined,
+    response_format: (options.jsonMode && !isQwen) ? { type: 'json_object' } : undefined,
     temperature: 0.6,
     max_tokens: 1500
   })
