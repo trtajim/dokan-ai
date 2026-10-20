@@ -27,8 +27,8 @@
           </p>
         </div>
 
-        <!-- 4 Core Merchant Superpowers (Clearly show benefits BEFORE action) -->
-        <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto text-left">
+        <!-- Core Merchant Superpowers (5 Distinct Cards) -->
+        <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto text-left">
           
           <!-- Benefit 1: Telegram Alerts -->
           <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-emerald-300 transition-all flex items-start gap-3.5">
@@ -63,14 +63,25 @@
             </div>
           </div>
 
-          <!-- Benefit 4: Stock & AI Sales Bot -->
+          <!-- Benefit 4: Real-time Stock Management -->
           <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-emerald-300 transition-all flex items-start gap-3.5">
-            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-              <Sparkles class="w-5 h-5" />
+            <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+              <Boxes class="w-5 h-5" />
             </div>
             <div>
-              <h3 class="font-bold text-slate-900 text-sm">লাইভ স্টক ও AI সেলস বট</h3>
-              <p class="text-xs text-slate-500 mt-0.5 leading-snug">স্টক আর্জেন্সি বার ও ২৪/৭ বাংলা এআই চ্যাটবট কাস্টমারের ডাউট সমাধান করে অর্ডার কনফার্ম করায়।</p>
+              <h3 class="font-bold text-slate-900 text-sm">লাইভ স্টক ম্যানেজমেন্ট</h3>
+              <p class="text-xs text-slate-500 mt-0.5 leading-snug">প্রতি অর্ডারে ইনভেন্টরি অটো-ডিডাক্ট, আউট-অব-স্টক গার্ড ও পেজে লাইভ কাউন্টার আর্জেন্সি।</p>
+            </div>
+          </div>
+
+          <!-- Benefit 5: 24/7 AI Sales Agent -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-emerald-300 transition-all flex items-start gap-3.5 sm:col-span-2 lg:col-span-2">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <Bot class="w-5 h-5" />
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">২৪/৭ AI সেলস এজেন্ট</h3>
+              <p class="text-xs text-slate-500 mt-0.5 leading-snug">পণ্য সম্পর্কে কাস্টমারের যে কোনো দ্বিধা ও প্রশ্নের খাঁটি বাংলায় উত্তর দিয়ে সরাসরি অর্ডার কনফার্ম করে।</p>
             </div>
           </div>
 
@@ -189,5 +200,5 @@
 </template>
 
 <script setup>
-import { Rocket, ArrowRight, ExternalLink, Zap, Send, Truck, Target, Sparkles, CheckCircle2 } from 'lucide-vue-next'
+import { Rocket, ArrowRight, ExternalLink, Zap, Send, Truck, Target, Sparkles, Boxes, Bot, CheckCircle2 } from 'lucide-vue-next'
 </script>
