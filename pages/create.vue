@@ -366,12 +366,20 @@ const sendMessage = async () => {
   isAiTyping.value = true
   startLoadingMessages()
 
+  // Format outbound userMessage so LLM explicitly knows if pictures are attached
+  let outboundUserMessage = text
+  if (attached.length > 0) {
+    outboundUserMessage = text 
+      ? `${text} [প্রোডাক্টের ${attached.length}টি ছবি সংযুক্ত করেছি]`
+      : `প্রোডাক্টের ${attached.length}টি ছবি সংযুক্ত করেছি`
+  }
+
   try {
     const res = await $fetch('/api/ai/onboard', {
       method: 'POST',
       body: {
         messages: messages.value,
-        userMessage: text || 'আমি ছবি দিয়েছি',
+        userMessage: outboundUserMessage || 'তথ্য দিয়েছি',
         currentState: { ...extractedData },
         uploadedImagesCount: allUploadedImages.value.length
       }

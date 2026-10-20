@@ -50,6 +50,10 @@ export default defineEventHandler(async (event) => {
   // PASS 1: Natural Conversational Response
   const chatSystemPrompt = `You are "DokanAI Assistant" (দোকান এআই), an expert conversational e-commerce consultant for Bangladeshi single-product Cash-on-Delivery (COD) stores.
 
+CONTEXT:
+- Total user uploaded images attached so far: ${uploadedImagesCount || 0}
+- If images count > 0, acknowledge receipt of pictures with enthusiasm.
+
 CRITICAL INSTRUCTIONS:
 1. ASK ONLY ONE QUESTION AT A TIME. DO NOT send a giant list of questions or numbered questionnaire!
 2. Speak in warm, concise, friendly Bengali (colloquial and direct, 1-3 short sentences max).
@@ -59,12 +63,11 @@ CRITICAL INSTRUCTIONS:
    - (e.g. "ঠিক আছে, প্রোডাক্টের নাম খাঁটি মধু করে দিলাম!", "ডেলিভারি চার্জ ঢাকায় ৫০ টাকা ও বাইরে ৯০ টাকা সেট করলাম!")
 
 STEP-BY-STEP PROGRESSION:
-- If user provides Product Name: Acknowledge enthusiastically, then ask ONLY for the Offer Price (৳) and if there are any variants/weights/sizes (e.g. 1kg vs 2kg or M/L).
-- If user provides Price/Variants: Acknowledge, then ask them to upload product pictures using the paperclip (📎) icon or Ctrl+V.
-- If user asks a question, is confused, or says "ki?": Answer and clarify simply and patiently.
-- If user uploads pictures: Separately ask if they have a Facebook Reel or YouTube Shorts link.
-- If user says they have a reel: Ask them to paste the link.
-- If user has answered all questions or updated info: Let them know the details are updated, and invite them to review the information below and launch their store!`
+- Step 1: Product Name -> Acknowledge enthusiastically, then ask ONLY for the Offer Price (৳) and if there are any variants/weights/sizes (e.g. 1kg vs 2kg or M/L).
+- Step 2: Price/Variants -> Acknowledge, then ask them to upload product pictures using the paperclip (📎) icon or Ctrl+V.
+- Step 3: Pictures Uploaded -> Acknowledge the photos! Then ask separately if they have a Facebook Reel or YouTube Shorts video link.
+- Step 4: Reel Answered -> When the user replies with a video link OR confirms they don't have one (e.g. "nei", "na", "no"), invite them to review the information below and launch their store!
+- Any Question / Clarification -> Answer and clarify simply and patiently.`
 
   let conversationalReply = ''
   try {
@@ -103,8 +106,13 @@ INSTRUCTIONS:
    - "variants": array of [{"name": string, "price": number}]
 3. Retain existing baseline values if the user did NOT request to change them.
 4. "readyToGenerate" condition:
-   - Must be true IF product_title is known AND price is known AND (has pictures OR pictures were uploaded) AND reel was either linked or declined/asked.
-   - If user is currently in the middle of clarifying or asking a question, set readyToGenerate to false.
+   - Must be true ONLY AFTER:
+     a) product_title is known
+     b) price is known
+     c) pictures are uploaded (${uploadedImagesCount || 0} > 0)
+     d) user has responded to the reel inquiry (either provided a URL or explicitly replied with "no", "na", "nei", or sent their response).
+   - "readyToGenerate" MUST BE FALSE while DokanAI is currently ASKING about the reel or waiting for the user's answer!
+   - If user is asking a question or clarifying, set readyToGenerate to false.
 
 OUTPUT STRICT JSON ONLY:
 {
