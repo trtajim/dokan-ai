@@ -54,12 +54,22 @@
           </div>
         </div>
 
-        <!-- Action Items (AI edit visible only to owner) -->
-        <div class="flex items-center gap-2 shrink-0">
+        <!-- Action Items (Dashboard & AI edit visible only to owner) -->
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <NuxtLink 
+            v-if="isStoreOwner"
+            to="/dashboard"
+            class="px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 flex items-center gap-1.5 transition-all active:scale-95 border border-slate-200/80"
+            title="মার্চেন্ট ড্যাশবোর্ডে যান"
+          >
+            <LayoutDashboard class="w-3.5 h-3.5 text-emerald-600" />
+            <span class="hidden xs:inline">ড্যাশবোর্ড</span>
+          </NuxtLink>
+
           <button 
             v-if="isStoreOwner"
             @click="isEditingStore = true"
-            class="px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-black bg-slate-900 text-white hover:bg-slate-800 flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
+            class="px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-black bg-slate-900 text-white hover:bg-slate-800 flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer"
           >
             <Sparkles class="w-3.5 h-3.5 text-emerald-400" />
             <span>AI এডিট</span>
@@ -426,7 +436,7 @@
 
 <script setup>
 import { ref, computed, nextTick, onMounted } from 'vue'
-import { Flame, ShoppingBag, ArrowDown, Check, Sparkles, Star, HelpCircle, X, Video, ShieldCheck, CheckCircle2, Loader2, Send } from 'lucide-vue-next'
+import { Flame, ShoppingBag, ArrowDown, Check, Sparkles, Star, HelpCircle, X, Video, ShieldCheck, CheckCircle2, Loader2, Send, LayoutDashboard } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 
 const { currentUser, initAuth } = useAuth()
