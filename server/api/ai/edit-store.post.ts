@@ -36,10 +36,10 @@ export default defineEventHandler(async (event) => {
     try {
       const ai = new GoogleGenAI({ apiKey })
 
-      const prompt = `You are "DokanAI Master Store Editor".
-The merchant is giving you natural language commands to customize or remove/hide sections on their live single-product store page.
+      const prompt = `You are "DokanAI Master Store Editor & Consultant".
+The merchant is asking for modifications, design feedback, or questions about their live store.
 
-Merchant's Instruction: "${instruction}"
+Merchant's Message: "${instruction}"
 
 Current Store Data:
 - Product Title: "${currentStore.product_title}"
@@ -60,15 +60,19 @@ Current Store Data:
 - FAQs: ${JSON.stringify(currentStore.config?.faqs ?? [])}
 - Testimonials: ${JSON.stringify(currentStore.config?.testimonials ?? [])}
 
-RULES FOR SECTION VISIBILITY:
-- If the merchant asks to remove/hide the top urgency bar ("অফার বারটা সরাও" / "স্টক নোটিশ সরাও"), set "show_urgency_bar": false.
-- If they ask to remove/hide the verified seller badge ("১০০% ভেরিফাইড বিক্রেতা লেখাটি বাদ দাও"), set "show_verified_badge": false.
-- If they ask to remove the reviews or FAQs, set "show_testimonials": false or "show_faqs": false, or empty the arrays.
-- If they ask to bring it back ("আবার যোগ করো"), set to true.
+BEHAVIOR AND INTERMEDIARY CONFIRMATION RULES:
+1. Apply requested changes accurately.
+2. In "reply", confirm the modification clearly in friendly Bengali AND offer an intelligent follow-up suggestion or question (e.g. asking if they want to adjust stock, discount percentage, delivery fee, or review texts accordingly).
+3. Provide 2 to 3 quick clickable follow-up suggestion chips in Bengali in "suggestions" array (e.g. ["ডেলিভারি চার্জ পরিবর্তন", "অফার ব্যানার বন্ধ করুন", "আরেকটি রিভিউ যোগ করুন"]).
+4. SECTION VISIBILITY:
+   - If asked to hide/remove urgency bar, set "show_urgency_bar": false.
+   - If asked to hide/remove verified badge, set "show_verified_badge": false.
+   - If asked to hide/remove testimonials/reviews or FAQs, set "show_testimonials": false or "show_faqs": false.
 
 RETURN STRICT JSON ONLY:
 {
-  "reply": "friendly 1-sentence confirmation of what was modified in Bengali",
+  "reply": "friendly explanation in Bengali with follow-up suggestion",
+  "suggestions": ["suggested chip 1", "suggested chip 2"],
   "product_title": "string",
   "price": number,
   "regular_price": number,
@@ -144,6 +148,7 @@ RETURN STRICT JSON ONLY:
       return {
         success: true,
         reply: parsed.reply || 'আপনার নির্দেশনা অনুযায়ী সেকশনটি আপডেট করা হয়েছে!',
+        suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
         store: currentStore
       }
     } catch (err: any) {

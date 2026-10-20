@@ -354,13 +354,28 @@
             </ul>
           </div>
 
-          <div v-for="(log, lIdx) in editLogs" :key="lIdx" class="space-y-1">
+          <div v-for="(log, lIdx) in editLogs" :key="lIdx" class="space-y-1.5">
             <div class="bg-slate-900 text-white p-2.5 sm:p-3 rounded-2xl rounded-br-none ml-auto max-w-[85%] text-xs">
               {{ log.prompt }}
             </div>
-            <div class="bg-white border border-slate-200 p-2.5 sm:p-3 rounded-2xl rounded-bl-none mr-auto max-w-[85%] text-xs text-slate-800 font-medium flex items-center gap-2">
-              <CheckCircle2 class="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>{{ log.response }}</span>
+            <div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-bl-none mr-auto max-w-[90%] text-xs text-slate-800 space-y-2 shadow-xs">
+              <div class="flex items-start gap-2">
+                <CheckCircle2 class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <span class="font-medium leading-relaxed">{{ log.response }}</span>
+              </div>
+              <!-- Proactive suggestions / Follow-up chips -->
+              <div v-if="log.suggestions && log.suggestions.length" class="pt-1.5 border-t border-slate-100 flex flex-wrap gap-1.5">
+                <span class="text-[10px] text-slate-400 font-bold block w-full">পরামর্শ অনুযায়ী পরবর্তী একশন:</span>
+                <button
+                  v-for="(sug, sIdx) in log.suggestions"
+                  :key="sIdx"
+                  @click="applySuggestion(sug)"
+                  type="button"
+                  class="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 rounded-lg text-[10px] font-semibold transition-colors text-left"
+                >
+                  ⚡ {{ sug }}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -513,7 +528,8 @@ const submitAiEdit = async () => {
       }
       editLogs.value.push({
         prompt: instruction,
-        response: res.reply
+        response: res.reply,
+        suggestions: res.suggestions || []
       })
       await refresh()
       await nextTick()
@@ -526,6 +542,11 @@ const submitAiEdit = async () => {
   } finally {
     isAiEditing.value = false
   }
+}
+
+const applySuggestion = (sug) => {
+  aiInstruction.value = sug
+  submitAiEdit()
 }
 
 useHead({
