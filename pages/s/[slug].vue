@@ -17,7 +17,7 @@
     </NuxtLink>
   </div>
 
-  <div v-else class="min-h-screen bg-[#fbf9f3] text-[#16251d] pb-24 sm:pb-12 font-sans-bn selection:bg-amber-500 selection:text-white">
+  <div v-else class="min-h-screen flex flex-col bg-[#fbf9f3] text-[#16251d] font-sans-bn selection:bg-amber-500 selection:text-white">
     
     <!-- TOP STRIP (Urgency / Stock Notice) -->
     <div 
@@ -40,10 +40,10 @@
       </span>
     </div>
 
-    <!-- STORE HEADER NAVIGATION BAR -->
+    <!-- STORE HEADER NAVIGATION BAR with subtle divider border -->
     <header 
       :style="{ backgroundColor: themeStyles.heroBg, color: themeStyles.heroText }"
-      class="py-3.5 px-4 sm:px-8 sticky z-30 shadow-md transition-colors duration-300" 
+      class="py-3.5 px-4 sm:px-8 sticky z-30 shadow-md border-b border-white/15 transition-colors duration-300" 
       :class="showUrgencyBar ? 'top-[36px]' : 'top-0'"
     >
       <div class="max-w-5xl mx-auto flex items-center justify-between">
@@ -229,7 +229,7 @@
     </div>
 
     <!-- MAIN BODY CONTENT SECTIONS -->
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-14 space-y-12 sm:space-y-16">
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-14 space-y-12 sm:space-y-16">
       
       <!-- PROMOTIONAL VIDEO REEL SECTION (If provided) -->
       <section v-if="showVideoReel && videoEmbedUrl" class="text-center space-y-3">
@@ -381,7 +381,7 @@
     <!-- FOOTER -->
     <footer 
       :style="{ backgroundColor: themeStyles.footerBg, color: themeStyles.footerText }"
-      class="text-center py-8 px-4 text-xs sm:text-sm mt-12 transition-colors duration-300"
+      class="text-center py-8 px-4 text-xs sm:text-sm mt-auto pb-24 sm:pb-8 transition-colors duration-300"
     >
       <div class="max-w-md mx-auto space-y-2">
         <p :style="{ color: themeStyles.heroText }" class="font-serif-bn text-base font-bold">{{ store.product_title }}</p>
