@@ -252,6 +252,12 @@ const sendMessage = async () => {
           extractedData.price = res.extractedData.price
           extractedData.regular_price = res.extractedData.regular_price || Math.round(res.extractedData.price * 1.4)
         }
+        if (res.extractedData.video_reel_url) {
+          extractedData.video_reel_url = res.extractedData.video_reel_url
+        }
+        if (res.extractedData.variants) {
+          extractedData.variants = res.extractedData.variants
+        }
         if (res.extractedData.delivery_fee_inside) {
           extractedData.delivery_fee_inside = res.extractedData.delivery_fee_inside
         }
@@ -295,6 +301,8 @@ const generateFullStore = async () => {
         regular_price: extractedData.regular_price || 1400,
         delivery_fee_inside: extractedData.delivery_fee_inside || 70,
         delivery_fee_outside: extractedData.delivery_fee_outside || 130,
+        video_reel_url: extractedData.video_reel_url || '',
+        variants: extractedData.variants || [],
         images: allUploadedImages.value.length > 0 ? allUploadedImages.value : ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80'],
         theme_color: extractedData.theme_color || 'emerald',
         description: messages.value.map(m => m.content).join(' ')

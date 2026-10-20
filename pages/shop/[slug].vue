@@ -474,13 +474,23 @@ const productImages = computed(() => {
 })
 
 const videoEmbedUrl = computed(() => {
-  const url = store.value?.config?.video_reel_url
-  if (!url) return null
-  const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/))([\w-]{11})/)
+  const url = store.value?.config?.video_reel_url || store.value?.video_reel_url
+  if (!url || typeof url !== 'string' || !url.trim()) return null
+  const cleanUrl = url.trim()
+
+  // Match YouTube Shorts, watch URL, or youtu.be
+  const ytMatch = cleanUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/))([\w-]{11})/)
   if (ytMatch && ytMatch[1]) {
     return `https://www.youtube.com/embed/${ytMatch[1]}`
   }
-  return url
+
+  // Match Facebook Reel / Video
+  if (cleanUrl.includes('facebook.com') || cleanUrl.includes('fb.watch')) {
+    return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(cleanUrl)}&show_text=0`
+  }
+
+  // Direct video URL or embeddable URL
+  return cleanUrl
 })
 
 const primaryBgClass = computed(() => {
