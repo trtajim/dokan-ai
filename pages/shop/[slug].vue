@@ -321,14 +321,26 @@
       </button>
     </div>
 
-    <!-- CONVERSATIONAL AI STORE EDITOR MODAL -->
-    <div v-if="isEditingStore" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
-      <div class="bg-white rounded-3xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
-        
-        <!-- Editor Modal Header -->
-        <div class="p-3.5 sm:p-4 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white">
+    <!-- CONVERSATIONAL AI STORE EDITOR SIDEBAR / DRAWER -->
+    <!-- Backdrop overlay -->
+    <Transition name="fade">
+      <div 
+        v-if="isEditingStore" 
+        @click="isEditingStore = false" 
+        class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 transition-opacity"
+      ></div>
+    </Transition>
+
+    <!-- Side Drawer Panel (slides in from right) -->
+    <Transition name="slide-right">
+      <aside 
+        v-if="isEditingStore" 
+        class="fixed top-0 right-0 bottom-0 w-full sm:w-[420px] md:w-[460px] bg-white z-50 shadow-2xl flex flex-col border-l border-slate-200"
+      >
+        <!-- Editor Drawer Header -->
+        <div class="p-3.5 sm:p-4 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white shrink-0">
           <div class="flex items-center gap-2">
-            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-500 text-slate-950 flex items-center justify-center font-bold">
+            <div class="w-8 h-8 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-bold shadow-xs">
               <Sparkles class="w-4 h-4" />
             </div>
             <div>
@@ -336,17 +348,17 @@
               <p class="text-[9px] sm:text-[10px] text-slate-300">যেকোনো সেকশন সরাতে, লুকোতে বা পরিবর্তন করতে বলুন</p>
             </div>
           </div>
-          <button @click="isEditingStore = false" class="p-1 rounded-lg text-slate-300 hover:text-white">
+          <button @click="isEditingStore = false" class="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer">
             <X class="w-5 h-5" />
           </button>
         </div>
 
         <!-- Chat / Instruction History Area -->
-        <div ref="editorScroll" class="flex-1 p-3 sm:p-4 overflow-y-auto space-y-2.5 bg-slate-50/50 text-xs">
-          <div class="p-3 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl leading-relaxed">
+        <div ref="editorScroll" class="flex-1 p-3 sm:p-4 overflow-y-auto space-y-3 bg-slate-50/50 text-xs">
+          <div class="p-3 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl leading-relaxed shadow-xs">
             👋 <strong>আমি DokanAI এডিটর!</strong><br />
             দোকানের যেকোনো সেকশন বাদ দিতে বা পরিবর্তন করতে বলুন। যেমন:
-            <ul class="list-disc pl-4 mt-1 space-y-0.5 text-emerald-800 text-[11px]">
+            <ul class="list-disc pl-4 mt-1.5 space-y-0.5 text-emerald-800 text-[11px]">
               <li>"উপরের লাল অফার বারটা বাদ দাও"</li>
               <li>"১০০% ভেরিফাইড বিক্রেতা লেখাটি লুকিয়ে ফেলো"</li>
               <li>"রিভিউ বা টেস্টিমোনিয়াল সেকশন মুছে দাও"</li>
@@ -355,7 +367,7 @@
           </div>
 
           <div v-for="(log, lIdx) in editLogs" :key="lIdx" class="space-y-1.5">
-            <div class="bg-slate-900 text-white p-2.5 sm:p-3 rounded-2xl rounded-br-none ml-auto max-w-[85%] text-xs">
+            <div class="bg-slate-900 text-white p-2.5 sm:p-3 rounded-2xl rounded-br-none ml-auto max-w-[85%] text-xs shadow-xs">
               {{ log.prompt }}
             </div>
             <div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-bl-none mr-auto max-w-[90%] text-xs text-slate-800 space-y-2 shadow-xs">
@@ -371,7 +383,7 @@
                   :key="sIdx"
                   @click="applySuggestion(sug)"
                   type="button"
-                  class="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 rounded-lg text-[10px] font-semibold transition-colors text-left"
+                  class="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 rounded-lg text-[10px] font-semibold transition-colors text-left cursor-pointer"
                 >
                   ⚡ {{ sug }}
                 </button>
@@ -379,26 +391,26 @@
             </div>
           </div>
 
-          <div v-if="isAiEditing" class="flex items-center gap-2 bg-white border border-slate-200 p-2.5 rounded-2xl w-fit">
+          <div v-if="isAiEditing" class="flex items-center gap-2 bg-white border border-slate-200 p-2.5 rounded-2xl w-fit shadow-xs">
             <Loader2 class="w-4 h-4 animate-spin text-emerald-600" />
             <span class="text-xs font-bold text-slate-700">AI আপডেট করছে...</span>
           </div>
         </div>
 
         <!-- Editor Prompt Input Bar -->
-        <div class="p-2.5 sm:p-3 border-t border-slate-100 bg-white">
+        <div class="p-3 border-t border-slate-100 bg-white shrink-0">
           <form @submit.prevent="submitAiEdit" class="flex items-center gap-2">
             <input 
               v-model="aiInstruction" 
               type="text" 
               placeholder="কী পরিবর্তন করতে চান বলুন..." 
-              class="flex-1 px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-emerald-500 font-medium"
+              class="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-emerald-500 font-medium"
               :disabled="isAiEditing"
             />
             <button 
               type="submit" 
               :disabled="!aiInstruction.trim() || isAiEditing"
-              class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl font-bold text-xs flex items-center gap-1 shadow-sm transition-all active:scale-95 shrink-0"
+              class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all active:scale-95 shrink-0 cursor-pointer"
             >
               <span>আপডেট</span>
               <Send class="w-3.5 h-3.5" />
@@ -406,8 +418,8 @@
           </form>
         </div>
 
-      </div>
-    </div>
+      </aside>
+    </Transition>
 
   </div>
 </template>
@@ -565,3 +577,23 @@ useHead({
   ]
 })
 </script>
+
+<style scoped>
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.slide-right-enter-from,
+.slide-right-leave-to {
+  transform: translateX(100%);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
