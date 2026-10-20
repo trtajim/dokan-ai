@@ -446,15 +446,51 @@
 
         <!-- Chat / Instruction History Area (Scrollable container strictly pinned) -->
         <div ref="editorScroll" class="flex-1 min-h-0 p-3 sm:p-4 overflow-y-auto space-y-3 bg-[#fbf9f3] text-xs overscroll-contain">
-          <div class="p-3 bg-amber-50 border border-amber-200 text-amber-950 rounded-2xl leading-relaxed shadow-xs">
-            👋 <strong>আমি DokanAI এডিটর!</strong><br />
-            দোকানের যেকোনো সেকশন বাদ দিতে বা পরিবর্তন করতে বলুন। যেমন:
-            <ul class="list-disc pl-4 mt-1.5 space-y-0.5 text-amber-900 text-[11px]">
-              <li>"উপরের লাল অফার বারটা বাদ দাও"</li>
-              <li>"১০০% ভেরিফাইড বিক্রেতা লেখাটি লুকিয়ে ফেলো"</li>
-              <li>"রিভিউ বা টেস্টিমোনিয়াল সেকশন মুছে দাও"</li>
-              <li>"দাম ১০০০ থেকে কমিয়ে ৯৫০ টাকা করো"</li>
-            </ul>
+          <div class="p-3.5 bg-amber-50/90 border border-amber-200/90 text-amber-950 rounded-2xl leading-relaxed shadow-xs">
+            <div class="font-bold flex items-center gap-1.5 mb-1 text-xs">
+              <Sparkles class="w-3.5 h-3.5 text-amber-600" />
+              <span>আমি DokanAI স্টোর এডিটর!</span>
+            </div>
+            <p class="text-[11px] text-amber-900 leading-normal">
+              আপনার দোকানের যেকোনো লেখা, দাম, কালার থিম বা সেকশন পরিবর্তন করতে বলুন। কিছু নমুনা প্রম্পট:
+            </p>
+            <div class="grid grid-cols-1 gap-1.5 mt-2.5">
+              <button 
+                type="button" 
+                @click="applySuggestion('থিম কালার এম্বার / মধু গোল্ডেন করো')" 
+                class="text-left px-2.5 py-1.5 rounded-xl bg-white/90 hover:bg-white border border-amber-200 text-amber-900 text-[11px] font-medium transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <span>🎨 "থিম কালার এম্বার / মধু গোল্ডেন করো"</span>
+              </button>
+              <button 
+                type="button" 
+                @click="applySuggestion('দাম ১০০০ থেকে কমিয়ে ৯৫০ টাকা করো')" 
+                class="text-left px-2.5 py-1.5 rounded-xl bg-white/90 hover:bg-white border border-amber-200 text-amber-900 text-[11px] font-medium transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <span>🏷️ "দাম ১০০০ থেকে কমিয়ে ৯৫০ টাকা করো"</span>
+              </button>
+              <button 
+                type="button" 
+                @click="applySuggestion('উপরের লাল অফার বারটা লুকিয়ে ফেলো')" 
+                class="text-left px-2.5 py-1.5 rounded-xl bg-white/90 hover:bg-white border border-amber-200 text-amber-900 text-[11px] font-medium transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <span>🔥 "উপরের লাল অফার বারটা লুকিয়ে ফেলো"</span>
+              </button>
+              <button 
+                type="button" 
+                @click="applySuggestion('রিভিউ বা টেস্টিমোনিয়াল সেকশন মুছে দাও')" 
+                class="text-left px-2.5 py-1.5 rounded-xl bg-white/90 hover:bg-white border border-amber-200 text-amber-900 text-[11px] font-medium transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <span>⭐ "রিভিউ বা টেস্টিমোনিয়াল সেকশন মুছে দাও"</span>
+              </button>
+              <button 
+                type="button" 
+                @click="applySuggestion('অর্ডার বাটনের লেখা পরিবর্তন করে এখনই কিনুন করো')" 
+                class="text-left px-2.5 py-1.5 rounded-xl bg-white/90 hover:bg-white border border-amber-200 text-amber-900 text-[11px] font-medium transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <span>🛒 "অর্ডার বাটনের লেখা 'এখনই কিনুন' করো"</span>
+              </button>
+            </div>
           </div>
 
           <div v-for="(log, lIdx) in editLogs" :key="lIdx" class="space-y-1.5">
@@ -793,25 +829,26 @@ const submitAiEdit = async () => {
     })
 
     if (res && res.success) {
+      // 1. Immediately sync the authoritative state returned by the server
       if (res.store && data.value) {
         data.value.store = { ...data.value.store, ...res.store }
       }
       
-      // Update the active log item with the response
+      // 2. Update the chat log with AI reply and actionable suggestions
       if (editLogs.value[activeLogIndex]) {
         editLogs.value[activeLogIndex].response = res.reply
         editLogs.value[activeLogIndex].suggestions = res.suggestions || []
+        editLogs.value[activeLogIndex].isClarification = Boolean(res.isClarification)
       }
 
-      // Persist in tab session so refresh doesn't wipe chat history
+      // 3. Persist in tab session so refresh doesn't wipe chat history
       if (import.meta.client) {
         sessionStorage.setItem(`dokan_edit_logs_${slug}`, JSON.stringify(editLogs.value))
       }
 
-      // If store properties actually changed (not just consultative chat/clarification),
-      // perform a clean background refresh to re-sync any server dependencies
+      // 4. Trigger data re-fetch from server to ensure complete bidirectional consistency
       if (res.hasChanged) {
-        refresh()
+        await refresh()
       }
 
       await nextTick()

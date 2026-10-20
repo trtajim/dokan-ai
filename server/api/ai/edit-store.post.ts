@@ -64,22 +64,34 @@ Current Store Data:
 - Testimonials: ${JSON.stringify(currentStore.config?.testimonials ?? [])}
 
 BEHAVIOR AND INTERMEDIARY CONFIRMATION RULES:
-1. Apply requested changes accurately. You can customize EVERY SINGLE PIECE of text and setting:
-   - Badge text above headline (e.g. "প্রিমিয়াম কোয়ালিটি গ্যারান্টিড" -> anything the user wants)
-   - CTA button text (e.g. "অর্ডার করুন", "এখনই কিনুন", etc.)
-   - Headline, subheadline, price, regular price, stock, color theme
-   - Features, trust badges, FAQs, reviews/testimonials
-2. In "reply", confirm the modification clearly in friendly Bengali AND offer an intelligent follow-up suggestion or question.
-3. Provide 2 to 3 quick clickable follow-up suggestion chips in Bengali in "suggestions" array.
-4. SECTION VISIBILITY:
+1. VAGUE OR AMBIGUOUS REQUESTS (CRITICAL):
+   - If the merchant's request is unclear, vague, or missing key details (e.g., "change it", "এটা পরিবর্তন করো", "দাম বদলাও", "কালার বদলাও", "কিছু একটা বাদ দাও"), DO NOT guess or make random destructive modifications.
+   - Set "is_clarification": true.
+   - Keep all store fields, prices, themes, and configs EXACTLY as their current values.
+   - In "reply", ask a polite, precise follow-up question in Bengali clarifying exactly what they want to change (e.g. "আপনি কি পণ্যের দাম, কালার থিম নাকি কোনো নির্দিষ্ট লেখা পরিবর্তন করতে চাচ্ছেন? বিস্তারিত জানালে সাথে সাথে করে দিচ্ছি।").
+   - In "suggestions", provide 3 distinct, specific clickable options (e.g. ["দাম পরিবর্তন করুন", "কালার থিম পরিবর্তন করুন", "হেডলাইন পরিবর্তন করুন"]).
+
+2. SPECIFIC INSTRUCTIONS:
+   - Apply requested changes accurately. You can customize EVERY SINGLE PIECE of text and setting:
+     - Badge text above headline (e.g. "প্রিমিয়াম কোয়ালিটি গ্যারান্টিড" -> anything the user wants)
+     - CTA button text (e.g. "অর্ডার করুন", "এখনই কিনুন", etc.)
+     - Headline, subheadline, price, regular price, stock, color theme ("amber", "emerald", "indigo", "rose", "slate")
+     - Features, trust badges, FAQs, reviews/testimonials
+     - Video Reel URL (add YouTube/Facebook reel or remove)
+   - In "reply", confirm the exact modification clearly in natural, reassuring Bengali (e.g. "আপনার পণ্যের দাম ১০০০ থেকে কমিয়ে ৯৫০ টাকা করা হয়েছে!") AND ask a helpful follow-up question.
+   - Provide 2 to 3 quick clickable next-step chips in "suggestions" array.
+
+3. SECTION VISIBILITY:
    - If asked to hide/remove urgency bar, set "show_urgency_bar": false.
    - If asked to hide/remove verified badge, set "show_verified_badge": false.
    - If asked to hide/remove testimonials/reviews or FAQs, set "show_testimonials": false or "show_faqs": false.
+   - If asked to show them back, set them to true.
 
 RETURN STRICT JSON ONLY:
 {
-  "reply": "friendly explanation in Bengali with follow-up suggestion",
-  "suggestions": ["suggested chip 1", "suggested chip 2"],
+  "reply": "friendly explanation in Bengali (or precise clarifying question if request was vague)",
+  "is_clarification": boolean,
+  "suggestions": ["suggested chip 1", "suggested chip 2", "suggested chip 3"],
   "product_title": "string",
   "price": number,
   "regular_price": number,
@@ -143,45 +155,51 @@ RETURN STRICT JSON ONLY:
         config: currentStore.config
       })
 
-      currentStore.product_title = parsed.product_title || currentStore.product_title
-      currentStore.price = parsed.price || currentStore.price
-      currentStore.regular_price = parsed.regular_price || currentStore.regular_price
-      currentStore.theme_color = parsed.theme_color || currentStore.theme_color
-      currentStore.stock = parsed.stock ?? currentStore.stock
-      currentStore.variants = parsed.variants || currentStore.variants
-      currentStore.config = updatedConfig
+      const isClarification = Boolean(parsed.is_clarification)
+      let hasChanged = false
 
-      const newSnapshot = JSON.stringify({
-        title: currentStore.product_title,
-        price: currentStore.price,
-        regular_price: currentStore.regular_price,
-        theme_color: currentStore.theme_color,
-        stock: currentStore.stock,
-        config: currentStore.config
-      })
+      if (!isClarification) {
+        currentStore.product_title = parsed.product_title || currentStore.product_title
+        currentStore.price = parsed.price || currentStore.price
+        currentStore.regular_price = parsed.regular_price || currentStore.regular_price
+        currentStore.theme_color = parsed.theme_color || currentStore.theme_color
+        currentStore.stock = parsed.stock ?? currentStore.stock
+        currentStore.variants = parsed.variants || currentStore.variants
+        currentStore.config = updatedConfig
 
-      const hasChanged = prevSnapshot !== newSnapshot
+        const newSnapshot = JSON.stringify({
+          title: currentStore.product_title,
+          price: currentStore.price,
+          regular_price: currentStore.regular_price,
+          theme_color: currentStore.theme_color,
+          stock: currentStore.stock,
+          config: currentStore.config
+        })
 
-      if (supabase) {
-        try {
-          await supabase.from('stores').update({
-            product_title: currentStore.product_title,
-            price: currentStore.price,
-            regular_price: currentStore.regular_price,
-            theme_color: currentStore.theme_color,
-            config: currentStore.config
-          }).eq('slug', slug)
-        } catch (dbErr) {
-          console.warn('Supabase store AI edit update error:', dbErr)
+        hasChanged = prevSnapshot !== newSnapshot
+
+        if (supabase && hasChanged) {
+          try {
+            await supabase.from('stores').update({
+              product_title: currentStore.product_title,
+              price: currentStore.price,
+              regular_price: currentStore.regular_price,
+              theme_color: currentStore.theme_color,
+              config: currentStore.config
+            }).eq('slug', slug)
+          } catch (dbErr) {
+            console.warn('Supabase store AI edit update error:', dbErr)
+          }
         }
-      }
 
-      memoryStore.setStore(slug, currentStore)
+        memoryStore.setStore(slug, currentStore)
+      }
 
       return {
         success: true,
-        reply: parsed.reply || 'আপনার নির্দেশনা অনুযায়ী সেকশনটি আপডেট করা হয়েছে!',
+        reply: parsed.reply || (isClarification ? 'কী পরিবর্তন করতে চান অনুগ্রহ করে একটু বিস্তারিত বলুন।' : 'আপনার নির্দেশনা অনুযায়ী সেকশনটি আপডেট করা হয়েছে!'),
         suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
+        isClarification,
         hasChanged,
         store: currentStore
       }
