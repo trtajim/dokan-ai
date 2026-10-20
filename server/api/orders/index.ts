@@ -3,6 +3,7 @@
  */
 import { memoryStore, type OrderRecord } from '../../utils/memoryStore'
 import { getSupabaseClient } from '../../utils/supabase'
+import { sendMetaPurchaseEvent } from '../../utils/metaCapi'
 
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
@@ -139,8 +140,12 @@ export default defineEventHandler(async (event) => {
     }
 
     const supabase = getSupabaseClient()
+    let currentOrder: any = null
+
     if (supabase) {
       try {
+        const { data } = await supabase.from('orders').select('*').eq('id', order_id).single()
+        if (data) currentOrder = data
         await supabase.from('orders').update({ status }).eq('id', order_id)
       } catch (err) {
         console.warn('Failed to update status on Supabase:', err)
@@ -148,6 +153,44 @@ export default defineEventHandler(async (event) => {
     }
 
     const updated = memoryStore.updateOrderStatus(order_id, status)
+    if (!currentOrder && updated) {
+      currentOrder = updated
+    }
+
+    // Trigger Meta Conversions API (CAPI) Purchase event when admin confirms order
+    if (status === 'confirmed' && currentOrder) {
+      try {
+        const storeSlug = currentOrder.store_slug
+        let storeConfig: any = null
+
+        if (supabase) {
+          const { data: storeData } = await supabase.from('stores').select('config').eq('slug', storeSlug).single()
+          if (storeData) storeConfig = storeData.config
+        }
+        if (!storeConfig) {
+          const memStore = memoryStore.getStore(storeSlug)
+          if (memStore) storeConfig = memStore.config
+        }
+
+        const pixelId = storeConfig?.pixel_id
+        const accessToken = storeConfig?.meta_access_token
+
+        if (pixelId && accessToken) {
+          await sendMetaPurchaseEvent({
+            pixelId,
+            accessToken,
+            orderId: currentOrder.id,
+            totalPrice: currentOrder.total_price,
+            currency: 'BDT',
+            customerPhone: currentOrder.customer_phone,
+            customerName: currentOrder.customer_name,
+            customerAddress: currentOrder.customer_address
+          })
+        }
+      } catch (capiErr) {
+        console.warn('Meta CAPI trigger error upon confirmation:', capiErr)
+      }
+    }
 
     return {
       success: true,
