@@ -1,5 +1,5 @@
 /**
- * Shared memory fallback store when Supabase keys are not set up yet.
+ * Shared memory fallback store with live dynamic stock tracking
  */
 
 export interface StoreRecord {
@@ -11,6 +11,7 @@ export interface StoreRecord {
   regular_price: number
   image_url: string
   images?: string[]
+  stock: number
   delivery_fee_inside?: number
   delivery_fee_outside?: number
   theme_color: string
@@ -46,6 +47,7 @@ if (!globalThis.__dokan_stores) {
     product_title: 'T900 Ultra 2 Max Smartwatch (অরিজিনাল)',
     price: 1350,
     regular_price: 2200,
+    stock: 14,
     image_url: 'https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&w=800&q=80',
@@ -57,7 +59,7 @@ if (!globalThis.__dokan_stores) {
     config: {
       headline: 'প্রিমিয়াম ব্লুটুথ কলিং ও ফুল ওয়াটারপ্রুফ স্মার্টওয়াচ',
       subheadline: '২.০৯ ইঞ্চি ফুল এইচডি ডিসপ্লে, ২ দিনের ব্যাটারি লাইফ এবং প্রিমিয়াম মেটালিক ডিজাইন সহ প্রিমিয়াম কোয়ালিটি ওয়াচ। সাথে থাকছে ২টি ফ্রি স্ট্র্যাপ!',
-      urgency_text: '🔥 অফারটি সীমিত সময়ের জন্য! আর মাত্র ১৪ টি স্টক বাকি আছে!',
+      urgency_text: '🔥 অফারটি সীমিত সময়ের জন্য! ক্যাশ অন ডেলিভারিতে অর্ডার করুন!',
       trust_badges: [
         'ক্যাশ অন ডেলিভারি (পণ্য দেখে মূল্য পরিশোধ)',
         '৭ দিনের রিপ্লেসমেন্ট গ্যারান্টি',
@@ -114,21 +116,7 @@ if (!globalThis.__dokan_stores) {
 }
 
 if (!globalThis.__dokan_orders) {
-  globalThis.__dokan_orders = [
-    {
-      id: 'ord-1001',
-      store_slug: 't900-ultra-smartwatch',
-      customer_name: 'রাকিবুল হাসান',
-      customer_phone: '01712345678',
-      customer_address: 'বাসা ১২, রোড ৪, সেক্টর ১০, উত্তরা, ঢাকা',
-      delivery_zone: 'inside_dhaka',
-      delivery_fee: 70,
-      total_price: 1420,
-      quantity: 1,
-      status: 'pending',
-      created_at: new Date(Date.now() - 1000 * 60 * 35).toISOString()
-    }
-  ]
+  globalThis.__dokan_orders = []
 }
 
 export const memoryStore = {
@@ -136,6 +124,22 @@ export const memoryStore = {
   setStore: (slug: string, data: StoreRecord) => {
     globalThis.__dokan_stores?.set(slug, data)
     return data
+  },
+  decrementStock: (slug: string, qty: number) => {
+    const store = globalThis.__dokan_stores?.get(slug)
+    if (store && typeof store.stock === 'number') {
+      store.stock = Math.max(0, store.stock - qty)
+      return store.stock
+    }
+    return null
+  },
+  updateStock: (slug: string, newStock: number) => {
+    const store = globalThis.__dokan_stores?.get(slug)
+    if (store) {
+      store.stock = Math.max(0, newStock)
+      return store.stock
+    }
+    return null
   },
   getAllStores: () => Array.from(globalThis.__dokan_stores?.values() || []),
   getOrders: (slug?: string) => {

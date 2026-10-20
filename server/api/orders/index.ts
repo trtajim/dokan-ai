@@ -1,6 +1,5 @@
 /**
- * Customer Orders Handler
- * Receives COD orders from the storefront and persists to DB and memory
+ * Customer Orders Handler - Decrements live stock upon order
  */
 import { memoryStore, type OrderRecord } from '../../utils/memoryStore'
 import { getSupabaseClient } from '../../utils/supabase'
@@ -8,7 +7,6 @@ import { getSupabaseClient } from '../../utils/supabase'
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
 
-  // GET: Fetch orders for a specific store or all
   if (method === 'GET') {
     const query = getQuery(event)
     const storeSlug = query.slug as string | undefined
@@ -35,7 +33,6 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // POST: Create a new customer COD order
   if (method === 'POST') {
     const body = await readBody(event)
     const { store_slug, customer_name, customer_phone, customer_address, delivery_zone, quantity, unit_price } = body
@@ -44,7 +41,6 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, message: 'Missing required customer order fields' })
     }
 
-    // Validate 11-digit Bangladesh phone number
     const cleanPhone = customer_phone.replace(/\D/g, '')
     if (cleanPhone.length < 11) {
       throw createError({ statusCode: 400, message: 'সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 01712345678)' })
@@ -69,6 +65,9 @@ export default defineEventHandler(async (event) => {
       created_at: new Date().toISOString()
     }
 
+    // Automatically decrement live stock
+    memoryStore.decrementStock(store_slug, qty)
+
     const supabase = getSupabaseClient()
     if (supabase) {
       try {
@@ -84,6 +83,15 @@ export default defineEventHandler(async (event) => {
           quantity: newOrder.quantity,
           status: newOrder.status
         })
+
+        // Also update Supabase config.stock
+        const { data: store } = await supabase.from('stores').select('config').eq('slug', store_slug).single()
+        if (store) {
+          const cfg = store.config || {}
+          const currentStock = typeof cfg.stock === 'number' ? cfg.stock : 25
+          cfg.stock = Math.max(0, currentStock - qty)
+          await supabase.from('stores').update({ config: cfg }).eq('slug', store_slug)
+        }
       } catch (dbErr) {
         console.warn('Failed to insert into Supabase:', dbErr)
       }
@@ -98,7 +106,6 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // PATCH: Update order status (pending -> confirmed -> shipped -> cancelled)
   if (method === 'PATCH') {
     const body = await readBody(event)
     const { order_id, status } = body

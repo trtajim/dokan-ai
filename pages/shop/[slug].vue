@@ -16,10 +16,18 @@
 
   <div v-else class="min-h-screen bg-slate-50/60 pb-28 sm:pb-16 font-sans">
     
-    <!-- Top Floating Urgency Bar -->
-    <div class="bg-gradient-to-r from-red-600 via-amber-600 to-red-600 text-white text-xs sm:text-sm font-black py-2.5 px-4 text-center sticky top-0 z-30 shadow-md flex items-center justify-center gap-2">
+    <!-- Top Floating Urgency Bar (Now 100% Dynamic with real stock) -->
+    <div 
+      class="text-white text-xs sm:text-sm font-black py-2.5 px-4 text-center sticky top-0 z-30 shadow-md flex items-center justify-center gap-2"
+      :class="currentStock <= 0 ? 'bg-red-700' : 'bg-gradient-to-r from-red-600 via-amber-600 to-red-600'"
+    >
       <Flame class="w-4 h-4 animate-bounce" />
-      <span>{{ store.config?.urgency_text || '🔥 অফারটি সীমিত সময়ের জন্য! ক্যাশ অন ডেলিভারিতে অর্ডার করুন!' }}</span>
+      <span v-if="currentStock > 0">
+        🔥 অফারটি সীমিত সময়ের জন্য! আর মাত্র {{ currentStock }} টি স্টক বাকি আছে!
+      </span>
+      <span v-else>
+        ⚠️ স্টক আউট! আজকের মতো এই প্রডাক্টের সব স্টক শেষ হয়ে গেছে।
+      </span>
     </div>
 
     <!-- Store Navigation -->
@@ -43,7 +51,12 @@
             <span>এডিট স্টোর</span>
           </button>
 
-          <button @click="scrollToForm" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black text-white shadow-md active:scale-95 transition-all" :class="primaryBgClass">
+          <button 
+            v-if="currentStock > 0"
+            @click="scrollToForm" 
+            class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black text-white shadow-md active:scale-95 transition-all" 
+            :class="primaryBgClass"
+          >
             <span>অর্ডার করুন</span>
             <ArrowDown class="w-3.5 h-3.5" />
           </button>
@@ -58,7 +71,7 @@
       <section class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-sm">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           
-          <!-- Product Gallery (Multi-Image Support) -->
+          <!-- Product Gallery -->
           <div class="space-y-3">
             <div class="aspect-square rounded-2xl overflow-hidden bg-slate-100 border border-slate-200/60 relative group flex items-center justify-center">
               <img 
@@ -71,7 +84,7 @@
               </div>
             </div>
 
-            <!-- Thumbnail Carousel if multiple images exist -->
+            <!-- Thumbnail Carousel -->
             <div v-if="productImages.length > 1" class="flex items-center gap-2 overflow-x-auto py-1">
               <button 
                 v-for="(img, idx) in productImages" 
@@ -95,16 +108,29 @@
               {{ store.config?.subheadline }}
             </p>
 
-            <!-- Price Container -->
-            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-baseline gap-3">
-              <div class="text-3xl sm:text-4xl font-black" :class="primaryTextClass">
-                ৳{{ store.price }}
+            <!-- Price & Stock Container -->
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-2">
+              <div class="flex items-baseline gap-3">
+                <div class="text-3xl sm:text-4xl font-black" :class="primaryTextClass">
+                  ৳{{ store.price }}
+                </div>
+                <div v-if="store.regular_price" class="text-base sm:text-lg text-slate-400 line-through font-bold">
+                  ৳{{ store.regular_price }}
+                </div>
+                <div class="ml-auto text-[11px] font-bold px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full">
+                  ক্যাশ অন ডেলিভারি
+                </div>
               </div>
-              <div v-if="store.regular_price" class="text-base sm:text-lg text-slate-400 line-through font-bold">
-                ৳{{ store.regular_price }}
-              </div>
-              <div class="ml-auto text-[11px] font-bold px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full">
-                ক্যাশ অন ডেলিভারি
+
+              <!-- Live Stock Indicator -->
+              <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-200/60 font-semibold">
+                <span class="text-slate-500">বর্তমান স্টক পরিস্থিতি:</span>
+                <span 
+                  class="px-2 py-0.5 rounded-full font-bold text-[11px]"
+                  :class="currentStock > 5 ? 'bg-emerald-100 text-emerald-800' : currentStock > 0 ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800'"
+                >
+                  {{ currentStock > 0 ? `${currentStock} টি এভেইলেবল আছে` : 'স্টক শেষ (Out of Stock)' }}
+                </span>
               </div>
             </div>
 
@@ -125,6 +151,7 @@
             <!-- Hero Action CTA -->
             <div class="pt-4">
               <button 
+                v-if="currentStock > 0"
                 @click="scrollToForm" 
                 class="w-full py-4 text-white font-black text-base rounded-2xl shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
                 :class="primaryBgClass"
@@ -132,6 +159,9 @@
                 <ShoppingBag class="w-5 h-5" />
                 <span>এখনই অর্ডার করুন (ক্যাশ অন ডেলিভারি)</span>
               </button>
+              <div v-else class="w-full py-4 bg-slate-300 text-slate-600 font-black text-center rounded-2xl cursor-not-allowed">
+                পণ্যটির স্টক শেষ হয়ে গেছে
+              </div>
             </div>
           </div>
 
@@ -213,8 +243,14 @@
         </div>
       </section>
 
-      <!-- THE ROCK-SOLID COD ORDER FORM -->
-      <StoreCodForm :store="store" />
+      <!-- THE COD ORDER FORM (Disabled if out of stock) -->
+      <div v-if="currentStock > 0">
+        <StoreCodForm :store="store" />
+      </div>
+      <div v-else class="p-8 bg-white border border-red-200 rounded-3xl text-center space-y-2">
+        <h3 class="text-lg font-black text-red-600">বর্তমানে এই পণ্যটির স্টক খালি</h3>
+        <p class="text-xs text-slate-500">দোকানদার নতুন স্টক যোগ করলে পুনরায় অর্ডার করা যাবে।</p>
+      </div>
 
     </main>
 
@@ -222,7 +258,7 @@
     <StoreAiSalesBot :store="store" />
 
     <!-- STICKY MOBILE BOTTOM BAR -->
-    <div class="sm:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 z-40 flex items-center justify-between shadow-2xl">
+    <div v-if="currentStock > 0" class="sm:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 z-40 flex items-center justify-between shadow-2xl">
       <div>
         <div class="text-[11px] text-slate-400 font-semibold">অফার মূল্য:</div>
         <div class="text-xl font-black" :class="primaryTextClass">৳{{ store.price }}</div>
@@ -243,7 +279,7 @@
         <div class="flex items-center justify-between border-b pb-3">
           <div>
             <h3 class="text-lg font-black text-slate-900">দোকানের তথ্য এডিট করুন</h3>
-            <p class="text-xs text-slate-500">প্রোডাক্টের নাম, মূল্য, কপি এবং ডেলিভারি চার্জ সরাসরি পরিবর্তন করুন</p>
+            <p class="text-xs text-slate-500">প্রোডাক্টের নাম, স্টক, মূল্য ও ডেলিভারি চার্জ সরাসরি পরিবর্তন করুন</p>
           </div>
           <button @click="isEditingStore = false" class="p-1 rounded-lg text-slate-400 hover:text-slate-600">
             <X class="w-5 h-5" />
@@ -256,7 +292,7 @@
             <input v-model="editForm.product_title" type="text" class="w-full px-3 py-2 bg-slate-50 border rounded-xl" />
           </div>
 
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-3 gap-3">
             <div>
               <label class="block font-bold text-slate-700 mb-1">অফার মূল্য (৳):</label>
               <input v-model.number="editForm.price" type="number" class="w-full px-3 py-2 bg-slate-50 border rounded-xl font-bold text-emerald-600" />
@@ -264,6 +300,10 @@
             <div>
               <label class="block font-bold text-slate-700 mb-1">পূর্বের মূল্য (৳):</label>
               <input v-model.number="editForm.regular_price" type="number" class="w-full px-3 py-2 bg-slate-50 border rounded-xl line-through text-slate-400" />
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">বর্তমান স্টক সংখ্যা:</label>
+              <input v-model.number="editForm.stock" type="number" class="w-full px-3 py-2 bg-slate-50 border rounded-xl font-bold text-indigo-600" />
             </div>
           </div>
 
@@ -322,6 +362,12 @@ const { data, pending, refresh } = await useFetch(`/api/stores?slug=${slug}`)
 
 const store = computed(() => data.value?.store)
 
+const currentStock = computed(() => {
+  if (typeof store.value?.stock === 'number') return store.value.stock
+  if (typeof store.value?.config?.stock === 'number') return store.value.config.stock
+  return 15
+})
+
 const isEditingStore = ref(false)
 const isSaving = ref(false)
 const activeHeroImage = ref('')
@@ -330,6 +376,7 @@ const editForm = reactive({
   product_title: '',
   price: 0,
   regular_price: 0,
+  stock: 15,
   delivery_fee_inside: 70,
   delivery_fee_outside: 130,
   headline: '',
@@ -342,6 +389,7 @@ watch(store, (st) => {
     editForm.product_title = st.product_title
     editForm.price = st.price
     editForm.regular_price = st.regular_price || 0
+    editForm.stock = st.stock ?? st.config?.stock ?? 15
     editForm.delivery_fee_inside = st.config?.delivery_fee_inside || st.delivery_fee_inside || 70
     editForm.delivery_fee_outside = st.config?.delivery_fee_outside || st.delivery_fee_outside || 130
     editForm.headline = st.config?.headline || ''
@@ -388,6 +436,7 @@ const saveStoreEdits = async () => {
       ...store.value.config,
       headline: editForm.headline,
       subheadline: editForm.subheadline,
+      stock: editForm.stock,
       delivery_fee_inside: editForm.delivery_fee_inside,
       delivery_fee_outside: editForm.delivery_fee_outside
     }
@@ -399,6 +448,7 @@ const saveStoreEdits = async () => {
         product_title: editForm.product_title,
         price: editForm.price,
         regular_price: editForm.regular_price,
+        stock: editForm.stock,
         theme_color: editForm.theme_color,
         image_url: store.value.image_url,
         config: updatedConfig
@@ -407,7 +457,7 @@ const saveStoreEdits = async () => {
 
     await refresh()
     isEditingStore.value = false
-    alert('দোকানের তথ্য সফলভাবে আপডেট হয়েছে!')
+    alert('দোকানের তথ্য ও স্টক সফলভাবে আপডেট হয়েছে!')
   } catch (err) {
     alert('আপডেট করতে সমস্যা হয়েছে।')
   } finally {

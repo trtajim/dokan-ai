@@ -8,7 +8,7 @@
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">মার্চেন্ট ড্যাশবোর্ড</h1>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1">আপনার তৈরি করা স্টোর ও কাস্টমারদের রিয়েল-টাইম ক্যাশ অন ডেলিভারি অর্ডার তালিকা</p>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">আপনার স্টোরসমূহ, লাইভ স্টক ও কাস্টমারদের ক্যাশ অন ডেলিভারি অর্ডার তালিকা</p>
         </div>
 
         <div class="flex items-center gap-3">
@@ -67,40 +67,76 @@
         </div>
       </div>
 
-      <!-- Active Stores Shelf -->
+      <!-- Active Stores Shelf & Live Stock Management -->
       <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm space-y-4">
-        <h2 class="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
-          <Store class="w-4 h-4 text-emerald-600" />
-          <span>আপনার সক্রিয় দোকানসমূহ</span>
-        </h2>
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
+            <Boxes class="w-4 h-4 text-emerald-600" />
+            <span>সক্রিয় দোকান ও লাইভ স্টক ম্যানেজমেন্ট</span>
+          </h2>
+          <span class="text-xs text-slate-400">স্টক আপডেট করলে কাস্টমার পেজে রিয়েলটাইম পরিবর্তন হবে</span>
+        </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div 
             v-for="st in stores" 
             :key="st.id" 
-            class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3 hover:border-slate-300 transition-colors"
+            class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between gap-3 hover:border-slate-300 transition-colors"
           >
-            <div class="min-w-0">
-              <h3 class="font-bold text-slate-900 text-sm truncate">{{ st.product_title }}</h3>
+            <div>
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="font-bold text-slate-900 text-sm truncate">{{ st.product_title }}</h3>
+                <span 
+                  class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider"
+                  :class="getStoreStock(st) > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'"
+                >
+                  {{ getStoreStock(st) > 0 ? 'ইন স্টক' : 'স্টক আউট' }}
+                </span>
+              </div>
               <p class="text-xs text-slate-500 font-semibold mt-0.5">৳{{ st.price }} | /shop/{{ st.slug }}</p>
             </div>
-            <div class="flex items-center gap-1.5 shrink-0">
-              <button 
-                @click="copyStoreLink(st.slug)" 
-                class="p-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold flex items-center gap-1"
-                title="লিংক কপি করুন"
-              >
-                <Copy class="w-3.5 h-3.5" />
-              </button>
+
+            <!-- In-card stock adjust buttons -->
+            <div class="flex items-center justify-between pt-2 border-t border-slate-200/60 text-xs">
+              <span class="font-bold text-slate-700">স্টক সংখ্যা:</span>
+              <div class="flex items-center gap-2">
+                <button 
+                  @click="quickAdjustStock(st.slug, getStoreStock(st) - 1)" 
+                  class="w-7 h-7 rounded-lg bg-white border border-slate-300 font-bold flex items-center justify-center hover:bg-slate-100 active:scale-95"
+                >
+                  -
+                </button>
+                <span class="font-extrabold text-sm w-6 text-center text-slate-900">{{ getStoreStock(st) }}</span>
+                <button 
+                  @click="quickAdjustStock(st.slug, getStoreStock(st) + 1)" 
+                  class="w-7 h-7 rounded-lg bg-white border border-slate-300 font-bold flex items-center justify-center hover:bg-slate-100 active:scale-95"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <!-- Actions row -->
+            <div class="flex items-center justify-between pt-1">
               <NuxtLink 
                 :to="`/shop/${st.slug}`" 
                 target="_blank" 
-                class="p-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1"
-                title="দোকান খুলুন"
+                class="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
               >
+                <span>স্টোর ভিজিট</span>
                 <ExternalLink class="w-3.5 h-3.5" />
               </NuxtLink>
+
+              <button 
+                @click="copyStoreLink(st.slug)" 
+                class="px-2.5 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold flex items-center gap-1"
+                title="লিংক কপি করুন"
+              >
+                <Copy class="w-3.5 h-3.5" />
+                <span>লিংক</span>
+              </button>
             </div>
+
           </div>
         </div>
       </div>
@@ -231,8 +267,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { RefreshCw, Plus, Banknote, ShoppingBag, Clock, Store, Copy, ExternalLink, PhoneCall, Trash2 } from 'lucide-vue-next'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { RefreshCw, Plus, Banknote, ShoppingBag, Clock, Store, Boxes, Copy, ExternalLink, PhoneCall, Trash2 } from 'lucide-vue-next'
 
 const isRefreshing = ref(false)
 const activeFilter = ref('all')
@@ -253,6 +289,29 @@ const refreshData = async () => {
     console.error('Failed to load dashboard data:', err)
   } finally {
     isRefreshing.value = false
+  }
+}
+
+const getStoreStock = (st) => {
+  if (typeof st.stock === 'number') return st.stock
+  if (typeof st.config?.stock === 'number') return st.config.stock
+  return 15
+}
+
+const quickAdjustStock = async (slug, newStock) => {
+  const stockVal = Math.max(0, newStock)
+  try {
+    await $fetch('/api/stores', {
+      method: 'PATCH',
+      body: { slug, stock: stockVal }
+    })
+    const st = stores.value.find(s => s.slug === slug)
+    if (st) {
+      st.stock = stockVal
+      if (st.config) st.config.stock = stockVal
+    }
+  } catch (e) {
+    alert('স্টক আপডেট করা সম্ভব হয়নি।')
   }
 }
 
@@ -295,7 +354,6 @@ const changeStatus = async (orderId, newStatus) => {
 
 onMounted(() => {
   refreshData()
-  // Poll periodically every 15 seconds for live demo feel
   const interval = setInterval(refreshData, 15000)
   onUnmounted(() => clearInterval(interval))
 })
