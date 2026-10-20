@@ -1,7 +1,7 @@
 /**
- * Strict Conversational Onboarding Agent
- * MUST ask follow-up questions step-by-step through pure dialogue.
- * Only triggers store creation when the seller answers all key questions.
+ * Step-by-Step Patient Onboarding Agent
+ * Strictly asks ONE question at a time. Never dumps multiple questions.
+ * Proactively suggests compelling benefits, marketing angles, and prices.
  */
 import { GoogleGenAI } from '@google/genai'
 
@@ -19,29 +19,23 @@ export default defineEventHandler(async (event) => {
   try {
     const ai = new GoogleGenAI({ apiKey })
 
-    const systemPrompt = `You are "DokanAI Onboarding Specialist" (দোকান এআই), an intelligent conversational e-commerce consultant for Bangladeshi single-product Cash-on-Delivery (COD) stores.
+    const systemPrompt = `You are "DokanAI Assistant" (দোকান এআই), a warm, patient, and expert Bangladeshi e-commerce consultant specialized in high-converting Cash-on-Delivery (COD) stores.
 
-YOUR GOAL:
-You MUST interview the merchant naturally across a dialogue of 2 to 4 turns. 
-DO NOT rush to generate the store on the first or second turn unless the merchant already provided all of these details in depth!
+CRITICAL CONVERSATIONAL RULES (STRICT):
+1. **NEVER HURRY. ASK ONLY ONE QUESTION AT A TIME.** Do not dump 2 or 3 questions in one message.
+2. **ACTIVE SUGGESTIONS & IDEAS:** Whenever you ask a question, ALWAYS PROACTIVELY SUGGEST realistic ideas, prices, or benefits for their specific product! (e.g. If they sell মধু, suggest: "যেমন: সুন্দরবনের প্রাকৃতিক চাকের মধু, ১০০% ভেজালমুক্ত, অথবা কোনো প্রিজারভেটিভ নেই—এমন কিছু কি হাইলাইট করব?")
+3. **NATURAL PROGRESSION (Step-by-Step Flow):**
+   - **Step 1 (Product Name):** Ask what product they want to sell.
+   - **Step 2 (Price & Offer):** Praise their product, suggest a realistic market price range or discount strategy, and ask: "অফার মূল্য কত রাখতে চান এবং আগের রেগুলার মূল্য কত দেখাব?"
+   - **Step 3 (Delivery Fee):** Praise the price. Proactively suggest delivery fees (e.g. "সাধারণত ঢাকায় ৭০ টাকা ও বাইরে ১৩০ টাকা রাখা হয়, আপনি কি এই রেট রাখবেন নাকি নিজের মতো কোনো চার্জ নির্ধারণ করতে চান?")
+   - **Step 4 (Core Benefits & Transformation):** Enthusiastically suggest 2-3 compelling sales points for their product and ask: "এই প্রডাক্টের প্রধান ২/৩টি বিশেষ সুবিধা কী কী রাখবেন? (আমি কি সাজেস্ট করে দিতে পারি যেমন: ...?)"
+   - **Step 5 (Confirmation & Launch):** Warmly summarize all gathered information and set "readyToGenerate": true.
 
-THE 5 ESSENTIAL DETAILS YOU MUST EXTRACT:
-1. Product Name & what it does (প্রোডাক্টের নাম)
-2. Selling/Offer Price & Regular/Old Price in BDT (কত টাকায় বিক্রি করবেন এবং আগের রেগুলার প্রাইজ কত)
-3. Delivery charges (ঢাকার ভেতরে ও ঢাকার বাইরে ডেলিভারি চার্জ কত — default in BD is usually ৳70 inside, ৳130 outside, ask if they want this or custom)
-4. 2-3 Core Customer Benefits/Features (প্রোডাক্টটির বিশেষ গুণাবলী বা সমস্যা সমাধানের উপায়)
-5. Guarantee or Return policy (ক্যাশ অন ডেলিভারি, ৭ দিনের রিপ্লেসমেন্ট ইত্যাদি)
-
-BEHAVIOR RULES:
-- Ask 1 or at most 2 concise follow-up questions at a time in warm, natural colloquial Bengali.
-- Acknowledge whatever info the seller just gave (e.g. "৳১,২০০ টাকা দারুণ আকর্ষণীয় অফার প্রাইজ!").
-- If delivery charge was NOT explicitly mentioned, ASK THEM: "ঢাকার ভেতরে ও ঢাকার বাইরে ডেলিভারি চার্জ কত রাখবেন? (যেমন: ৭০ ও ১৩০ টাকা)"
-- If core features or benefits were NOT mentioned, ASK THEM: "এই প্রোডাক্টের প্রধান ২/৩টি বিশেষ সুবিধা বা গুণ কি কি যা কাস্টমারকে আকৃষ্ট করবে?"
-- ONLY when you have at least: Product Name, Price, Delivery Charges, AND at least 2 benefits/details, set "readyToGenerate": true. Otherwise set it to false and continue asking the missing question.
+4. **TONE:** Friendly, encouraging, polite Bengali (feel free to use natural Banglish words like 'offer price', 'delivery charge', 'discount', 'COD').
 
 RETURN STRICT JSON ONLY:
 {
-  "reply": "Your friendly conversational Bengali response asking the specific follow-up question",
+  "reply": "Your friendly Bengali reply asking EXACTLY ONE single focused question with smart suggestions",
   "readyToGenerate": boolean,
   "extractedData": {
     "product_title": "string or null",
@@ -92,16 +86,16 @@ function handleFallbackAgent(messages: any[], userMessage: string) {
   const priceMatch = userMessage.match(/(\d{3,5})/g)
   let extractedPrice = priceMatch ? parseInt(priceMatch[0], 10) : null
 
-  // Turn 1: Ask for price and benefits if missing
+  // Turn 1 -> Ask Price with suggestion
   if (historyLen <= 1) {
     return {
       success: true,
-      reply: `চমৎকার প্রোডাক্ট আইডিয়া! ল্যান্ডিং পেজে কাস্টমারদের আকর্ষণ করার জন্য ২টি তথ্য জানান:\n\n১. অফার মূল্য কত রাখবেন এবং আগের মূল্য কত ছিল? (যেমন: ৳১২০০, আগে ১৮০০)\n২. এই প্রোডাক্টের প্রধান ২টি সুবিধা কি কি?`,
+      reply: `চমৎকার প্রোডাক্ট চয়েস! "${userMessage.slice(0, 30)}"-এর বর্তমান বাজারে খুব ভালো চাহিদা রয়েছে।\n\nআপনি এটি কত টাকায় স্পেশাল অফারে বিক্রি করতে চান? (যেমন: ৳৯৯৯ বা ৳১২৫০, সাথে পূর্বের রেগুলার মূল্য কত দেখাতে চান?)`,
       readyToGenerate: false,
       extractedData: {
         product_title: userMessage.slice(0, 40),
-        price: extractedPrice,
-        regular_price: extractedPrice ? Math.round(extractedPrice * 1.4) : null,
+        price: null,
+        regular_price: null,
         delivery_fee_inside: 70,
         delivery_fee_outside: 130,
         theme_color: 'emerald',
@@ -110,11 +104,11 @@ function handleFallbackAgent(messages: any[], userMessage: string) {
     }
   }
 
-  // Turn 2: Ask for delivery charges & guarantee
+  // Turn 2 -> Ask Delivery Fee with suggestion
   if (historyLen <= 3) {
     return {
       success: true,
-      reply: `তথ্যগুলো দারুণ! এবার শেষ ২টি তথ্য জানান:\n\n১. ঢাকার ভেতরে ও ঢাকার বাইরে আপনার ডেলিভারি চার্জ কত রাখবেন? (যেমন: সাধারণ নিয়ম অনুযায়ী ভেতরে ৭০ টাকা ও বাইরে ১৩০ টাকা)\n২. কাস্টমারদের জন্য কি কোনো রিপ্লেসমেন্ট গ্যারান্টি বা ক্যাশ অন ডেলিভারি সুবিধা থাকবে?`,
+      reply: `অফার প্রাইজটি খুব আকর্ষণীয় হয়েছে!\n\nএবার বলুন, ডেলিভারি চার্জ কত রাখবেন? সাধারণত ঢাকার ভেতরে ৭০ টাকা এবং বাইরে ১৩০ টাকা রাখা হয়—আপনি কি এই চার্জ রাখতে চান নাকি অন্য কোনো রেট দিতে চান?`,
       readyToGenerate: false,
       extractedData: {
         product_title: null,
@@ -123,15 +117,33 @@ function handleFallbackAgent(messages: any[], userMessage: string) {
         delivery_fee_inside: 70,
         delivery_fee_outside: 130,
         theme_color: 'emerald',
-        highlights: ['১০০% অরিজিনাল', 'প্রিমিয়াম কোয়ালিটি']
+        highlights: []
       }
     }
   }
 
-  // Turn 3: Ready
+  // Turn 3 -> Suggest and ask for benefits
+  if (historyLen <= 5) {
+    return {
+      success: true,
+      reply: `ডেলিভারি চার্জ নির্ধারণ ঠিক আছে!\n\nআচ্ছা, এই প্রোডাক্টের প্রধান ২ বা ৩টি বিশেষ গুণ বা সুবিধা কী কী, যা কাস্টমারকে কিনতে সবচেয়ে বেশি আকৃষ্ট করবে? (যেমন: ১০০% প্রাকৃতিক, দ্রুত ফলাফল, বা প্রিমিয়াম কোয়ালিটি—এমন কিছু কি আমরা হাইলাইট করব?)`,
+      readyToGenerate: false,
+      extractedData: {
+        product_title: null,
+        price: extractedPrice || 1200,
+        regular_price: extractedPrice ? Math.round(extractedPrice * 1.4) : 1600,
+        delivery_fee_inside: 70,
+        delivery_fee_outside: 130,
+        theme_color: 'emerald',
+        highlights: ['১০০% প্রিমিয়াম ও অরিজিনাল', 'ক্যাশ অন ডেলিভারি সুবিধা']
+      }
+    }
+  }
+
+  // Turn 4 -> Complete and ready
   return {
     success: true,
-    reply: `অসাধারণ! সব তথ্য সুন্দরভাবে পেয়ে গেছি।\nআপনার হাই-কনভার্টিং ল্যান্ডিং পেজ এবং কাস্টমার ক্লোজিং AI চ্যাটবট রেডি করতে নিচের বাটনে চাপ দিন!`,
+    reply: `অসাধারণ! সব তথ্য চমৎকারভাবে সাজিয়ে নিয়েছি। আপনার দোকানের জন্য হাইপার-কনভার্টিং ল্যান্ডিং পেজ ও সেলস অ্যাসিস্ট্যান্ট চ্যাটবট রেডি করতে নিচের বাটনে চাপ দিন!`,
     readyToGenerate: true,
     extractedData: {
       product_title: null,
@@ -140,7 +152,7 @@ function handleFallbackAgent(messages: any[], userMessage: string) {
       delivery_fee_inside: 70,
       delivery_fee_outside: 130,
       theme_color: 'emerald',
-      highlights: ['ক্যাশ অন ডেলিভারি', '৭ দিনের রিপ্লেসমেন্ট']
+      highlights: ['১০০% অরিজিনাল', 'ক্যাশ অন ডেলিভারি', '৭ দিনের রিটার্ন গ্যারান্টি']
     }
   }
 }

@@ -7,13 +7,13 @@
       <div class="mb-4 text-center">
         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
           <Sparkles class="w-3.5 h-3.5 text-emerald-600" />
-          <span>Multimodal AI Store Agent</span>
+          <span>Step-by-Step AI Store Consultant</span>
         </div>
         <h1 class="text-2xl sm:text-3xl font-black text-slate-900">
           AI সহকারীর সাথে কথা বলে দোকান তৈরি করুন
         </h1>
         <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-md mx-auto">
-          ChatGPT/Gemini-এর মতো ছবি আপলোড করুন ও চ্যাট করুন। সব প্রশ্নের উত্তর দিয়ে তৈরি করুন সম্পূর্ণ লাইভ স্টোর।
+          AI আপনাকে একটি একটি করে প্রশ্ন করবে এবং আইডিয়া সাজেস্ট করবে। চ্যাট শেষেই পেয়ে যাবেন লাইভ সিঙ্গেল প্রোডাক্ট স্টোর।
         </p>
       </div>
 
@@ -27,9 +27,9 @@
               <Bot class="w-5 h-5" />
             </div>
             <div>
-              <h3 class="text-sm font-bold text-slate-900">DokanAI অনবোর্ডিং স্পেশালিস্ট</h3>
+              <h3 class="text-sm font-bold text-slate-900">DokanAI সহকারী</h3>
               <span class="inline-flex items-center gap-1.5 text-[11px] text-emerald-600 font-semibold">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> অনলাইন (Conversational Mode)
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> অনলাইন (১টি করে প্রশ্ন ও পরামর্শ মোড)
               </span>
             </div>
           </div>
@@ -50,7 +50,7 @@
                 ? 'bg-emerald-600 text-white rounded-br-none shadow-md shadow-emerald-600/10' 
                 : 'bg-slate-100 text-slate-800 rounded-bl-none border border-slate-200/50'"
             >
-              <!-- Render user-attached images directly inside user message bubble (like ChatGPT/Gemini) -->
+              <!-- Render user-attached images inside message bubble -->
               <div v-if="msg.images && msg.images.length > 0" class="flex flex-wrap gap-2 mb-2.5">
                 <div v-for="(img, imgIdx) in msg.images" :key="imgIdx" class="w-20 h-20 rounded-xl overflow-hidden border border-white/20 shadow-sm">
                   <img :src="img" class="w-full h-full object-cover" />
@@ -64,14 +64,14 @@
                 <div class="p-3.5 bg-white rounded-2xl border border-emerald-200 shadow-sm space-y-2.5 text-slate-800">
                   <div class="flex items-center gap-2 text-emerald-700 font-bold text-xs">
                     <CheckCircle2 class="w-4 h-4 text-emerald-600" />
-                    <span>সব প্রয়োজনীয় তথ্য সংগ্রহ সম্পন্ন হয়েছে!</span>
+                    <span>সব প্রয়োজনীয় তথ্য সংগ্রহ ও সাজানো সম্পন্ন হয়েছে!</span>
                   </div>
                   
                   <div class="text-[11px] text-slate-600 font-medium space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                     <div>📦 প্রোডাক্ট: <strong>{{ extractedData.product_title || 'এক্সক্লুসিভ কালেকশন' }}</strong></div>
                     <div>💰 অফার মূল্য: <strong class="text-emerald-600">৳{{ extractedData.price || 1200 }}</strong> (আগে ছিল: <span class="line-through">৳{{ extractedData.regular_price || 1800 }}</span>)</div>
                     <div>🚚 ডেলিভারি চার্জ: <strong>ঢাকার ভেতরে ৳{{ extractedData.delivery_fee_inside }} | বাইরে ৳{{ extractedData.delivery_fee_outside }}</strong></div>
-                    <div>🖼️ প্রোডাক্ট ফটো: <strong>{{ allUploadedImages.length }} টি ছবি সংযুক্ত আছে</strong></div>
+                    <div>🖼️ প্রোডাক্ট ফটো: <strong>{{ allUploadedImages.length }} টি ছবি যুক্ত আছে</strong></div>
                   </div>
 
                   <button 
@@ -100,11 +100,11 @@
           </div>
         </div>
 
-        <!-- Chat Input Area (ChatGPT / Gemini Style: Pill Box with Embedded Attachment) -->
+        <!-- Chat Input Area (ChatGPT / Gemini Style) -->
         <div class="p-3 sm:p-4 border-t border-slate-100 bg-white">
           <form @submit.prevent="sendMessage" class="bg-slate-50 border border-slate-200 rounded-3xl p-2 sm:p-2.5 focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-all">
             
-            <!-- Pre-send attached image thumbnails (Inside the input card, just like ChatGPT/Gemini) -->
+            <!-- Pre-send attached image thumbnails -->
             <div v-if="pendingImages.length > 0" class="flex items-center gap-2 px-2 pt-1 pb-2 overflow-x-auto">
               <div v-for="(img, pIdx) in pendingImages" :key="pIdx" class="relative group w-14 h-14 rounded-xl overflow-hidden border border-slate-300 shrink-0">
                 <img :src="img" class="w-full h-full object-cover" />
@@ -120,26 +120,23 @@
 
             <!-- Input row: Clip button + Textarea + Send button -->
             <div class="flex items-end gap-2">
-              <!-- Paperclip / Image Attachment Button -->
               <label 
                 class="cursor-pointer p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-slate-200/60 rounded-full transition-colors flex items-center justify-center shrink-0 mb-0.5" 
-                title="ছবি আপলোড করুন (Attach photo)"
+                title="ছবি আপলোড করুন"
               >
                 <Paperclip class="w-5 h-5" />
                 <input type="file" accept="image/*" multiple @change="handleFileUpload" class="hidden" />
               </label>
 
-              <!-- Growing Textarea -->
               <textarea 
                 v-model="inputMessage" 
                 @keydown.enter.exact.prevent="sendMessage"
                 rows="1"
-                placeholder="প্রোডাক্টের বিবরণ লিখুন বা ছবি যুক্ত করুন..." 
+                placeholder="উত্তর লিখুন বা প্রশ্ন করুন..." 
                 class="flex-1 max-h-32 min-h-[38px] py-2 px-1 text-xs sm:text-sm bg-transparent border-0 focus:outline-none resize-none placeholder:text-slate-400 text-slate-800 font-medium"
                 :disabled="isAiTyping || isGeneratingStore"
               ></textarea>
 
-              <!-- Send Button -->
               <button 
                 type="submit" 
                 :disabled="(!inputMessage.trim() && pendingImages.length === 0) || isAiTyping || isGeneratingStore"
@@ -150,7 +147,7 @@
             </div>
           </form>
           <div class="text-[11px] text-slate-400 text-center mt-2 font-medium">
-            Shift + Enter দিয়ে নতুন লাইন লিখুন। ছবি যুক্ত করতে ক্লিপ বাটনে চাপ দিন।
+            Shift + Enter দিয়ে নতুন লাইন লিখুন। ছবি যুক্ত করতে ক্লিপ আইকনে চাপ দিন।
           </div>
         </div>
 
@@ -172,15 +169,14 @@ const isAiTyping = ref(false)
 const isGeneratingStore = ref(false)
 const inputMessage = ref('')
 
-// Pre-send images attached to current prompt
 const pendingImages = ref([])
-// All images collected throughout the chat
 const allUploadedImages = ref([])
 
+// First message asks ONLY for the product name
 const messages = ref([
   {
     role: 'model',
-    content: `আসসালামু আলাইকুম! আমি আপনার DokanAI সহকারী।\nআপনার সিঙ্গেল প্রোডাক্টটি কি এবং কত টাকায় অফারে বিক্রি করতে চান? প্রোডাক্টের ছবি যুক্ত করতে পারেন বা লিখে জানাতে পারেন!`
+    content: `হ্যালো! আপনার অনলাইন সিঙ্গেল-প্রোডাক্ট স্টোরের জন্য আপনি কোন প্রোডাক্টটি বিক্রি করতে চান? লিখে জানান, প্লিজ!`
   }
 ])
 
@@ -225,14 +221,12 @@ const sendMessage = async () => {
 
   if (!text && attached.length === 0) return
 
-  // Push user message with any attached images (like ChatGPT/Gemini)
   messages.value.push({ 
     role: 'user', 
     content: text || 'প্রোডাক্টের ছবি যুক্ত করেছি',
     images: attached
   })
 
-  // Add to global store image repository
   if (attached.length > 0) {
     allUploadedImages.value.push(...attached)
   }
@@ -248,13 +242,13 @@ const sendMessage = async () => {
       method: 'POST',
       body: {
         messages: messages.value,
-        userMessage: text || 'আমি প্রোডাক্টের ছবি আপলোড করেছি'
+        userMessage: text || 'আমি ছবি দিয়েছি'
       }
     })
 
     if (res && res.reply) {
       if (res.extractedData) {
-        if (res.extractedData.product_title) {
+        if (res.extractedData.product_title && !extractedData.product_title) {
           extractedData.product_title = res.extractedData.product_title
         }
         if (res.extractedData.price) {
@@ -325,7 +319,7 @@ const resetChat = () => {
   messages.value = [
     {
       role: 'model',
-      content: `আসসালামু আলাইকুম! আমি আপনার DokanAI সহকারী। আপনার প্রোডাক্টের বিবরণ দিন বা ছবি যুক্ত করুন!`
+      content: `হ্যালো! আপনার অনলাইন সিঙ্গেল-প্রোডাক্ট স্টোরের জন্য আপনি কোন প্রোডাক্টটি বিক্রি করতে চান? লিখে জানান, প্লিজ!`
     }
   ]
   extractedData.product_title = ''
