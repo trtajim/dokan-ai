@@ -1,5 +1,5 @@
 /**
- * Step-by-Step Patient Onboarding Agent with Variant Discovery
+ * Step-by-Step Patient Onboarding Agent with Video Reel & Multimodal Inquiry
  */
 import { GoogleGenAI } from '@google/genai'
 
@@ -20,17 +20,19 @@ export default defineEventHandler(async (event) => {
     const systemPrompt = `You are "DokanAI Assistant" (দোকান এআই), an expert conversational consultant for Bangladeshi single-product Cash-on-Delivery (COD) stores.
 
 CRITICAL RULES:
-1. ASK ONLY ONE FOCUSED QUESTION AT A TIME. Never rush.
-2. PROACTIVELY SUGGEST IDEAS & VARIANTS based on product type:
-   - For Honey/Food/Ghee: Suggest weight variants (e.g. "১ কেজি (৳১০০০), ৫০০ গ্রাম (৳৫৫০), ২ কেজি (৳১৮৫০)").
-   - For Clothing/Shoes: Suggest size or color variants (e.g. "M, L, XL, XXL").
-   - For Electronics/Gadgets: Suggest color or bundle variants (e.g. "Black, Silver, অথবা Extra Strap সহ").
-3. CONVERSATIONAL PROGRESSION:
+1. ASK ONLY ONE FOCUSED QUESTION AT A TIME. Never rush or dump multiple questions.
+2. PROACTIVELY SUGGEST IDEAS & PROMOTIONAL REEL INQUIRY:
+   - For Product Name: Praise and validate the product market in BD.
+   - For Price & Variants: Ask about variants (sizes, weights e.g. 1kg vs 2kg or sizes M/L/XL) and suggest pricing.
+   - For Video Reel: Ask if they have a Facebook or YouTube promotional reel/video link (e.g. "আপনার কি প্রডাক্টের কোনো ইউটিউব বা ফেসবুক রিল/ভিডিও লিঙ্ক আছে? থাকলে পেজে লাইভ ভিডিও প্লেয়ার যোগ করে দেব, না থাকলে স্কিপ করতে পারেন!").
+   - For Delivery & Benefits: Ask delivery charges and suggest 2-3 high converting transformation points.
+3. ONBOARDING SEQUENCE:
    - Step 1: Product Name
-   - Step 2: Price & Variants (Ask if there are sizes, weights, or colors, or just a single standard pack. Proactively suggest examples!)
-   - Step 3: Delivery Charges (Suggest inside Dhaka 70, outside Dhaka 130)
-   - Step 4: Core Benefits & Why customer should buy (Suggest 2-3 strong transformation points)
-   - Step 5: Wrap up, summarize, and trigger store launch (readyToGenerate: true).
+   - Step 2: Price & Variants (weight, size, or color)
+   - Step 3: Promotional Video Reel (YouTube Shorts / Reel URL - optional)
+   - Step 4: Delivery Fees (inside/outside Dhaka)
+   - Step 5: Core Benefits & Transformative selling points
+   - Step 6: Confirmation & Store Launch (readyToGenerate: true).
 
 RETURN STRICT JSON ONLY:
 {
@@ -40,9 +42,9 @@ RETURN STRICT JSON ONLY:
     "product_title": "string or null",
     "price": number or null,
     "regular_price": number or null,
+    "video_reel_url": "string or null",
     "variants": [
-      { "name": "1 কেজি", "price": 1000 },
-      { "name": "500 গ্রাম", "price": 550 }
+      { "name": "1 কেজি", "price": 1000 }
     ],
     "delivery_fee_inside": number or null,
     "delivery_fee_outside": number or null,
@@ -89,6 +91,7 @@ function handleFallbackAgent(messages: any[], userMessage: string) {
   const priceMatch = userMessage.match(/(\d{3,5})/g)
   let extractedPrice = priceMatch ? parseInt(priceMatch[0], 10) : 1000
 
+  // Turn 1 -> Ask Price with suggestion
   if (historyLen <= 1) {
     return {
       success: true,
@@ -106,10 +109,29 @@ function handleFallbackAgent(messages: any[], userMessage: string) {
     }
   }
 
+  // Turn 2 -> Ask for promotional reel / video
   if (historyLen <= 3) {
     return {
       success: true,
-      reply: `ভ্যারিয়েন্ট ও প্রাইসের তথ্য চমৎকার!\n\nএবার জানান, ডেলিভারি চার্জ কত রাখবেন? (সাধারণত ঢাকায় ৭০ টাকা ও ঢাকার বাইরে ১৩০ টাকা রাখা হয়, আপনি কি এই রেট রাখবেন নাকি নিজের কোনো ফি নির্ধারণ করবেন?)`,
+      reply: `প্রাইসিং তথ্য সংরক্ষিত হয়েছে!\n\nআপনার কি প্রোডাক্টের কোনো ইউটিউব বা ফেসবুক রিল/ভিডিও লিঙ্ক আছে? (লিঙ্ক দিলে ল্যান্ডিং পেজে আকর্ষণীয় ভিডিও সেকশন যুক্ত হবে, না থাকলে "নেই" লিখে দিন)।`,
+      readyToGenerate: false,
+      extractedData: {
+        product_title: null,
+        price: extractedPrice,
+        regular_price: Math.round(extractedPrice * 1.4),
+        delivery_fee_inside: 70,
+        delivery_fee_outside: 130,
+        theme_color: 'emerald',
+        highlights: []
+      }
+    }
+  }
+
+  // Turn 3 -> Ask delivery fee
+  if (historyLen <= 5) {
+    return {
+      success: true,
+      reply: `এবার জানান, ডেলিভারি চার্জ কত রাখবেন? (সাধারণত ঢাকায় ৭০ টাকা ও ঢাকার বাইরে ১৩০ টাকা রাখা হয়, আপনি কি এই রেট রাখবেন নাকি নিজের কোনো ফি নির্ধারণ করবেন?)`,
       readyToGenerate: false,
       extractedData: {
         product_title: null,

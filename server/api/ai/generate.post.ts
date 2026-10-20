@@ -1,5 +1,5 @@
 /**
- * AI Store Configuration Generator with Variant Support
+ * AI Store Configuration Generator with Intelligent Image Placement and Reel Support
  */
 import { GoogleGenAI } from '@google/genai'
 import { memoryStore } from '../../utils/memoryStore'
@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
     regular_price, 
     variants,
     stock,
+    video_reel_url,
     delivery_fee_inside,
     delivery_fee_outside,
     description, 
@@ -41,35 +42,43 @@ export default defineEventHandler(async (event) => {
     ? images 
     : [image_url || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80']
 
+  // Intelligent Image Placement: Hero image, Secondary image, and Trust image
+  const heroImage = allImages[0]
+  const secondaryImage = allImages.length > 1 ? allImages[1] : allImages[0]
+  const featureImage = allImages.length > 2 ? allImages[2] : (allImages.length > 1 ? allImages[1] : allImages[0])
+
   let generatedConfig: any = null
 
   if (apiKey) {
     try {
       const ai = new GoogleGenAI({ apiKey })
-      const prompt = `You are an elite direct-response e-commerce copywriter in Bangladesh.
-Generate high-converting sales landing page content in persuasive Bengali for this product:
+      const prompt = `You are Bangladesh's top e-commerce landing page copywriter and conversion strategist.
+Generate an irresistible, emotionally persuasive sales page JSON in natural colloquial Bengali for:
 
 Product: ${product_title}
-Offer Price: ${productPrice} BDT (Regular: ${oldPrice} BDT)
-Delivery: Inside Dhaka ${insideFee} BDT, Outside Dhaka ${outsideFee} BDT (Cash on Delivery)
+Price: ৳${productPrice} (Original: ৳${oldPrice})
+Delivery Charges: Inside Dhaka ৳${insideFee}, Outside Dhaka ৳${outsideFee} (COD)
 Variants Info: ${JSON.stringify(variants || [])}
-Notes / Highlights: ${description || '100% genuine with warranty'}
+Reel / Video URL: "${video_reel_url || ''}"
+Notes: ${description || '100% genuine with warranty'}
 Theme: ${theme_color || 'emerald'}
 
 Respond ONLY with a strictly valid JSON matching this schema:
 {
-  "headline": "Persuasive attention-grabbing headline in Bengali",
-  "subheadline": "Benefit-driven 2-sentence description in Bengali",
+  "headline": "Emotional, curiosity-driven Bengali headline solving customer problem",
+  "subheadline": "2-sentence transformation explanation highlighting benefits and why order now",
   "urgency_text": "🔥 অফারটি সীমিত সময়ের জন্য! ক্যাশ অন ডেলিভারিতে অর্ডার করুন!",
+  "video_reel_url": "${video_reel_url || ''}",
   "trust_badges": [
     "ক্যাশ অন ডেলিভারি (পণ্য চেক করে মূল্য পরিশোধ)",
     "৭ দিনের সহজ রিপ্লেসমেন্ট পলিসি",
     "১০০% অরিজিনাল ও প্রিমিয়াম কোয়ালিটি"
   ],
   "features": [
-    { "title": "Feature title in Bengali", "desc": "Detailed benefit description in Bengali" },
-    { "title": "Feature title in Bengali", "desc": "Detailed benefit description in Bengali" },
-    { "title": "Feature title in Bengali", "desc": "Detailed benefit description in Bengali" }
+    { "title": "Feature 1 Bengali title", "desc": "Detailed emotional benefit description" },
+    { "title": "Feature 2 Bengali title", "desc": "Detailed emotional benefit description" },
+    { "title": "Feature 3 Bengali title", "desc": "Detailed emotional benefit description" },
+    { "title": "Feature 4 Bengali title", "desc": "Detailed emotional benefit description" }
   ],
   "faqs": [
     { "q": "ডেলিভারি ম্যানের সামনে কি খুলে দেখা যাবে?", "a": "হ্যাঁ, সম্পূর্ণ নিশ্চিত হয়ে চেক করে মূল্য পরিশোধ করবেন।" },
@@ -77,7 +86,8 @@ Respond ONLY with a strictly valid JSON matching this schema:
     { "q": "কোন সমস্যা হলে রিপ্লেসমেন্ট পাব?", "a": "আমাদের রয়েছে ৭ দিনের সহজ ফ্রি রিপ্লেসমেন্ট পলিসি।" }
   ],
   "testimonials": [
-    { "name": "কাস্টমারের নাম", "location": "ঢাকা / চট্টগ্রাম / সিলেট", "comment": "স্বাভাবিক ও বাস্তবসম্মত প্রশংসা রিভিউ" }
+    { "name": "তানভীর আহমেদ", "location": "ঢাকা", "comment": "যেমন চেয়েছিলাম ঠিক তেমনই পেয়েছি। প্যাকেজিং খুব ভালো ছিল।" },
+    { "name": "মোঃ সাইদুল ইসলাম", "location": "সিলেট", "comment": "ক্যাশ অন ডেলিভারিতে চেক করে নিতে পেরে খুব ভালো লাগল।" }
   ]
 }`
 
@@ -98,8 +108,9 @@ Respond ONLY with a strictly valid JSON matching this schema:
   if (!generatedConfig || !generatedConfig.headline) {
     generatedConfig = {
       headline: `প্রিমিয়াম কোয়ালিটির ${product_title} - আপনার প্রতিদিনের বিশ্বস্ত সঙ্গী`,
-      subheadline: `সেরা কোয়ালিটি, আকর্ষণীয় ডিজাইন এবং দীর্ঘস্থায়ী পারফরম্যান্সের নিশ্চয়তা। এখনই অর্ডার করুন এবং উপভোগ করুন স্পেশাল ক্যাশ অন ডেলিভারি ডিসকাউন্ট!`,
+      subheadline: `সেরা কোয়ালিটি, আকর্ষণীয় ফিনিশিং এবং দীর্ঘস্থায়ী পারফরম্যান্সের নিশ্চয়তা। এখনই অর্ডার করুন ক্যাশ অন ডেলিভারি ডিসকাউন্টে!`,
       urgency_text: `🔥 অফারটি সীমিত সময়ের জন্য! ক্যাশ অন ডেলিভারিতে অর্ডার করুন!`,
+      video_reel_url: video_reel_url || '',
       trust_badges: [
         'ক্যাশ অন ডেলিভারি (পণ্য দেখে মূল্য পরিশোধ)',
         '৭ দিনের ফ্রি রিপ্লেসমেন্ট সুবিধা',
@@ -137,11 +148,26 @@ Respond ONLY with a strictly valid JSON matching this schema:
 
   const normalizedVariants = Array.isArray(variants) && variants.length > 0 ? variants : []
 
+  // Clean / embed YouTube / Facebook reel URL
+  let cleanVideoEmbed = ''
+  if (video_reel_url) {
+    const ytMatch = video_reel_url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/))([\w-]{11})/)
+    if (ytMatch && ytMatch[1]) {
+      cleanVideoEmbed = `https://www.youtube.com/embed/${ytMatch[1]}`
+    } else {
+      cleanVideoEmbed = video_reel_url
+    }
+  }
+
   generatedConfig.delivery_fee_inside = insideFee
   generatedConfig.delivery_fee_outside = outsideFee
   generatedConfig.images = allImages
+  generatedConfig.hero_image = heroImage
+  generatedConfig.secondary_image = secondaryImage
+  generatedConfig.feature_image = featureImage
   generatedConfig.stock = initialStock
   generatedConfig.variants = normalizedVariants
+  generatedConfig.video_reel_url = cleanVideoEmbed
   generatedConfig.user_id = user_id || 'guest_merchant_demo'
 
   const storeData = {
@@ -153,7 +179,7 @@ Respond ONLY with a strictly valid JSON matching this schema:
     regular_price: oldPrice,
     stock: initialStock,
     variants: normalizedVariants,
-    image_url: allImages[0],
+    image_url: heroImage,
     images: allImages,
     delivery_fee_inside: insideFee,
     delivery_fee_outside: outsideFee,
