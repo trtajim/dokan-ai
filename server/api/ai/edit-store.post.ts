@@ -129,7 +129,8 @@ RETURN STRICT JSON ONLY:
         faqs: parsed.faqs || currentStore.config?.faqs,
         testimonials: parsed.testimonials || currentStore.config?.testimonials,
         variants: parsed.variants || currentStore.config?.variants,
-        stock: parsed.stock ?? currentStore.stock
+        stock: parsed.stock ?? currentStore.stock,
+        pixel_id: parsed.pixel_id !== undefined ? parsed.pixel_id : currentStore.config?.pixel_id
       }
 
       const prevSnapshot = JSON.stringify({

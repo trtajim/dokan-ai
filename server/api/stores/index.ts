@@ -87,17 +87,28 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // PATCH: Quick stock update from dashboard
+  // PATCH: Quick stock or pixel update from dashboard
   if (method === 'PATCH') {
     const body = await readBody(event)
-    const { slug, stock } = body
+    const { slug, stock, pixel_id } = body
 
-    if (!slug || typeof stock !== 'number') {
-      throw createError({ statusCode: 400, message: 'slug and stock (number) are required' })
+    if (!slug) {
+      throw createError({ statusCode: 400, message: 'slug is required' })
     }
 
-    const updatedStock = Math.max(0, stock)
-    memoryStore.updateStock(slug, updatedStock)
+    let updatedStock: number | undefined
+    if (typeof stock === 'number') {
+      updatedStock = Math.max(0, stock)
+      memoryStore.updateStock(slug, updatedStock)
+    }
+
+    const currentStore = memoryStore.getStore(slug)
+    if (currentStore) {
+      if (!currentStore.config) currentStore.config = {}
+      if (typeof stock === 'number') currentStore.config.stock = updatedStock
+      if (pixel_id !== undefined) currentStore.config.pixel_id = pixel_id ? String(pixel_id).trim() : null
+      memoryStore.setStore(slug, currentStore)
+    }
 
     const supabase = getSupabaseClient()
     if (supabase) {
@@ -105,15 +116,20 @@ export default defineEventHandler(async (event) => {
         const { data: store } = await supabase.from('stores').select('config').eq('slug', slug).single()
         if (store) {
           const cfg = store.config || {}
-          cfg.stock = updatedStock
+          if (typeof stock === 'number') cfg.stock = updatedStock
+          if (pixel_id !== undefined) cfg.pixel_id = pixel_id ? String(pixel_id).trim() : null
           await supabase.from('stores').update({ config: cfg }).eq('slug', slug)
         }
       } catch (e) {
-        console.warn('Supabase stock sync error:', e)
+        console.warn('Supabase store patch error:', e)
       }
     }
 
-    return { success: true, stock: updatedStock }
+    return { 
+      success: true, 
+      stock: updatedStock,
+      pixel_id: pixel_id !== undefined ? (pixel_id ? String(pixel_id).trim() : null) : undefined
+    }
   }
 
   // PUT: Full store edit (including variants)
