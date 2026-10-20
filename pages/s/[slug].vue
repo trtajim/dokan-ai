@@ -803,6 +803,35 @@ const scrollToForm = () => {
   }
 }
 
+const scrollToEditorBottom = () => {
+  nextTick(() => {
+    if (editorScroll.value) {
+      editorScroll.value.scrollTo({
+        top: editorScroll.value.scrollHeight,
+        behavior: 'smooth'
+      })
+    }
+  })
+  // Secondary microtask to guarantee layout reflow after reactive render
+  setTimeout(() => {
+    if (editorScroll.value) {
+      editorScroll.value.scrollTo({
+        top: editorScroll.value.scrollHeight,
+        behavior: 'smooth'
+      })
+    }
+  }, 60)
+}
+
+// Auto-scroll when editor opens or logs mutate
+watch(isEditingStore, (open) => {
+  if (open) scrollToEditorBottom()
+})
+
+watch(() => editLogs.value.length, () => {
+  scrollToEditorBottom()
+})
+
 const submitAiEdit = async () => {
   const instruction = aiInstruction.value.trim()
   if (!instruction) return
@@ -817,10 +846,7 @@ const submitAiEdit = async () => {
     suggestions: []
   })
 
-  await nextTick()
-  if (editorScroll.value) {
-    editorScroll.value.scrollTop = editorScroll.value.scrollHeight
-  }
+  scrollToEditorBottom()
 
   isAiEditing.value = true
 
@@ -856,18 +882,17 @@ const submitAiEdit = async () => {
         await refresh()
       }
 
-      await nextTick()
-      if (editorScroll.value) {
-        editorScroll.value.scrollTop = editorScroll.value.scrollHeight
-      }
+      scrollToEditorBottom()
     }
   } catch (err) {
     if (editLogs.value[activeLogIndex]) {
       editLogs.value[activeLogIndex].response = 'AI এডিট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।'
     }
     toast.error('AI এডিট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।')
+    scrollToEditorBottom()
   } finally {
     isAiEditing.value = false
+    scrollToEditorBottom()
   }
 }
 
