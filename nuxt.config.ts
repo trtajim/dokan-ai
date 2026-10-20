@@ -5,8 +5,12 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss'],
   runtimeConfig: {
     geminiApiKey: process.env.GEMINI_API_KEY || '',
+    geminiApiKey2: process.env.GEMINI_API_KEY_2 || '',
+    geminiApiKey3: process.env.GEMINI_API_KEY_3 || '',
     groqApiKey: process.env.GROQ_API_KEY || '',
-    aiProvider: process.env.AI_PROVIDER || 'gemini',
+    groqApiKey2: process.env.GROQ_API_KEY_2 || '',
+    groqApiKey3: process.env.GROQ_API_KEY_3 || '',
+    aiProvider: process.env.AI_PROVIDER || 'groq',
     supabaseUrl: process.env.SUPABASE_URL || '',
     supabaseKey: process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY || '',
     telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || '',
