@@ -378,11 +378,14 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-[#16251d] text-[#b9cfc0] text-center py-8 px-4 text-xs sm:text-sm mt-12">
+    <footer 
+      :style="{ backgroundColor: themeStyles.footerBg, color: themeStyles.footerText }"
+      class="text-center py-8 px-4 text-xs sm:text-sm mt-12 transition-colors duration-300"
+    >
       <div class="max-w-md mx-auto space-y-2">
-        <p class="font-serif-bn text-base text-[#fff6e0] font-bold">{{ store.product_title }}</p>
-        <p class="text-xs text-slate-400">ক্যাশ অন ডেলিভারি সার্ভিস। পণ্য হাতে পেয়ে মূল্য পরিশোধ করুন।</p>
-        <p class="text-[11px] text-slate-500 pt-2">Powered by DokanAI</p>
+        <p :style="{ color: themeStyles.heroText }" class="font-serif-bn text-base font-bold">{{ store.product_title }}</p>
+        <p class="text-xs opacity-80">ক্যাশ অন ডেলিভারি সার্ভিস। পণ্য হাতে পেয়ে মূল্য পরিশোধ করুন।</p>
+        <p class="text-[11px] opacity-60 pt-2">Powered by DokanAI</p>
       </div>
     </footer>
 
@@ -632,7 +635,9 @@ const themeStyles = computed(() => {
         testimonialCardBg: '#3d2203',
         testimonialBorder: '#543007',
         btnBg: '#d97706',
-        btnText: '#ffffff'
+        btnText: '#ffffff',
+        footerBg: '#1f1001',
+        footerText: '#d8b688'
       }
     case 'indigo':
       return {
@@ -653,7 +658,9 @@ const themeStyles = computed(() => {
         testimonialCardBg: '#1e293b',
         testimonialBorder: '#334155',
         btnBg: '#4f46e5',
-        btnText: '#ffffff'
+        btnText: '#ffffff',
+        footerBg: '#090d16',
+        footerText: '#94a3b8'
       }
     case 'rose':
       return {
@@ -674,7 +681,9 @@ const themeStyles = computed(() => {
         testimonialCardBg: '#3d0c1f',
         testimonialBorder: '#5c132f',
         btnBg: '#e11d48',
-        btnText: '#ffffff'
+        btnText: '#ffffff',
+        footerBg: '#18040c',
+        footerText: '#f43f5e'
       }
     case 'slate':
       return {
@@ -695,7 +704,9 @@ const themeStyles = computed(() => {
         testimonialCardBg: '#27272a',
         testimonialBorder: '#3f3f46',
         btnBg: '#ea580c',
-        btnText: '#ffffff'
+        btnText: '#ffffff',
+        footerBg: '#09090b',
+        footerText: '#a1a1aa'
       }
     case 'emerald':
     default:
@@ -717,7 +728,9 @@ const themeStyles = computed(() => {
         testimonialCardBg: '#1f5a42',
         testimonialBorder: '#065f46',
         btnBg: '#e8a020',
-        btnText: '#16251d'
+        btnText: '#16251d',
+        footerBg: '#0e1c15',
+        footerText: '#8fa998'
       }
   }
 })

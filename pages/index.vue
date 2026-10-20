@@ -61,53 +61,8 @@
       </div>
     </section>
 
-    <!-- How It Works Section -->
-    <section class="py-16 bg-white border-y border-slate-200/70">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-xl mx-auto mb-14">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-2">সহজ ৩টি ধাপ</h2>
-          <p class="text-3xl font-extrabold text-slate-900">কীভাবে কাজ করে DokanAI?</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <!-- Step 1 -->
-          <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 hover:shadow-lg transition-shadow">
-            <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-lg mb-4">
-              ১
-            </div>
-            <h3 class="text-lg font-bold text-slate-900 mb-2">প্রোডাক্টের বিবরণ দিন</h3>
-            <p class="text-sm text-slate-600 leading-relaxed">
-              আপনার প্রোডাক্টের নাম, দাম এবং অন্যান্য তথ্য লিখুন। DokanAI অনবোর্ডিং এজেন্ট বাকি সব নিজে সাজিয়ে নিবে।
-            </p>
-          </div>
-
-          <!-- Step 2 -->
-          <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 hover:shadow-lg transition-shadow">
-            <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center font-black text-lg mb-4">
-              ২
-            </div>
-            <h3 class="text-lg font-bold text-slate-900 mb-2">স্বয়ংক্রিয় স্টোর জেনারেট</h3>
-            <p class="text-sm text-slate-600 leading-relaxed">
-              হাইপার-কনভার্টিং বাংলা হেডলাইন, ট্রাস্ট ব্যাজ, এফএকিউ এবং ক্যাশ অন ডেলিভারি ফর্ম সহ সম্পূর্ণ পেজ তৈরি হবে নিমেষেই।
-            </p>
-          </div>
-
-          <!-- Step 3 -->
-          <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 hover:shadow-lg transition-shadow">
-            <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-black text-lg mb-4">
-              ৩
-            </div>
-            <h3 class="text-lg font-bold text-slate-900 mb-2">অর্ডার পান ড্যাশবোর্ডে</h3>
-            <p class="text-sm text-slate-600 leading-relaxed">
-              ফেসবুক অ্যাড বা বায়োতে লিংক শেয়ার করুন। গ্রাহক অর্ডার করলেই ড্যাশবোর্ডে রিয়েল-টাইম নোটিফিকেশন চলে আসবে।
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Merchant Power Tools & Automation Showcase -->
-    <section class="py-16 lg:py-24 bg-slate-50 border-b border-slate-200/80">
+    <!-- Merchant Power Tools & Automation Showcase (Moved above How It Works) -->
+    <section class="py-16 lg:py-20 bg-slate-50 border-b border-slate-200/80">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-2xl mx-auto mb-14">
           <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-3">
@@ -189,6 +144,51 @@
               <CheckCircle2 class="w-3.5 h-3.5" />
               <span>অটো স্টক ডিডাকশন ও আর্জেন্সি বার</span>
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="py-16 bg-white border-y border-slate-200/70">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-xl mx-auto mb-14">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-2">সহজ ৩টি ধাপ</h2>
+          <p class="text-3xl font-extrabold text-slate-900">কীভাবে কাজ করে DokanAI?</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Step 1 -->
+          <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 hover:shadow-lg transition-shadow">
+            <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-lg mb-4">
+              ১
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">প্রোডাক্টের বিবরণ দিন</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              আপনার প্রোডাক্টের নাম, দাম এবং অন্যান্য তথ্য লিখুন। DokanAI অনবোর্ডিং এজেন্ট বাকি সব নিজে সাজিয়ে নিবে।
+            </p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 hover:shadow-lg transition-shadow">
+            <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center font-black text-lg mb-4">
+              ২
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">স্বয়ংক্রিয় স্টোর জেনারেট</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              হাইপার-কনভার্টিং বাংলা হেডলাইন, ট্রাস্ট ব্যাজ, এফএকিউ এবং ক্যাশ অন ডেলিভারি ফর্ম সহ সম্পূর্ণ পেজ তৈরি হবে নিমেষেই।
+            </p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 hover:shadow-lg transition-shadow">
+            <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-black text-lg mb-4">
+              ৩
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">অর্ডার পান ড্যাশবোর্ডে</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              ফেসবুক অ্যাড বা বায়োতে লিংক শেয়ার করুন। গ্রাহক অর্ডার করলেই ড্যাশবোর্ডে রিয়েল-টাইম নোটিফিকেশন চলে আসবে।
+            </p>
           </div>
         </div>
       </div>

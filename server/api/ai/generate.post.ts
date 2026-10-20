@@ -73,11 +73,15 @@ Pick the most aesthetic, high-converting color theme for this product in "theme_
 - "rose" -> for cosmetics, skincare, perfumes, jewelry, women fashion
 - "slate" -> for industrial tools, hardware, automotive parts, minimalist dark items
 
-CRITICAL HEADLINE RULES:
+CRITICAL HEADLINE & CONTENT RULES:
 1. "headline" MUST BE COMPACT & PUNCHY: Maximum 10-14 words (1 to 2 lines max). Do NOT write a whole paragraph or huge run-on sentence as the headline!
 2. Put the full detailed explanation and benefits inside "subheadline" (2 concise sentences).
 3. "badge_text": A clean 2-4 word Bengali highlight tag directly relevant to this product.
 4. "seller_tagline": A relevant, authentic short Bengali line directly specific to this product (e.g. for honey: pure wild honey assurance, for watch: original imported guarantee).
+5. "faqs": GENERATE 3-4 HIGHLY REALISTIC, PRODUCT-SPECIFIC FAQS directly addressing genuine customer queries and trust doubts for "${product_title}".
+   - For food/honey/agro (like মধু): Answer specific questions such as authenticity/purity assurance, whether it crystallizes (জমে যায় কিনা), sourcing/origin (সুন্দরবন বা পাহাড়ি), and delivery check. Do NOT put tech/device replacement policy ("৭ দিনের রিপ্লেসমেন্ট পলিসি") for honey/perishable foods! For honey, offer natural purity guarantee or return if found unpure.
+   - For tech/electronics: Battery backup, water resistance, warranty, replacement.
+   - For fashion/cosmetics: Original authenticity, ingredients/side effects, sizing/delivery.
 
 Respond ONLY with a strictly valid JSON matching this schema:
 {
@@ -95,9 +99,9 @@ Respond ONLY with a strictly valid JSON matching this schema:
           { "title": "Feature 4 Bengali title", "desc": "Detailed emotional benefit description" }
         ],
   "faqs": [
-    { "q": "ডেলিভারি ম্যানের সামনে কি খুলে দেখা যাবে?", "a": "হ্যাঁ, সম্পূর্ণ নিশ্চিত হয়ে চেক করে মূল্য পরিশোধ করবেন।" },
-    { "q": "ডেলিভারি চার্জ কত এবং কতদিনে পাব?", "a": "ঢাকার ভেতরে ${insideFee} টাকা (২৪-৪৮ ঘণ্টা) এবং ঢাকার বাইরে ${outsideFee} টাকা (২-৩ দিন)।" },
-    { "q": "কোন সমস্যা হলে রিপ্লেসমেন্ট পাব?", "a": "আমাদের রয়েছে ৭ দিনের সহজ ফ্রি রিপ্লেসমেন্ট পলিসি।" }
+    { "q": "ডেলিভারি ম্যানের সামনে কি খুলে চেক করা যাবে?", "a": "হ্যাঁ, সম্পূর্ণ নিশ্চিত হয়ে চেক করে তারপর মূল্য পরিশোধ করবেন।" },
+    { "q": "ডেলিভারি চার্জ কত এবং কতদিনে ডেলিভারি পাব?", "a": "ঢাকার ভেতরে ${insideFee} টাকা (২৪-৪৮ ঘণ্টা) এবং ঢাকার বাইরে ${outsideFee} টাকা (২-৩ দিন)।" },
+    { "q": "পণ্যটির আসল বা খাঁটি হওয়ার কী নিশ্চয়তা দিচ্ছেন?", "a": "আমরা ১০০% অরিজিনাল ও গুণগত মান নিশ্চিত করি। কোয়ালিটিতে সন্দেহ থাকলে তৎক্ষণাৎ ফেরত দেওয়ার সুবিধা রয়েছে।" }
   ],
   "testimonials": [
     { "name": "তানভীর আহমেদ", "location": "ঢাকা", "comment": "যেমন চেয়েছিলাম ঠিক তেমনই পেয়েছি। প্যাকেজিং খুব ভালো ছিল।" },
