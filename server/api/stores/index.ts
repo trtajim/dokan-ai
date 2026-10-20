@@ -158,4 +158,27 @@ export default defineEventHandler(async (event) => {
 
     return { success: true }
   }
+
+  // DELETE: Delete store by slug
+  if (method === 'DELETE') {
+    const body = await readBody(event)
+    const { slug } = body
+
+    if (!slug) {
+      throw createError({ statusCode: 400, message: 'Store slug is required' })
+    }
+
+    memoryStore.deleteStore(slug)
+
+    const supabase = getSupabaseClient()
+    if (supabase) {
+      try {
+        await supabase.from('stores').delete().eq('slug', slug)
+      } catch (err) {
+        console.warn('Supabase store delete error:', err)
+      }
+    }
+
+    return { success: true, message: 'Store deleted successfully' }
+  }
 })

@@ -146,6 +146,9 @@ export const memoryStore = {
     }
     return null
   },
+  deleteStore: (slug: string) => {
+    return globalThis.__dokan_stores?.delete(slug) || false
+  },
   getAllStores: () => Array.from(globalThis.__dokan_stores?.values() || []),
   getOrders: (slug?: string) => {
     if (!slug) return globalThis.__dokan_orders || []

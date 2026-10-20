@@ -150,6 +150,15 @@
                 <Copy class="w-3.5 h-3.5" />
                 <span>লিংক</span>
               </button>
+
+              <!-- Delete Store Button -->
+              <button 
+                @click="deleteStore(st)"
+                class="p-1.5 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                title="দোকান মুছে ফেলুন"
+              >
+                <Trash2 class="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>
@@ -465,6 +474,24 @@ const openStockPrompt = async (st) => {
     return
   }
   await quickAdjustStock(st.slug, num)
+}
+
+const deleteStore = async (st) => {
+  const confirmDelete = confirm(`আপনি কি নিশ্চিতভাবে "${st.product_title}" দোকানটি ডিলিট করতে চান?`)
+  if (!confirmDelete) return
+
+  try {
+    await $fetch('/api/stores', {
+      method: 'DELETE',
+      body: { slug: st.slug }
+    })
+    stores.value = stores.value.filter(s => s.slug !== st.slug)
+    if (selectedStoreFilter.value === st.slug) {
+      selectedStoreFilter.value = 'all'
+    }
+  } catch (err) {
+    alert('দোকান ডিলিট করতে সমস্যা হয়েছে।')
+  }
 }
 
 const copyStoreLink = (slug) => {
