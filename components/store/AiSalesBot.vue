@@ -65,9 +65,9 @@
               </button>
             </div>
 
-            <!-- 1-Click Order Form Shortcut inside AI Bot -->
+            <!-- 1-Click Order Form Shortcut inside AI Bot (Only on the last bot message) -->
             <button
-              v-if="msg.role === 'model' && (mIdx > 0 || messages.length > 1)"
+              v-if="msg.role === 'model' && mIdx === messages.length - 1 && (mIdx > 0 || messages.length > 1)"
               @click="closeAndScrollToOrder"
               class="mt-2 w-full py-1.5 px-2.5 text-[11px] font-bold text-white rounded-xl shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
               :class="primaryBgClass"
