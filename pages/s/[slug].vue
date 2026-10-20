@@ -206,7 +206,8 @@
               <button 
                 v-if="currentStock > 0"
                 @click="scrollToForm" 
-                class="w-full py-3.5 sm:py-4 bg-[#c97a0c] hover:bg-[#b06a08] text-white font-bold text-base sm:text-lg rounded-xl shadow-md active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer font-sans-bn"
+                :style="{ backgroundColor: themeStyles.btnBg, color: themeStyles.btnText }"
+                class="w-full py-3.5 sm:py-4 font-bold text-base sm:text-lg rounded-xl shadow-md active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer font-sans-bn"
               >
                 <ShoppingBag class="w-5 h-5" />
                 <span>{{ store.config?.cta_button_text || 'এখনই অর্ডার করুন' }}</span>
@@ -231,7 +232,7 @@
     <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-14 space-y-12 sm:space-y-16">
       
       <!-- PROMOTIONAL VIDEO REEL SECTION (If provided) -->
-      <section v-if="videoEmbedUrl" class="text-center space-y-3">
+      <section v-if="showVideoReel && videoEmbedUrl" class="text-center space-y-3">
         <div class="max-w-md mx-auto">
           <h2 class="font-serif-bn font-extrabold text-2xl sm:text-3xl text-[#16251d]">ভিডিওতে সরাসরি দেখুন</h2>
           <p class="text-slate-500 text-xs sm:text-sm">পণ্যটি কেমন, নিজের চোখেই দেখে নিন</p>
@@ -595,6 +596,10 @@ const showVerifiedBadge = computed(() => {
 
 const showTestimonials = computed(() => {
   return store.value?.config?.show_testimonials !== false
+})
+
+const showVideoReel = computed(() => {
+  return store.value?.config?.show_video_reel !== false
 })
 
 const openFaqIdx = ref(0)
