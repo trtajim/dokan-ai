@@ -89,11 +89,13 @@
             </span>
           </div>
 
-          <!-- Typing Indicator -->
-          <div v-if="isAiTyping" class="flex items-center gap-1.5 bg-slate-100 border border-slate-200/50 rounded-2xl rounded-bl-none px-3.5 py-2.5 w-fit">
-            <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce"></span>
-            <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.2s]"></span>
-            <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.4s]"></span>
+          <!-- Dynamic Friendly AI Progress Indicator -->
+          <div v-if="isAiTyping" class="flex items-center gap-2.5 bg-slate-100 border border-slate-200/60 rounded-2xl rounded-bl-none px-4 py-2.5 w-fit max-w-[85%] text-xs font-semibold text-slate-700 shadow-2xs">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span class="animate-pulse">{{ currentLoadingMessage }}</span>
           </div>
         </div>
 
@@ -167,6 +169,32 @@ const isAiTyping = ref(false)
 const isGeneratingStore = ref(false)
 const inputMessage = ref('')
 
+const loadingMessages = [
+  'আপনার তথ্যটি পর্যবেক্ষণ করছি...',
+  'প্রোডাক্টের বিবরণ বিশ্লেষণ করা হচ্ছে...',
+  'হাই-কনভার্টিং কপি ও তথ্য সাজাচ্ছি...',
+  'একটু অপেক্ষা করুন, উত্তর তৈরি হচ্ছে...'
+]
+const currentLoadingMessage = ref(loadingMessages[0])
+let loadingInterval = null
+
+const startLoadingMessages = () => {
+  let idx = 0
+  currentLoadingMessage.value = loadingMessages[0]
+  if (loadingInterval) clearInterval(loadingInterval)
+  loadingInterval = setInterval(() => {
+    idx = (idx + 1) % loadingMessages.length
+    currentLoadingMessage.value = loadingMessages[idx]
+  }, 1800)
+}
+
+const stopLoadingMessages = () => {
+  if (loadingInterval) {
+    clearInterval(loadingInterval)
+    loadingInterval = null
+  }
+}
+
 const pendingImages = ref([])
 const allUploadedImages = ref([])
 
@@ -233,6 +261,7 @@ const sendMessage = async () => {
   scrollToBottom()
 
   isAiTyping.value = true
+  startLoadingMessages()
 
   try {
     const res = await $fetch('/api/ai/onboard', {
@@ -284,6 +313,7 @@ const sendMessage = async () => {
     })
   } finally {
     isAiTyping.value = false
+    stopLoadingMessages()
     scrollToBottom()
   }
 }

@@ -11,6 +11,10 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'GET') {
     if (slug) {
+      if (memoryStore.isDeleted(slug)) {
+        throw createError({ statusCode: 404, message: 'Store not found' })
+      }
+
       // 1. Check local/memory store first for freshest in-flight edits
       const memStore = memoryStore.getStore(slug)
 
@@ -53,7 +57,8 @@ export default defineEventHandler(async (event) => {
       try {
         const { data } = await supabase.from('stores').select('*').order('created_at', { ascending: false })
         if (data && data.length > 0) {
-          const mergedList = data.map((s: any) => {
+          const filtered = data.filter((s: any) => !memoryStore.isDeleted(s.slug))
+          const mergedList = filtered.map((s: any) => {
             const mem = memoryStore.getStore(s.slug)
             if (mem) {
               return {
