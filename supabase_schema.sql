@@ -65,6 +65,7 @@ create table public.orders (
   quantity integer default 1,
   selected_variant text,
   status text default 'pending',
+  courier_data jsonb default null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 

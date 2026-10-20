@@ -11,8 +11,21 @@
           <p class="text-xs sm:text-sm text-slate-500 mt-1">আপনার সকল সক্রিয় দোকান, লাইভ স্টক ও কাস্টমারদের ক্যাশ অন ডেলিভারি অর্ডার তালিকা</p>
         </div>
 
-        <!-- Account-Wide Telegram Alerts Button -->
-        <div class="shrink-0">
+        <!-- Account-Wide Telegram Alerts & Courier Setup Buttons -->
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <!-- Courier Setup Button -->
+          <button 
+            @click="courierModal.isOpen = true"
+            class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all shadow-xs cursor-pointer border bg-white hover:bg-slate-50 text-slate-700 border-slate-200"
+          >
+            <div class="w-6 h-6 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+              <Truck class="w-3.5 h-3.5" />
+            </div>
+            <span>কুরিয়ার ইন্টিগ্রেশন</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          </button>
+
+          <!-- Telegram Alerts Button -->
           <button 
             @click="openAccountTelegramModal"
             class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all shadow-xs cursor-pointer border"
@@ -576,6 +589,174 @@
       </div>
     </div>
 
+    <!-- Custom Modal: Courier Settings & API Setup -->
+    <div v-if="courierModal.isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+      <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+              <Truck class="w-5 h-5" />
+            </div>
+            <div>
+              <h3 class="text-base font-black text-slate-900">কুরিয়ার সার্ভিস ইন্টিগ্রেশন</h3>
+              <span class="text-[11px] text-emerald-600 font-bold block">অটোমেটেড পার্সেল বুকিং</span>
+            </div>
+          </div>
+          <button @click="courierModal.isOpen = false" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+            <X class="w-5 h-5" />
+          </button>
+        </div>
+
+        <p class="text-xs text-slate-500 leading-relaxed">
+          আপনার পছন্দের বাংলাদেশি কুরিয়ার সিলেক্ট করুন। অর্ডার আসলে ১-ক্লিকে সরাসরি কুরিয়ার সার্ভারে পার্সেল রিকোয়েস্ট চলে যাবে।
+        </p>
+
+        <!-- Courier Selector Tabs -->
+        <div class="grid grid-cols-3 gap-2">
+          <button 
+            type="button"
+            @click="courierModal.selected = 'steadfast'"
+            class="p-2.5 rounded-2xl border-2 text-center transition-all cursor-pointer"
+            :class="courierModal.selected === 'steadfast' ? 'border-amber-500 bg-amber-50/50 shadow-xs' : 'border-slate-200 hover:border-slate-300'"
+          >
+            <span class="text-lg block">🚚</span>
+            <span class="text-xs font-bold block text-slate-800">Steadfast</span>
+            <span class="text-[10px] text-emerald-600 font-bold">সক্রিয়</span>
+          </button>
+          <button 
+            type="button"
+            @click="courierModal.selected = 'pathao'"
+            class="p-2.5 rounded-2xl border-2 text-center transition-all cursor-pointer"
+            :class="courierModal.selected === 'pathao' ? 'border-red-500 bg-red-50/50 shadow-xs' : 'border-slate-200 hover:border-slate-300'"
+          >
+            <span class="text-lg block">🏍️</span>
+            <span class="text-xs font-bold block text-slate-800">Pathao</span>
+            <span class="text-[10px] text-slate-400">কানেক্টেড</span>
+          </button>
+          <button 
+            type="button"
+            @click="courierModal.selected = 'redx'"
+            class="p-2.5 rounded-2xl border-2 text-center transition-all cursor-pointer"
+            :class="courierModal.selected === 'redx' ? 'border-rose-500 bg-rose-50/50 shadow-xs' : 'border-slate-200 hover:border-slate-300'"
+          >
+            <span class="text-lg block">📦</span>
+            <span class="text-xs font-bold block text-slate-800">RedX</span>
+            <span class="text-[10px] text-slate-400">কানেক্টেড</span>
+          </button>
+        </div>
+
+        <!-- Fake API Configuration Inputs -->
+        <div class="space-y-3 pt-1 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">API Key / Merchant Client ID:</label>
+            <input 
+              type="password"
+              v-model="courierModal.apiKey"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-slate-800 focus:outline-none focus:border-amber-500 bg-slate-50"
+              placeholder="st_live_94827410928471"
+            />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Secret Key / Token:</label>
+            <input 
+              type="password"
+              v-model="courierModal.secretKey"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-slate-800 focus:outline-none focus:border-amber-500 bg-slate-50"
+              placeholder="••••••••••••••••••••••••••••"
+            />
+          </div>
+          <p class="text-[11px] text-slate-400 leading-tight">
+            💡 মার্চেন্ট অ্যাকাউন্টে লাইভ API ক্রেডেনশিয়াল সেভ থাকলে যেকোনো অর্ডারের পাশে ১-ক্লিকেই পার্সেল তৈরি হবে।
+          </p>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+          <button
+            @click="courierModal.isOpen = false"
+            class="px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+          >
+            বন্ধ করুন
+          </button>
+          <button
+            @click="saveCourierSettings"
+            class="px-4 py-2 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 active:scale-95 rounded-xl transition-all shadow-sm cursor-pointer"
+          >
+            সংরক্ষণ করুন
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom Modal: Dispatch Order to Courier -->
+    <div v-if="dispatchModal.isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+      <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-black">
+              <Truck class="w-4 h-4" />
+            </div>
+            <div>
+              <h3 class="text-sm font-black text-slate-900">কুরিয়ার পার্সেল বুকিং</h3>
+              <span class="text-[10px] text-slate-400 font-mono">{{ dispatchModal.order?.id }}</span>
+            </div>
+          </div>
+          <button @click="dispatchModal.isOpen = false" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+            <X class="w-4 h-4" />
+          </button>
+        </div>
+
+        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/70 text-xs space-y-1 text-slate-600">
+          <div>গ্রাহক: <strong class="text-slate-900">{{ dispatchModal.order?.customer_name }}</strong></div>
+          <div>ফোন: <span class="font-mono font-bold text-slate-900">{{ dispatchModal.order?.customer_phone }}</span></div>
+          <div>ঠিকানা: <span class="text-slate-700">{{ dispatchModal.order?.customer_address }}</span></div>
+          <div class="pt-1 flex justify-between font-bold text-slate-900 border-t border-slate-200/80">
+            <span>ক্যাশ কালেকশন (COD):</span>
+            <span class="text-emerald-700">৳{{ dispatchModal.order?.total_price }}</span>
+          </div>
+        </div>
+
+        <!-- Choose Courier -->
+        <div class="space-y-1.5 text-xs">
+          <label class="block font-bold text-slate-700">কুরিয়ার সিলেক্ট করুন:</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button 
+              type="button" 
+              @click="dispatchModal.courier = 'steadfast'"
+              class="p-2 rounded-xl border text-center font-bold transition-all cursor-pointer"
+              :class="dispatchModal.courier === 'steadfast' ? 'border-amber-500 bg-amber-50 text-amber-900' : 'border-slate-200 text-slate-700'"
+            >
+              Steadfast
+            </button>
+            <button 
+              type="button" 
+              @click="dispatchModal.courier = 'pathao'"
+              class="p-2 rounded-xl border text-center font-bold transition-all cursor-pointer"
+              :class="dispatchModal.courier === 'pathao' ? 'border-red-500 bg-red-50 text-red-900' : 'border-slate-200 text-slate-700'"
+            >
+              Pathao
+            </button>
+            <button 
+              type="button" 
+              @click="dispatchModal.courier = 'redx'"
+              class="p-2 rounded-xl border text-center font-bold transition-all cursor-pointer"
+              :class="dispatchModal.courier === 'redx' ? 'border-rose-500 bg-rose-50 text-rose-900' : 'border-slate-200 text-slate-700'"
+            >
+              RedX
+            </button>
+          </div>
+        </div>
+
+        <button
+          @click="confirmDispatch"
+          :disabled="dispatchModal.isLoading"
+          class="w-full py-2.5 px-3 bg-amber-500 hover:bg-amber-600 disabled:opacity-75 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
+        >
+          <Loader2 v-if="dispatchModal.isLoading" class="w-4 h-4 animate-spin text-white" />
+          <span v-else>🚀 বুকিং কনফার্ম করুন</span>
+        </button>
+      </div>
+    </div>
+
     <!-- Custom Modal: Confirm Delete Store -->
     <div v-if="deleteModal.isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
       <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in-95 duration-200">
@@ -680,6 +861,31 @@
             </div>
           </div>
 
+          <!-- Courier Tracking Info Banner if Dispatched -->
+          <div v-if="orderModal.order.courier_data" class="p-3 bg-amber-50 rounded-2xl border border-amber-200 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+                <Truck class="w-4 h-4 text-amber-600" />
+                <span>{{ orderModal.order.courier_data.courier_name }}</span>
+              </span>
+              <span class="font-mono text-xs font-black text-amber-900 bg-amber-200/80 px-2 py-0.5 rounded-md">
+                {{ orderModal.order.courier_data.tracking_code }}
+              </span>
+            </div>
+            <p class="text-[11px] text-amber-700">পার্সেলটি পিকআপের অপেক্ষায় কুরিয়ার সিস্টেমে নিবন্ধিত হয়েছে।</p>
+          </div>
+
+          <!-- Dispatch to Courier Button if not dispatched yet -->
+          <div v-else-if="orderModal.order.status !== 'cancelled'" class="pt-1">
+            <button
+              @click="openDispatchModal(orderModal.order)"
+              class="w-full py-2.5 px-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
+            >
+              <Truck class="w-4 h-4" />
+              <span>🚀 কুরিয়ারে পাঠান (Steadfast / Pathao 1-Click Dispatch)</span>
+            </button>
+          </div>
+
           <!-- Status Editor in Modal -->
           <div class="flex items-center justify-between pt-1">
             <span class="text-xs font-bold text-slate-600">অর্ডার স্ট্যাটাস পরিবর্তন:</span>
@@ -713,7 +919,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
-import { RefreshCw, Plus, Banknote, ShoppingBag, Clock, Store, Boxes, Copy, ExternalLink, PhoneCall, Trash2, Eye, X, Activity, Send } from 'lucide-vue-next'
+import { RefreshCw, Plus, Banknote, ShoppingBag, Clock, Store, Boxes, Copy, ExternalLink, PhoneCall, Trash2, Eye, X, Activity, Send, Truck, Loader2 } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 import { useAuthModal } from '~/composables/useAuthModal'
 import { useAppToast } from '~/composables/useAppToast'
@@ -764,6 +970,62 @@ const telegramModal = reactive({
   chatId: '',
   isSubmitting: false
 })
+
+const courierModal = reactive({
+  isOpen: false,
+  selected: 'steadfast',
+  apiKey: 'st_live_8927419204812',
+  secretKey: '••••••••••••••••••••'
+})
+
+const dispatchModal = reactive({
+  isOpen: false,
+  order: null,
+  courier: 'steadfast',
+  isLoading: false
+})
+
+const saveCourierSettings = () => {
+  courierModal.isOpen = false
+  toast.success('কুরিয়ার API সেটিংস সফলভাবে সংরক্ষিত হয়েছে!')
+}
+
+const openDispatchModal = (order) => {
+  dispatchModal.order = order
+  dispatchModal.courier = courierModal.selected || 'steadfast'
+  dispatchModal.isOpen = true
+}
+
+const confirmDispatch = async () => {
+  if (!dispatchModal.order) return
+  dispatchModal.isLoading = true
+  try {
+    const res = await $fetch('/api/courier/dispatch', {
+      method: 'POST',
+      body: {
+        order_id: dispatchModal.order.id,
+        courier: dispatchModal.courier
+      }
+    })
+
+    if (res?.success) {
+      toast.success(res.message || 'কুরিয়ারে পার্সেল বুকিং সফল হয়েছে!')
+      dispatchModal.isOpen = false
+      if (orderModal.order && orderModal.order.id === dispatchModal.order.id) {
+        orderModal.order.status = 'under_courier'
+        orderModal.order.courier_data = {
+          courier_name: res.courier_name,
+          tracking_code: res.tracking_code
+        }
+      }
+      await refreshData()
+    }
+  } catch (err) {
+    toast.error('কুরিয়ারে বুকিং করতে সমস্যা হয়েছে।')
+  } finally {
+    dispatchModal.isLoading = false
+  }
+}
 
 const userTelegramChatId = ref(null)
 

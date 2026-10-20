@@ -91,6 +91,22 @@
             </div>
           </div>
 
+          <!-- Courier Live Tracking Banner if Dispatched -->
+          <div v-if="order?.courier_data" class="p-4 bg-amber-50 rounded-2xl border border-amber-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+                <Truck class="w-4 h-4 text-amber-600" />
+                <span>{{ order.courier_data.courier_name }} দ্বারা প্রেরিত</span>
+              </span>
+              <span class="font-mono text-xs font-black text-amber-900 bg-amber-200/80 px-2 py-0.5 rounded-md">
+                {{ order.courier_data.tracking_code }}
+              </span>
+            </div>
+            <p class="text-[11px] text-amber-700 leading-relaxed">
+              আপনার পার্সেলটি কুরিয়ারে বুকিং করা হয়েছে। খুব শীঘ্রই ডেলিভারিম্যান আপনার সাথে যোগাযোগ করবেন।
+            </p>
+          </div>
+
           <!-- Customer & Delivery Address Card -->
           <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 space-y-1.5 text-xs text-slate-600">
             <div class="font-bold text-slate-800 flex items-center gap-1.5">
