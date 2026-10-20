@@ -1,11 +1,11 @@
 <template>
-  <div id="order-form-section" class="bg-white rounded-3xl p-6 sm:p-8 border-2 shadow-xl" :class="borderAccentClass">
+  <div id="order-form-section" class="bg-white rounded-3xl p-5 sm:p-8 border shadow-lg transition-all" :class="borderAccentClass">
     <div class="text-center mb-6">
       <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2" :class="badgeClass">
         <ShieldCheck class="w-4 h-4" />
         <span>১০০% ক্যাশ অন ডেলিভারি</span>
       </div>
-      <h3 class="text-2xl font-black text-slate-900">অর্ডার ফর্মটি পূরণ করুন</h3>
+      <h3 class="text-2xl sm:text-3xl font-black text-slate-900 font-serif-bn">অর্ডার ফর্মটি পূরণ করুন</h3>
       <p class="text-xs sm:text-sm text-slate-500 mt-1">পণ্য হাতে পেয়ে চেক করে মূল্য পরিশোধ করবেন</p>
     </div>
 
@@ -14,19 +14,19 @@
       <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
         <CheckCircle2 class="w-10 h-10" />
       </div>
-      <h4 class="text-2xl font-black text-slate-900">আপনার অর্ডার সফল হয়েছে!</h4>
+      <h4 class="text-2xl font-black text-slate-900 font-serif-bn">আপনার অর্ডার সফল হয়েছে!</h4>
       <p class="text-sm text-slate-600 max-w-md mx-auto">
         ধন্যবাদ <strong>{{ form.customer_name }}</strong>। আমাদের প্রতিনিধি খুব শীঘ্রই আপনার নম্বরে ({{ form.customer_phone }}) ফোন করে অর্ডার নিশ্চিত করবেন।
       </p>
       <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 max-w-sm mx-auto text-left text-xs space-y-1.5">
         <div v-if="selectedVariantName" class="flex justify-between"><span>সিলেক্টেড ভ্যারিয়েন্ট:</span> <strong class="text-slate-800">{{ selectedVariantName }}</strong></div>
-        <div class="flex justify-between"><span>মোট বিল:</span> <strong class="text-emerald-700 font-bold">৳{{ totalBill }}</strong></div>
+        <div class="flex justify-between"><span>মোট বিল:</span> <strong class="text-emerald-700 font-bold font-serif-bn text-sm">৳{{ totalBill }}</strong></div>
         <div class="flex justify-between"><span>পেমেন্ট মাধ্যম:</span> <span>ক্যাশ অন ডেলিভারি</span></div>
         <div class="flex justify-between"><span>ডেলিভারি ঠিকানা:</span> <span class="truncate max-w-[180px]">{{ form.customer_address }}</span></div>
       </div>
       <button 
         @click="orderSubmitted = false" 
-        class="mt-4 text-xs font-semibold text-slate-500 hover:text-slate-800 underline"
+        class="mt-4 text-xs font-semibold text-slate-500 hover:text-slate-800 underline cursor-pointer"
       >
         আরেকটি অর্ডার করুন
       </button>
@@ -36,19 +36,19 @@
     <form v-else @submit.prevent="submitOrder" class="space-y-4 text-xs sm:text-sm">
       
       <!-- VARIANT SELECTOR (E.g. 1kg vs 2kg or M vs L vs XL) -->
-      <div v-if="availableVariants.length > 0" class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-2">
+      <div v-if="availableVariants.length > 0" class="p-3.5 bg-amber-50/40 rounded-2xl border border-amber-200/60 space-y-2">
         <label class="block font-bold text-slate-800">পণ্য নির্বাচন করুন (সাইজ/ওজন/প্যাক): <span class="text-red-500">*</span></label>
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        <div class="grid grid-cols-2 gap-2.5">
           <button 
             v-for="(v, vIdx) in availableVariants" 
             :key="vIdx"
             type="button"
             @click="selectedVariant = v"
-            class="p-2.5 rounded-xl border-2 text-center transition-all flex flex-col items-center justify-center gap-0.5"
-            :class="selectedVariant?.name === v.name ? borderActiveDeliveryClass : 'border-slate-200 bg-white hover:border-slate-300'"
+            class="p-3 rounded-xl border-2 text-left transition-all flex items-center justify-between gap-2 cursor-pointer"
+            :class="selectedVariant?.name === v.name ? 'border-amber-500 bg-amber-50 text-slate-900 shadow-xs' : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'"
           >
-            <span class="font-bold text-xs truncate max-w-full">{{ v.name }}</span>
-            <span class="text-[11px] font-black text-slate-900">৳{{ v.price || store.price }}</span>
+            <span class="font-bold text-xs sm:text-sm truncate max-w-full">{{ v.name }}</span>
+            <span class="text-xs sm:text-sm font-bold font-serif-bn text-slate-900 shrink-0">৳{{ v.price || store.price }}</span>
           </button>
         </div>
       </div>
@@ -61,7 +61,7 @@
           type="text" 
           required 
           placeholder="আপনার সম্পূর্ণ নাম লিখুন" 
-          class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
+          class="w-full px-4 py-3 bg-[#fbf9f3] border border-[#e6e0cf] rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
         />
       </div>
 
@@ -74,7 +74,7 @@
           required 
           placeholder="যেমন: 01712345678" 
           maxlength="11"
-          class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all font-mono"
+          class="w-full px-4 py-3 bg-[#fbf9f3] border border-[#e6e0cf] rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all font-mono"
         />
         <span v-if="phoneError" class="text-[11px] text-red-500 font-medium block mt-1">
           ১১ ডিজিটের সঠিক বাংলাদেশি মোবাইল নম্বর দিন
@@ -89,31 +89,31 @@
           rows="2" 
           required 
           placeholder="বাসা নং, রোড নং, এলাকা এবং জেলা" 
-          class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all resize-none"
+          class="w-full px-4 py-2.5 bg-[#fbf9f3] border border-[#e6e0cf] rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all resize-none"
         ></textarea>
       </div>
 
       <!-- Quantity Selector with Live Stock Limit -->
-      <div class="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl border border-slate-200/80">
+      <div class="flex items-center justify-between p-3.5 bg-[#fbf9f3] rounded-xl border border-[#e6e0cf]">
         <div>
           <span class="font-bold text-slate-800 block">অর্ডার পরিমাণ:</span>
-          <span class="text-[11px] text-slate-400">সর্বোচ্চ {{ maxAvailableStock }} টি অর্ডার করা যাবে</span>
+          <span class="text-[11px] text-slate-500">সর্বোচ্চ {{ maxAvailableStock }} টি অর্ডার করা যাবে</span>
         </div>
         <div class="flex items-center gap-3">
           <button 
             type="button" 
             @click="decrementQty"
             :disabled="form.quantity <= 1"
-            class="w-8 h-8 rounded-lg bg-white border border-slate-300 text-slate-700 font-bold flex items-center justify-center hover:bg-slate-100 active:scale-95 disabled:opacity-40 cursor-pointer"
+            class="w-9 h-9 rounded-xl bg-white border border-[#e6e0cf] text-slate-700 font-bold flex items-center justify-center hover:bg-slate-50 active:scale-95 disabled:opacity-40 cursor-pointer text-lg leading-none shadow-2xs"
           >
-            -
+            –
           </button>
-          <span class="font-extrabold text-base w-4 text-center">{{ form.quantity }}</span>
+          <span class="font-bold text-lg font-serif-bn min-w-[24px] text-center">{{ form.quantity }}</span>
           <button 
             type="button" 
             @click="incrementQty"
             :disabled="form.quantity >= maxAvailableStock"
-            class="w-8 h-8 rounded-lg bg-white border border-slate-300 text-slate-700 font-bold flex items-center justify-center hover:bg-slate-100 active:scale-95 disabled:opacity-40 cursor-pointer"
+            class="w-9 h-9 rounded-xl bg-white border border-[#e6e0cf] text-slate-700 font-bold flex items-center justify-center hover:bg-slate-50 active:scale-95 disabled:opacity-40 cursor-pointer text-lg leading-none shadow-2xs"
           >
             +
           </button>
@@ -126,41 +126,41 @@
         <div class="grid grid-cols-2 gap-3">
           <label 
             class="flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all"
-            :class="form.delivery_zone === 'inside_dhaka' ? borderActiveDeliveryClass : 'border-slate-200 bg-slate-50/50'"
+            :class="form.delivery_zone === 'inside_dhaka' ? 'border-amber-500 bg-[#fff9ea] text-slate-900 font-bold shadow-2xs' : 'border-[#e6e0cf] bg-[#fbf9f3] hover:border-slate-300 text-slate-700'"
           >
             <div class="flex items-center gap-2">
-              <input type="radio" value="inside_dhaka" v-model="form.delivery_zone" class="accent-slate-900" />
-              <span class="font-bold text-slate-800">ঢাকার ভিতরে</span>
+              <input type="radio" value="inside_dhaka" v-model="form.delivery_zone" class="accent-amber-600" />
+              <span class="font-bold text-slate-800 text-xs sm:text-sm">ঢাকার ভিতরে</span>
             </div>
-            <span class="font-extrabold text-slate-900">৳{{ feeInside }}</span>
+            <span class="font-bold font-serif-bn text-slate-900 text-xs sm:text-sm">৳{{ feeInside }}</span>
           </label>
 
           <label 
             class="flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all"
-            :class="form.delivery_zone === 'outside_dhaka' ? borderActiveDeliveryClass : 'border-slate-200 bg-slate-50/50'"
+            :class="form.delivery_zone === 'outside_dhaka' ? 'border-amber-500 bg-[#fff9ea] text-slate-900 font-bold shadow-2xs' : 'border-[#e6e0cf] bg-[#fbf9f3] hover:border-slate-300 text-slate-700'"
           >
             <div class="flex items-center gap-2">
-              <input type="radio" value="outside_dhaka" v-model="form.delivery_zone" class="accent-slate-900" />
-              <span class="font-bold text-slate-800">ঢাকার বাইরে</span>
+              <input type="radio" value="outside_dhaka" v-model="form.delivery_zone" class="accent-amber-600" />
+              <span class="font-bold text-slate-800 text-xs sm:text-sm">ঢাকার বাইরে</span>
             </div>
-            <span class="font-extrabold text-slate-900">৳{{ feeOutside }}</span>
+            <span class="font-bold font-serif-bn text-slate-900 text-xs sm:text-sm">৳{{ feeOutside }}</span>
           </label>
         </div>
       </div>
 
       <!-- Price Breakdown Summary -->
-      <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-2 mt-4">
+      <div class="p-4 bg-[#fbf9f3] rounded-2xl border-2 border-dashed border-[#e6e0cf] space-y-2 mt-4 font-sans-bn">
         <div class="flex justify-between text-slate-600">
           <span>প্রোডাক্ট মূল্য:</span>
-          <span>৳{{ unitItemPrice }} × {{ form.quantity }} = <strong>৳{{ unitItemPrice * form.quantity }}</strong></span>
+          <span>৳{{ unitItemPrice }} × {{ form.quantity }} = <strong class="font-serif-bn text-slate-900">৳{{ unitItemPrice * form.quantity }}</strong></span>
         </div>
         <div class="flex justify-between text-slate-600">
           <span>ডেলিভারি চার্জ:</span>
-          <span>৳{{ deliveryFee }}</span>
+          <span class="font-serif-bn text-slate-900">৳{{ deliveryFee }}</span>
         </div>
-        <div class="flex justify-between text-slate-900 font-black text-base pt-2 border-t border-slate-200">
+        <div class="flex justify-between text-slate-900 font-black text-base sm:text-lg pt-2 border-t border-[#e6e0cf]">
           <span>সর্বমোট বিল:</span>
-          <span class="text-lg" :class="totalPriceTextClass">৳{{ totalBill }}</span>
+          <span class="font-serif-bn text-xl font-bold text-amber-700">৳{{ totalBill }}</span>
         </div>
       </div>
 
@@ -168,7 +168,7 @@
       <button 
         type="submit" 
         :disabled="submitting"
-        class="w-full py-4 text-white font-black text-base sm:text-lg rounded-2xl shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+        class="w-full py-4 text-white font-black text-base sm:text-lg rounded-2xl shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
         :class="primaryButtonClass"
       >
         <Loader2 v-if="submitting" class="w-5 h-5 animate-spin" />
@@ -176,8 +176,8 @@
         <span>{{ submitting ? 'অর্ডার প্রসেস হচ্ছে...' : 'অর্ডার কনফার্ম করুন' }}</span>
       </button>
 
-      <p class="text-center text-[11px] text-slate-400">
-        🔒 আপনার তথ্য সম্পূর্ণ সুরক্ষিত এবং অর্ডার কনফার্ম করতে কোনো অগ্রিম পেমেন্ট প্রয়োজন নেই।
+      <p class="text-center text-xs text-slate-500 pt-1">
+        🔒 আপনার তথ্য সম্পূর্ণ সুরক্ষিত। কোনো অগ্রিম পেমেন্ট লাগবে না।
       </p>
     </form>
   </div>
