@@ -2,104 +2,110 @@
   <div v-if="pending" class="min-h-screen flex items-center justify-center bg-slate-50">
     <div class="text-center space-y-3">
       <div class="w-10 h-10 border-4 border-slate-300 border-t-emerald-600 rounded-full animate-spin mx-auto"></div>
-      <p class="text-sm font-bold text-slate-600">দোকান লোড হচ্ছে...</p>
+      <p class="text-xs sm:text-sm font-bold text-slate-600">দোকান প্রস্তুত হচ্ছে...</p>
     </div>
   </div>
 
   <div v-else-if="!store" class="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-4 text-center">
-    <h2 class="text-2xl font-black text-slate-800 mb-2">দোকানটি খুঁজে পাওয়া যায়নি</h2>
-    <p class="text-sm text-slate-500 mb-6">লিংকটি সঠিক কিনা যাচাই করুন অথবা হোমপেজে যান।</p>
-    <NuxtLink to="/" class="px-5 py-2.5 bg-emerald-600 text-white rounded-xl font-bold text-sm">
+    <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3 text-slate-400">
+      <ShoppingBag class="w-8 h-8" />
+    </div>
+    <h2 class="text-xl sm:text-2xl font-black text-slate-900 mb-1">দোকানটি খুঁজে পাওয়া যায়নি</h2>
+    <p class="text-xs sm:text-sm text-slate-500 mb-6">লিংকটি সঠিক কিনা যাচাই করুন অথবা হোমপেজে যান।</p>
+    <NuxtLink to="/" class="px-5 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-xs sm:text-sm shadow-md">
       হোমে ফিরে যান
     </NuxtLink>
   </div>
 
-  <div v-else class="min-h-screen bg-slate-50/70 pb-28 sm:pb-16 font-sans">
+  <div v-else class="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 text-slate-900 pb-28 sm:pb-20 font-sans selection:bg-emerald-500 selection:text-white">
     
-    <!-- Top Floating Urgency Bar (Can be removed/hidden by AI) -->
+    <!-- TOP NOTIFICATION BANNER (Urgency & Real Stock Counter) -->
     <div 
       v-if="showUrgencyBar"
-      class="text-white text-xs sm:text-sm font-black py-2.5 px-4 text-center sticky top-0 z-30 shadow-md flex items-center justify-center gap-2"
-      :class="currentStock <= 0 ? 'bg-red-700' : 'bg-gradient-to-r from-red-600 via-amber-600 to-red-600'"
+      class="text-white text-xs font-black py-2.5 px-3 text-center sticky top-0 z-40 shadow-sm flex items-center justify-center gap-2 transition-colors"
+      :class="currentStock <= 0 ? 'bg-red-600' : 'bg-gradient-to-r from-red-600 via-amber-600 to-red-600'"
     >
-      <Flame class="w-4 h-4 animate-bounce" />
-      <span v-if="currentStock > 0">
-        🔥 অফারটি সীমিত সময়ের জন্য! আর মাত্র {{ currentStock }} টি স্টক বাকি আছে!
+      <Flame class="w-4 h-4 animate-bounce shrink-0" />
+      <span v-if="currentStock > 0" class="tracking-wide">
+        অফারটি সীমিত সময়ের জন্য! আর মাত্র <strong class="underline decoration-white/60">{{ currentStock }} টি</strong> স্টক বাকি আছে!
       </span>
       <span v-else>
-        ⚠️ স্টক আউট! আজকের মতো এই প্রডাক্টের সব স্টক শেষ হয়ে গেছে।
+        ⚠️ দুঃখিত! আজকের মতো এই প্রডাক্টের সব স্টক শেষ হয়ে গেছে।
       </span>
     </div>
 
-    <!-- Store Navigation -->
-    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200/80 py-3.5 px-4 sm:px-8 sticky top-0 z-20" :class="{ 'top-9': showUrgencyBar }">
+    <!-- STORE HEADER NAVIGATION BAR -->
+    <header class="bg-white/95 backdrop-blur-md border-b border-slate-200/80 py-3 px-3.5 sm:px-8 sticky z-30 shadow-xs" :class="showUrgencyBar ? 'top-9' : 'top-0'">
       <div class="max-w-5xl mx-auto flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white font-black shadow-md shadow-emerald-500/20" :class="primaryBgClass">
-            <ShoppingBag class="w-5 h-5" />
+        
+        <!-- Store Identity -->
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-white font-black shadow-md shrink-0" :class="primaryBgClass">
+            <ShoppingBag class="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div>
-            <span class="font-black text-slate-900 tracking-tight text-base sm:text-lg block leading-tight">
+          <div class="min-w-0">
+            <span class="font-black text-slate-900 tracking-tight text-sm sm:text-base block truncate leading-tight">
               {{ store.product_title }}
             </span>
-            <!-- Verified Seller Badge (Can be toggled by AI) -->
-            <span v-if="showVerifiedBadge" class="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">
-              ১০০% ভেরিফাইড বিক্রেতা
-            </span>
+            <div v-if="showVerifiedBadge" class="flex items-center gap-1 text-[10px] font-bold text-emerald-600">
+              <CheckCircle2 class="w-3 h-3 text-emerald-600 shrink-0" />
+              <span>১০০% ভেরিফাইড বিক্রেতা</span>
+            </div>
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
-          <!-- AI Editor Trigger Button: ONLY VISIBLE TO LOGGED IN OWNER -->
+        <!-- Action Items (AI edit visible only to owner) -->
+        <div class="flex items-center gap-2 shrink-0">
           <button 
             v-if="isStoreOwner"
             @click="isEditingStore = true"
-            class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
+            class="px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-black bg-slate-900 text-white hover:bg-slate-800 flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
           >
             <Sparkles class="w-3.5 h-3.5 text-emerald-400" />
-            <span>AI দিয়ে এডিট করুন</span>
+            <span>AI এডিট</span>
           </button>
 
           <button 
             v-if="currentStock > 0"
             @click="scrollToForm" 
-            class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black text-white shadow-md active:scale-95 transition-all" 
+            class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-black text-white shadow-md active:scale-95 transition-all flex items-center gap-1" 
             :class="primaryBgClass"
           >
             <span>অর্ডার করুন</span>
             <ArrowDown class="w-3.5 h-3.5" />
           </button>
         </div>
+
       </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 pt-6 sm:pt-10 space-y-12">
+    <!-- MAIN PRODUCT LANDING CONTAINER -->
+    <main class="max-w-4xl mx-auto px-3 sm:px-6 pt-4 sm:pt-8 space-y-8 sm:space-y-12">
       
-      <!-- HERO & PRODUCT PRESENTATION -->
-      <section class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-xl shadow-slate-200/40 relative overflow-hidden">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <!-- HERO CARD: PRODUCT PRESENTATION & TRUST BADGES -->
+      <section class="bg-white rounded-3xl p-4 sm:p-8 border border-slate-200/90 shadow-xl shadow-slate-200/40 relative overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10 items-center">
           
-          <!-- Product Gallery (Intelligent Placement) -->
+          <!-- Image Gallery with Thumbnails & Zoom Hover -->
           <div class="space-y-3">
-            <div class="aspect-square rounded-3xl overflow-hidden bg-slate-100 border border-slate-200/70 relative group flex items-center justify-center shadow-inner">
+            <div class="aspect-square rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-100 border border-slate-200/80 relative group flex items-center justify-center shadow-inner">
               <img 
                 :src="activeHeroImage || store.config?.hero_image || store.image_url" 
                 :alt="store.product_title" 
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
               />
-              <div class="absolute top-3 left-3 px-3 py-1 bg-gradient-to-r from-red-600 to-amber-600 text-white text-xs font-black rounded-xl shadow-lg">
-                স্পেশাল ডিসকাউন্ট অফার
+              <div class="absolute top-2.5 left-2.5 px-3 py-1 bg-gradient-to-r from-red-600 to-amber-600 text-white text-[11px] sm:text-xs font-black rounded-xl shadow-md">
+                স্পেশাল অফার
               </div>
             </div>
 
-            <!-- Thumbnail Carousel -->
-            <div v-if="productImages.length > 1" class="flex items-center gap-2 overflow-x-auto py-1">
+            <!-- Thumbnail Carousel if multi-image -->
+            <div v-if="productImages.length > 1" class="flex items-center gap-2 overflow-x-auto py-1 no-scrollbar">
               <button 
                 v-for="(img, idx) in productImages" 
                 :key="idx"
                 @click="activeHeroImage = img"
-                class="w-16 h-16 rounded-2xl overflow-hidden border-2 shrink-0 transition-transform"
+                class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl overflow-hidden border-2 shrink-0 transition-transform"
                 :class="activeHeroImage === img ? 'border-slate-900 scale-105 shadow-md' : 'border-slate-200 opacity-70 hover:opacity-100'"
               >
                 <img :src="img" class="w-full h-full object-cover" />
@@ -107,36 +113,41 @@
             </div>
           </div>
 
-          <!-- Product Main Copy -->
-          <div class="space-y-4">
-            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-[1.2] tracking-tight">
+          <!-- Product Sales Copy -->
+          <div class="space-y-3.5 sm:space-y-5">
+            <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] sm:text-xs font-bold uppercase tracking-wider">
+              <Sparkles class="w-3 h-3 text-emerald-600" />
+              <span>প্রিমিয়াম কোয়ালিটি গ্যারান্টিড</span>
+            </div>
+
+            <h1 class="text-xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-[1.25] tracking-tight">
               {{ store.config?.headline }}
             </h1>
 
-            <p class="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
               {{ store.config?.subheadline }}
             </p>
 
-            <!-- Price & Stock Container -->
-            <div class="p-4 bg-slate-50/90 rounded-2xl border border-slate-200/80 space-y-2">
-              <div class="flex items-baseline gap-3">
-                <div class="text-3xl sm:text-4xl font-black" :class="primaryTextClass">
+            <!-- Pricing & Live Stock Pill -->
+            <div class="p-3.5 sm:p-4 bg-slate-50/90 rounded-2xl border border-slate-200/80 space-y-2">
+              <div class="flex items-baseline gap-2.5 sm:gap-3">
+                <div class="text-2xl sm:text-4xl font-black" :class="primaryTextClass">
                   ৳{{ store.price }}
                 </div>
-                <div v-if="store.regular_price" class="text-base sm:text-lg text-slate-400 line-through font-bold">
+                <div v-if="store.regular_price" class="text-sm sm:text-lg text-slate-400 line-through font-bold">
                   ৳{{ store.regular_price }}
                 </div>
-                <div class="ml-auto text-[11px] font-bold px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full flex items-center gap-1">
-                  <ShieldCheck class="w-3.5 h-3.5" />
+                <div class="ml-auto text-[10px] sm:text-xs font-bold px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full flex items-center gap-1">
+                  <ShieldCheck class="w-3.5 h-3.5 text-emerald-700" />
                   <span>ক্যাশ অন ডেলিভারি</span>
                 </div>
               </div>
 
-              <!-- Live Stock Indicator -->
-              <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-200/60 font-semibold">
+              <!-- Live Stock Counter -->
+              <div class="flex items-center justify-between text-[11px] sm:text-xs pt-2 border-t border-slate-200/60 font-semibold">
                 <span class="text-slate-500">বর্তমান স্টক পরিস্থিতি:</span>
                 <span 
-                  class="px-2.5 py-0.5 rounded-full font-bold text-[11px]"
+                  class="px-2.5 py-0.5 rounded-full font-bold text-[10px] sm:text-[11px]"
                   :class="currentStock > 5 ? 'bg-emerald-100 text-emerald-800' : currentStock > 0 ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800'"
                 >
                   {{ currentStock > 0 ? `${currentStock} টি এভেইলেবল আছে` : 'স্টক শেষ (Out of Stock)' }}
@@ -144,7 +155,7 @@
               </div>
             </div>
 
-            <!-- Trust Badges Checkmarks -->
+            <!-- Trust Badges List -->
             <div class="space-y-2 pt-1">
               <div 
                 v-for="(badge, bIdx) in store.config?.trust_badges" 
@@ -158,18 +169,18 @@
               </div>
             </div>
 
-            <!-- Hero Action CTA -->
-            <div class="pt-3">
+            <!-- Big CTA Button -->
+            <div class="pt-2">
               <button 
                 v-if="currentStock > 0"
                 @click="scrollToForm" 
-                class="w-full py-4 text-white font-black text-base rounded-2xl shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
+                class="w-full py-3.5 sm:py-4 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
                 :class="primaryBgClass"
               >
                 <ShoppingBag class="w-5 h-5" />
                 <span>এখনই অর্ডার করুন (ক্যাশ অন ডেলিভারি)</span>
               </button>
-              <div v-else class="w-full py-4 bg-slate-200 text-slate-500 font-black text-center rounded-2xl cursor-not-allowed">
+              <div v-else class="w-full py-3.5 sm:py-4 bg-slate-200 text-slate-500 font-black text-center rounded-2xl cursor-not-allowed text-sm">
                 পণ্যটির স্টক সাময়িকভাবে শেষ
               </div>
             </div>
@@ -178,17 +189,17 @@
         </div>
       </section>
 
-      <!-- PROMOTIONAL REEL / VIDEO SECTION (If available) -->
-      <section v-if="videoEmbedUrl" class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-4">
+      <!-- PROMOTIONAL VIDEO REEL SECTION (If provided) -->
+      <section v-if="videoEmbedUrl" class="bg-white rounded-3xl p-5 sm:p-8 border border-slate-200/90 shadow-sm space-y-4">
         <div class="text-center max-w-md mx-auto">
           <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold uppercase tracking-wider mb-1">
             <Video class="w-3.5 h-3.5" />
             <span>প্রোডাক্ট লাইভ ভিডিও ডেমো</span>
           </div>
-          <h2 class="text-xl sm:text-2xl font-black text-slate-900">ভিডিওতে সরাসরি প্রোডাক্টটি দেখুন</h2>
+          <h2 class="text-lg sm:text-2xl font-black text-slate-900">ভিডিওতে সরাসরি প্রোডাক্টটি দেখুন</h2>
         </div>
 
-        <div class="max-w-md mx-auto aspect-[9/16] max-h-[520px] rounded-2xl overflow-hidden shadow-xl border border-slate-200 bg-black">
+        <div class="max-w-xs sm:max-w-sm mx-auto aspect-[9/16] rounded-2xl overflow-hidden shadow-xl border border-slate-200 bg-black">
           <iframe 
             :src="videoEmbedUrl" 
             class="w-full h-full"
@@ -199,29 +210,29 @@
         </div>
       </section>
 
-      <!-- FEATURES & BENEFITS GRID WITH SECONDARY IMAGE -->
-      <section v-if="store.config?.features?.length" class="space-y-6">
+      <!-- FEATURES & BENEFITS GRID -->
+      <section v-if="store.config?.features?.length" class="space-y-4 sm:space-y-6">
         <div class="text-center max-w-lg mx-auto">
-          <h2 class="text-xl sm:text-2xl font-black text-slate-900">কেন এই পণ্যটি আপনার জন্য সেরা?</h2>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1">বিশেষ গুণাবলী যা আপনাকে দেবে সর্বোচ্চ সন্তুষ্টি</p>
+          <h2 class="text-lg sm:text-2xl font-black text-slate-900">কেন এই পণ্যটি আপনার জন্য সেরা?</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">বিশেষ গুণাবলী যা আপনাকে দেবে সর্বোচ্চ সন্তুষ্টি</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
           <div v-if="store.config?.secondary_image && productImages.length > 1" class="rounded-3xl overflow-hidden border border-slate-200/80 shadow-sm md:col-span-1 hidden md:block">
             <img :src="store.config.secondary_image" class="w-full h-full object-cover" />
           </div>
 
-          <div class="space-y-3.5" :class="store.config?.secondary_image && productImages.length > 1 ? 'md:col-span-2' : 'md:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4 space-y-0'">
+          <div class="space-y-3" :class="store.config?.secondary_image && productImages.length > 1 ? 'md:col-span-2' : 'md:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-3 space-y-0'">
             <div 
               v-for="(feat, fIdx) in store.config.features" 
               :key="fIdx"
-              class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm flex items-start gap-4 hover:border-slate-300 transition-colors"
+              class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm flex items-start gap-3.5 hover:border-slate-300 transition-colors"
             >
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 mt-0.5 shadow-sm" :class="primaryBgClass">
-                <Sparkles class="w-5 h-5" />
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-white shrink-0 mt-0.5 shadow-sm" :class="primaryBgClass">
+                <Sparkles class="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <div>
-                <h3 class="text-base font-bold text-slate-900 mb-1">{{ feat.title }}</h3>
+                <h3 class="text-sm sm:text-base font-bold text-slate-900 mb-0.5 sm:mb-1">{{ feat.title }}</h3>
                 <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">{{ feat.desc }}</p>
               </div>
             </div>
@@ -229,63 +240,63 @@
         </div>
       </section>
 
-      <!-- TESTIMONIALS & SOCIAL PROOF (Can be hidden by AI) -->
-      <section v-if="showTestimonials && store.config?.testimonials?.length" class="space-y-6">
+      <!-- TESTIMONIALS & SOCIAL PROOF -->
+      <section v-if="showTestimonials && store.config?.testimonials?.length" class="space-y-4 sm:space-y-6">
         <div class="text-center max-w-lg mx-auto">
-          <h2 class="text-xl sm:text-2xl font-black text-slate-900">সম্মানিত ক্রেতাদের মতামত</h2>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1">যারা ইতিমধ্যে ব্যবহার করে সন্তুষ্ট</p>
+          <h2 class="text-lg sm:text-2xl font-black text-slate-900">সম্মানিত ক্রেতাদের মতামত</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">যারা ইতিমধ্যে ব্যবহার করে সন্তুষ্ট</p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <div 
             v-for="(testi, tIdx) in store.config.testimonials" 
             :key="tIdx"
-            class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm space-y-3"
+            class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm space-y-2.5"
           >
             <div class="flex items-center gap-1 text-amber-400">
-              <Star v-for="i in 5" :key="i" class="w-4 h-4 fill-amber-400 text-amber-400" />
+              <Star v-for="i in 5" :key="i" class="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-amber-400 text-amber-400" />
             </div>
             <p class="text-xs sm:text-sm text-slate-700 italic leading-relaxed">
               "{{ testi.comment }}"
             </p>
             <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
               <strong class="text-slate-900 font-bold">{{ testi.name }}</strong>
-              <span class="text-slate-400">{{ testi.location }}</span>
+              <span class="text-slate-400 text-[11px]">{{ testi.location }}</span>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- FAQS ACCORDION (Can be hidden by AI) -->
-      <section v-if="showFaqs && store.config?.faqs?.length" class="space-y-4">
-        <div class="text-center max-w-lg mx-auto mb-6">
-          <h2 class="text-xl sm:text-2xl font-black text-slate-900">সাধারণ কিছু প্রশ্নের উত্তর</h2>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1">অর্ডার করার পূর্বে জেনে নিন</p>
+      <!-- FAQS ACCORDION -->
+      <section v-if="showFaqs && store.config?.faqs?.length" class="space-y-3 sm:space-y-4">
+        <div class="text-center max-w-lg mx-auto mb-4">
+          <h2 class="text-lg sm:text-2xl font-black text-slate-900">সাধারণ কিছু প্রশ্নের উত্তর</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">অর্ডার করার পূর্বে জেনে নিন</p>
         </div>
 
-        <div class="space-y-3">
+        <div class="space-y-2.5">
           <div 
             v-for="(faq, qIdx) in store.config.faqs" 
             :key="qIdx"
             class="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm"
           >
-            <h3 class="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
-              <HelpCircle class="w-4 h-4" :class="primaryTextClass" />
+            <h3 class="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-2">
+              <HelpCircle class="w-4 h-4 shrink-0" :class="primaryTextClass" />
               <span>{{ faq.q }}</span>
             </h3>
-            <p class="text-xs sm:text-sm text-slate-600 mt-2 pl-6 leading-relaxed">
+            <p class="text-xs sm:text-sm text-slate-600 mt-1.5 pl-6 leading-relaxed">
               {{ faq.a }}
             </p>
           </div>
         </div>
       </section>
 
-      <!-- THE COD ORDER FORM -->
+      <!-- THE ROCK-SOLID COD ORDER FORM -->
       <div v-if="currentStock > 0">
         <StoreCodForm :store="store" />
       </div>
-      <div v-else class="p-8 bg-white border border-red-200 rounded-3xl text-center space-y-2">
-        <h3 class="text-lg font-black text-red-600">বর্তমানে এই পণ্যটির স্টক খালি</h3>
+      <div v-else class="p-6 sm:p-8 bg-white border border-red-200 rounded-3xl text-center space-y-2">
+        <h3 class="text-base sm:text-lg font-black text-red-600">বর্তমানে এই পণ্যটির স্টক খালি</h3>
         <p class="text-xs text-slate-500">দোকানদার নতুন স্টক যোগ করলে পুনরায় অর্ডার করা যাবে।</p>
       </div>
 
@@ -295,17 +306,17 @@
     <StoreAiSalesBot :store="store" />
 
     <!-- STICKY MOBILE BOTTOM BAR -->
-    <div v-if="currentStock > 0" class="sm:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 z-40 flex items-center justify-between shadow-2xl">
-      <div>
-        <div class="text-[11px] text-slate-400 font-semibold">অফার মূল্য:</div>
-        <div class="text-xl font-black" :class="primaryTextClass">৳{{ store.price }}</div>
+    <div v-if="currentStock > 0" class="sm:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-2.5 z-40 flex items-center justify-between shadow-2xl">
+      <div class="pl-1">
+        <div class="text-[10px] text-slate-400 font-bold leading-none">অফার মূল্য:</div>
+        <div class="text-lg font-black leading-tight" :class="primaryTextClass">৳{{ store.price }}</div>
       </div>
       <button 
         @click="scrollToForm" 
-        class="px-6 py-3 text-white font-black text-sm rounded-xl shadow-lg active:scale-95 transition-all flex items-center gap-2"
+        class="px-5 py-2.5 text-white font-black text-xs rounded-xl shadow-lg active:scale-95 transition-all flex items-center gap-1.5"
         :class="primaryBgClass"
       >
-        <ShoppingBag class="w-4 h-4" />
+        <ShoppingBag class="w-3.5 h-3.5" />
         <span>এখনই অর্ডার করুন</span>
       </button>
     </div>
@@ -315,14 +326,14 @@
       <div class="bg-white rounded-3xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
         
         <!-- Editor Modal Header -->
-        <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white">
-          <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-emerald-500 text-slate-950 flex items-center justify-center font-bold">
+        <div class="p-3.5 sm:p-4 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-500 text-slate-950 flex items-center justify-center font-bold">
               <Sparkles class="w-4 h-4" />
             </div>
             <div>
-              <h3 class="text-sm font-black">AI লাইভ স্টোর এডিটর</h3>
-              <p class="text-[10px] text-slate-300">যেকোনো সেকশন সরাতে, লুকোতে বা পরিবর্তন করতে বলুন</p>
+              <h3 class="text-xs sm:text-sm font-black">AI লাইভ স্টোর এডিটর</h3>
+              <p class="text-[9px] sm:text-[10px] text-slate-300">যেকোনো সেকশন সরাতে, লুকোতে বা পরিবর্তন করতে বলুন</p>
             </div>
           </div>
           <button @click="isEditingStore = false" class="p-1 rounded-lg text-slate-300 hover:text-white">
@@ -331,51 +342,50 @@
         </div>
 
         <!-- Chat / Instruction History Area -->
-        <div ref="editorScroll" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50/50 text-xs sm:text-sm">
-          <div class="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl leading-relaxed">
+        <div ref="editorScroll" class="flex-1 p-3 sm:p-4 overflow-y-auto space-y-2.5 bg-slate-50/50 text-xs">
+          <div class="p-3 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl leading-relaxed">
             👋 <strong>আমি DokanAI এডিটর!</strong><br />
             দোকানের যেকোনো সেকশন বাদ দিতে বা পরিবর্তন করতে বলুন। যেমন:
-            <ul class="list-disc pl-4 mt-1.5 space-y-0.5 text-emerald-800 text-xs">
-              <li>"উপরের লাল অফার বারটা (Urgency Bar) বাদ দাও"</li>
+            <ul class="list-disc pl-4 mt-1 space-y-0.5 text-emerald-800 text-[11px]">
+              <li>"উপরের লাল অফার বারটা বাদ দাও"</li>
               <li>"১০০% ভেরিফাইড বিক্রেতা লেখাটি লুকিয়ে ফেলো"</li>
-              <li>"রিভিউ / টেস্টিমোনিয়াল সেকশন মুছে দাও"</li>
+              <li>"রিভিউ বা টেস্টিমোনিয়াল সেকশন মুছে দাও"</li>
               <li>"দাম ১০০০ থেকে কমিয়ে ৯৫০ টাকা করো"</li>
-              <li>"রিভিউতে নতুন এক কাস্টমারের নাম ও মন্তব্য যোগ করো"</li>
             </ul>
           </div>
 
           <div v-for="(log, lIdx) in editLogs" :key="lIdx" class="space-y-1">
-            <div class="bg-slate-900 text-white p-3 rounded-2xl rounded-br-none ml-auto max-w-[85%] text-xs">
+            <div class="bg-slate-900 text-white p-2.5 sm:p-3 rounded-2xl rounded-br-none ml-auto max-w-[85%] text-xs">
               {{ log.prompt }}
             </div>
-            <div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-bl-none mr-auto max-w-[85%] text-xs text-slate-800 font-medium flex items-center gap-2">
+            <div class="bg-white border border-slate-200 p-2.5 sm:p-3 rounded-2xl rounded-bl-none mr-auto max-w-[85%] text-xs text-slate-800 font-medium flex items-center gap-2">
               <CheckCircle2 class="w-4 h-4 text-emerald-600 shrink-0" />
               <span>{{ log.response }}</span>
             </div>
           </div>
 
-          <div v-if="isAiEditing" class="flex items-center gap-2 bg-white border border-slate-200 p-3 rounded-2xl w-fit">
+          <div v-if="isAiEditing" class="flex items-center gap-2 bg-white border border-slate-200 p-2.5 rounded-2xl w-fit">
             <Loader2 class="w-4 h-4 animate-spin text-emerald-600" />
-            <span class="text-xs font-bold text-slate-700">AI আপনার স্টোর আপডেট করছে...</span>
+            <span class="text-xs font-bold text-slate-700">AI আপডেট করছে...</span>
           </div>
         </div>
 
         <!-- Editor Prompt Input Bar -->
-        <div class="p-3 border-t border-slate-100 bg-white">
+        <div class="p-2.5 sm:p-3 border-t border-slate-100 bg-white">
           <form @submit.prevent="submitAiEdit" class="flex items-center gap-2">
             <input 
               v-model="aiInstruction" 
               type="text" 
-              placeholder="যেমন: উপরের অফার বারটা মুছে দাও..." 
-              class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-emerald-500 font-medium"
+              placeholder="কী পরিবর্তন করতে চান বলুন..." 
+              class="flex-1 px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-emerald-500 font-medium"
               :disabled="isAiEditing"
             />
             <button 
               type="submit" 
               :disabled="!aiInstruction.trim() || isAiEditing"
-              class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-md transition-all active:scale-95"
+              class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl font-bold text-xs flex items-center gap-1 shadow-sm transition-all active:scale-95 shrink-0"
             >
-              <span>আপডেট করুন</span>
+              <span>আপডেট</span>
               <Send class="w-3.5 h-3.5" />
             </button>
           </form>
