@@ -47,9 +47,8 @@
             <span class="font-black text-slate-900 tracking-tight text-sm sm:text-base block truncate leading-tight">
               {{ store.product_title }}
             </span>
-            <div v-if="showVerifiedBadge" class="flex items-center gap-1 text-[10px] font-bold text-emerald-600">
-              <CheckCircle2 class="w-3 h-3 text-emerald-600 shrink-0" />
-              <span>১০০% ভেরিফাইড বিক্রেতা</span>
+            <div v-if="showVerifiedBadge" class="text-[11px] font-bold text-slate-900 mt-0.5 truncate">
+              {{ store.config?.seller_tagline || store.product_title }}
             </div>
           </div>
         </div>
@@ -125,12 +124,11 @@
 
           <!-- Product Sales Copy -->
           <div class="space-y-3.5 sm:space-y-5">
-            <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] sm:text-xs font-bold uppercase tracking-wider">
-              <Sparkles class="w-3 h-3 text-emerald-600" />
-              <span>{{ store.config?.badge_text || 'প্রিমিয়াম কোয়ালিটি গ্যারান্টিড' }}</span>
+            <div class="inline-flex items-center px-3 py-1 rounded-full bg-slate-100 text-slate-800 text-xs sm:text-sm font-extrabold uppercase tracking-wider mb-0.5">
+              <span>{{ store.config?.badge_text || store.product_title }}</span>
             </div>
 
-            <h1 class="text-xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-[1.25] tracking-tight">
+            <h1 class="text-xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-[1.25] tracking-tight !mt-1">
               {{ store.config?.headline }}
             </h1>
 
@@ -165,20 +163,6 @@
               </div>
             </div>
 
-            <!-- Trust Badges List -->
-            <div class="space-y-2 pt-1">
-              <div 
-                v-for="(badge, bIdx) in store.config?.trust_badges" 
-                :key="bIdx" 
-                class="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-700"
-              >
-                <div class="w-4 h-4 rounded-full flex items-center justify-center text-white shrink-0" :class="primaryBgClass">
-                  <Check class="w-3 h-3" />
-                </div>
-                <span>{{ badge }}</span>
-              </div>
-            </div>
-
             <!-- Big CTA Button -->
             <div class="pt-2">
               <button 
@@ -204,7 +188,7 @@
         <div class="text-center max-w-md mx-auto">
           <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold uppercase tracking-wider mb-1">
             <Video class="w-3.5 h-3.5" />
-            <span>প্রোডাক্ট লাইভ ভিডিও ডেমো</span>
+            <span>প্রোডাক্টের বিবরণ</span>
           </div>
           <h2 class="text-lg sm:text-2xl font-black text-slate-900">ভিডিওতে সরাসরি প্রোডাক্টটি দেখুন</h2>
         </div>
@@ -239,7 +223,7 @@
               class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm flex items-start gap-3.5 hover:border-slate-300 transition-colors"
             >
               <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-white shrink-0 mt-0.5 shadow-sm" :class="primaryBgClass">
-                <Sparkles class="w-4 h-4 sm:w-5 sm:h-5" />
+                <Check class="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <div>
                 <h3 class="text-sm sm:text-base font-bold text-slate-900 mb-0.5 sm:mb-1">{{ feat.title }}</h3>
@@ -278,25 +262,46 @@
       </section>
 
       <!-- FAQS ACCORDION -->
-      <section v-if="showFaqs && store.config?.faqs?.length" class="space-y-3 sm:space-y-4">
-        <div class="text-center max-w-lg mx-auto mb-4">
+      <section v-if="showFaqs && store.config?.faqs?.length" class="space-y-4 max-w-3xl mx-auto">
+        <div class="text-center max-w-lg mx-auto mb-2">
           <h2 class="text-lg sm:text-2xl font-black text-slate-900">সাধারণ কিছু প্রশ্নের উত্তর</h2>
           <p class="text-xs sm:text-sm text-slate-500 mt-0.5">অর্ডার করার পূর্বে জেনে নিন</p>
         </div>
 
-        <div class="space-y-2.5">
+        <div class="space-y-3">
           <div 
             v-for="(faq, qIdx) in store.config.faqs" 
             :key="qIdx"
-            class="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm"
+            class="bg-white rounded-2xl border transition-all duration-200 overflow-hidden shadow-xs hover:border-slate-300"
+            :class="openFaqIdx === qIdx ? 'border-emerald-300 ring-2 ring-emerald-500/10' : 'border-slate-200/80'"
           >
-            <h3 class="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-2">
-              <HelpCircle class="w-4 h-4 shrink-0" :class="primaryTextClass" />
-              <span>{{ faq.q }}</span>
-            </h3>
-            <p class="text-xs sm:text-sm text-slate-600 mt-1.5 pl-6 leading-relaxed">
+            <button 
+              type="button"
+              @click="toggleFaq(qIdx)"
+              class="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-3 cursor-pointer select-none"
+            >
+              <div class="flex items-center gap-3">
+                <div 
+                  class="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 transition-colors"
+                  :class="openFaqIdx === qIdx ? 'bg-emerald-100 text-emerald-700 font-bold' : 'bg-slate-100 text-slate-500'"
+                >
+                  <span class="text-xs">Q</span>
+                </div>
+                <h3 class="text-xs sm:text-sm font-bold text-slate-900 leading-snug">
+                  {{ faq.q }}
+                </h3>
+              </div>
+              <ChevronDown 
+                class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200"
+                :class="{ 'rotate-180 text-emerald-600': openFaqIdx === qIdx }" 
+              />
+            </button>
+            <div 
+              v-show="openFaqIdx === qIdx"
+              class="px-5 pb-5 pt-1 text-xs sm:text-sm text-slate-600 border-t border-slate-100 bg-slate-50/50 leading-relaxed pl-14"
+            >
               {{ faq.a }}
-            </p>
+            </div>
           </div>
         </div>
       </section>
@@ -420,7 +425,7 @@
 
 <script setup>
 import { ref, computed, nextTick, onMounted } from 'vue'
-import { Flame, ShoppingBag, ArrowDown, Check, Sparkles, Star, HelpCircle, X, Video, ShieldCheck, CheckCircle2, Loader2, Send, LayoutDashboard } from 'lucide-vue-next'
+import { Flame, ShoppingBag, ArrowDown, Check, Sparkles, Star, HelpCircle, X, Video, ShieldCheck, CheckCircle2, Loader2, Send, LayoutDashboard, ChevronDown } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 
 const { currentUser, initAuth } = useAuth()
@@ -462,6 +467,11 @@ const showVerifiedBadge = computed(() => {
 const showTestimonials = computed(() => {
   return store.value?.config?.show_testimonials !== false
 })
+
+const openFaqIdx = ref(0)
+const toggleFaq = (idx) => {
+  openFaqIdx.value = openFaqIdx.value === idx ? null : idx
+}
 
 const showFaqs = computed(() => {
   return store.value?.config?.show_faqs !== false
