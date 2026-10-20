@@ -201,7 +201,7 @@ function handleFallbackAgent(messages: any[], userMessage: string) {
 
     return {
       success: true,
-      reply: `ছবি পেয়েছি!\n\nআপনার কি কোনো রিল বা ভিডিও আছে? (Facebook Reel অথবা YouTube Shorts এর লিঙ্ক থাকলে শেয়ার করুন, না থাকলে 'না' বা 'নেই' লিখে জানান)।`,
+      reply: `আপনার কি এই প্রোডাক্টটির কোনো রিল বা ভিডিও আছে? (Facebook Reel অথবা YouTube Shorts এর লিঙ্ক থাকলে শেয়ার করুন, না থাকলে 'না' বা 'নেই' লিখে জানান)।`,
       readyToGenerate: false,
       extractedData: {
         product_title: null,
