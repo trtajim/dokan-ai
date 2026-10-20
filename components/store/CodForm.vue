@@ -187,6 +187,7 @@
 import { reactive, ref, computed, watch } from 'vue'
 import { ShieldCheck, ShoppingBag, CheckCircle2, Loader2 } from 'lucide-vue-next'
 import confetti from 'canvas-confetti'
+import { useMetaPixel } from '~/composables/useMetaPixel'
 
 const props = defineProps({
   store: {
@@ -194,6 +195,9 @@ const props = defineProps({
     required: true
   }
 })
+
+const pixelId = computed(() => props.store?.config?.pixel_id)
+const { trackLead } = useMetaPixel(pixelId)
 
 const submitting = ref(false)
 const orderSubmitted = ref(false)
@@ -331,6 +335,16 @@ const submitOrder = async () => {
 
     if (res && res.success) {
       orderSubmitted.value = true
+      
+      // Fire Meta Pixel Lead event for COD order confirmation
+      if (pixelId.value) {
+        trackLead({
+          content_name: props.store.product_title,
+          value: totalBill.value,
+          currency: 'BDT'
+        })
+      }
+
       try {
         confetti({
           particleCount: 100,

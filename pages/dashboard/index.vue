@@ -111,6 +111,17 @@
                 <span class="font-black text-slate-900">{{ getStoreStock(st) }}টি</span>
               </button>
 
+              <!-- Meta Pixel Setup Button -->
+              <button 
+                @click="openPixelModal(st)"
+                class="px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                :class="st.config?.pixel_id ? 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'"
+                :title="st.config?.pixel_id ? `Pixel ID: ${st.config.pixel_id}` : 'মেটা পিক্সেল সেটআপ করুন'"
+              >
+                <Activity class="w-3.5 h-3.5" :class="st.config?.pixel_id ? 'text-indigo-600' : 'text-slate-400'" />
+                <span>{{ st.config?.pixel_id ? 'পিক্সেল অন' : 'পিক্সেল' }}</span>
+              </button>
+
               <NuxtLink 
                 :to="`/s/${st.slug}`" 
                 target="_blank" 
@@ -383,6 +394,58 @@
       </div>
     </div>
 
+    <!-- Custom Modal: Meta Pixel Setup -->
+    <div v-if="pixelModal.isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+      <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+        <div class="flex items-center justify-between">
+          <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <Activity class="w-5 h-5" />
+          </div>
+          <button @click="pixelModal.isOpen = false" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+            <X class="w-5 h-5" />
+          </button>
+        </div>
+        
+        <div>
+          <h3 class="text-base font-black text-slate-900">মেটা (ফেসবুক) পিক্সেল সেটআপ</h3>
+          <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+            দোকান: <span class="font-bold text-slate-800">{{ pixelModal.store?.product_title }}</span>
+          </p>
+        </div>
+
+        <div class="space-y-1.5 text-xs">
+          <label class="block font-bold text-slate-700">Meta Pixel ID (পিক্সেল আইডি):</label>
+          <input 
+            type="text"
+            v-model="pixelModal.value"
+            @keyup.enter="confirmPixelUpdate"
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-mono font-bold text-slate-900 focus:outline-none focus:border-indigo-500 bg-slate-50"
+            placeholder="যেমন: 123456789012345"
+            autoFocus
+          />
+          <p class="text-[11px] text-slate-400 leading-normal pt-1">
+            💡 COD অর্ডারে রিটার্ন/বাতিলের কারণে ভুয়া পারচেজ এড়াতে ফর্ম সাবমিটে নিরাপদ <strong>Lead</strong> ইভেন্ট ফায়ার করা হয়।
+          </p>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button
+            @click="pixelModal.isOpen = false"
+            class="px-3.5 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+          >
+            বাতিল
+          </button>
+          <button
+            @click="confirmPixelUpdate"
+            :disabled="pixelModal.isSubmitting"
+            class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 rounded-xl transition-all shadow-sm cursor-pointer disabled:opacity-50"
+          >
+            {{ pixelModal.isSubmitting ? 'সেভ হচ্ছে...' : 'পিক্সেল সেভ করুন' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Custom Modal: Confirm Delete Store -->
     <div v-if="deleteModal.isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
       <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in-95 duration-200">
@@ -520,7 +583,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
-import { RefreshCw, Plus, Banknote, ShoppingBag, Clock, Store, Boxes, Copy, ExternalLink, PhoneCall, Trash2, Eye, X } from 'lucide-vue-next'
+import { RefreshCw, Plus, Banknote, ShoppingBag, Clock, Store, Boxes, Copy, ExternalLink, PhoneCall, Trash2, Eye, X, Activity } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 import { useAuthModal } from '~/composables/useAuthModal'
 import { useAppToast } from '~/composables/useAppToast'
@@ -555,6 +618,13 @@ const deleteModal = reactive({
 const orderModal = reactive({
   isOpen: false,
   order: null
+})
+
+const pixelModal = reactive({
+  isOpen: false,
+  store: null,
+  value: '',
+  isSubmitting: false
 })
 
 const viewOrderDetails = (order) => {
@@ -687,6 +757,45 @@ const openStockPrompt = (st) => {
   stockModal.store = st
   stockModal.value = getStoreStock(st)
   stockModal.isOpen = true
+}
+
+const openPixelModal = (st) => {
+  pixelModal.store = st
+  pixelModal.value = st.config?.pixel_id || ''
+  pixelModal.isOpen = true
+}
+
+const confirmPixelUpdate = async () => {
+  if (!pixelModal.store) return
+  const cleanId = pixelModal.value.trim()
+  pixelModal.isSubmitting = true
+  try {
+    await $fetch('/api/stores', {
+      method: 'PATCH',
+      body: { 
+        slug: pixelModal.store.slug, 
+        pixel_id: cleanId || null 
+      }
+    })
+    
+    // Update local state reactively
+    const match = stores.value.find(s => s.slug === pixelModal.store.slug)
+    if (match) {
+      if (!match.config) match.config = {}
+      match.config.pixel_id = cleanId || null
+    }
+    
+    pixelModal.isOpen = false
+    if (cleanId) {
+      toast.success('মেটা পিক্সেল সফলভাবে সেভ করা হয়েছে!')
+    } else {
+      toast.success('মেটা পিক্সেল নিষ্ক্রিয় করা হয়েছে।')
+    }
+  } catch (e) {
+    toast.error('পিক্সেল আপডেট করা সম্ভব হয়নি।')
+  } finally {
+    pixelModal.isSubmitting = false
+  }
 }
 
 const confirmStockUpdate = async () => {

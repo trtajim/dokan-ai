@@ -468,6 +468,7 @@
 import { ref, computed, nextTick, onMounted } from 'vue'
 import { Flame, ShoppingBag, ArrowDown, Check, Sparkles, Star, HelpCircle, X, Video, ShieldCheck, CheckCircle2, Loader2, Send, LayoutDashboard, ChevronDown } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
+import { useMetaPixel } from '~/composables/useMetaPixel'
 
 const { currentUser, initAuth } = useAuth()
 const route = useRoute()
@@ -575,7 +576,27 @@ const primaryTextClass = computed(() => {
   return 'text-emerald-600'
 })
 
+const pixelId = computed(() => store.value?.config?.pixel_id)
+const { trackViewContent, trackInitiateCheckout } = useMetaPixel(pixelId)
+
+watch(store, (st) => {
+  if (st && pixelId.value) {
+    trackViewContent({
+      content_name: st.product_title,
+      value: st.price,
+      currency: 'BDT'
+    })
+  }
+}, { immediate: true })
+
 const scrollToForm = () => {
+  if (pixelId.value && store.value) {
+    trackInitiateCheckout({
+      content_name: store.value.product_title,
+      value: store.value.price,
+      currency: 'BDT'
+    })
+  }
   const el = document.getElementById('order-form-section')
   if (el) {
     el.scrollIntoView({ behavior: 'smooth' })
