@@ -851,12 +851,10 @@
 
         <button
           v-else
-          @click="confirmDispatch"
-          :disabled="dispatchModal.isLoading"
-          class="w-full py-2.5 px-3 bg-amber-500 hover:bg-amber-600 disabled:opacity-75 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
+          disabled
+          class="w-full py-2.5 px-3 bg-slate-100 border border-slate-200 text-slate-500 font-bold rounded-xl text-xs flex items-center justify-center gap-2 cursor-not-allowed"
         >
-          <Loader2 v-if="dispatchModal.isLoading" class="w-4 h-4 animate-spin text-white" />
-          <span v-else>🚀 বুকিং কনফার্ম করুন</span>
+          <span>🚀 কুরিয়ার অটোমেশন (শীঘ্রই আসছে - Coming Soon)</span>
         </button>
       </div>
     </div>
