@@ -56,8 +56,8 @@
 
               <p class="whitespace-pre-line">{{ msg.content }}</p>
 
-              <!-- IN-CHAT DYNAMIC ACTION CARD -->
-              <div v-if="msg.readyToGenerate" class="mt-3 pt-2.5 border-t border-slate-200/60 animate-in fade-in zoom-in-95 duration-200">
+              <!-- IN-CHAT DYNAMIC ACTION CARD (Only shown on the latest ready message) -->
+              <div v-if="msg.readyToGenerate && idx === latestReadyMessageIndex" class="mt-3 pt-2.5 border-t border-slate-200/60 animate-in fade-in zoom-in-95 duration-200">
                 <div class="p-3 bg-white rounded-xl sm:rounded-2xl border border-emerald-200 shadow-sm space-y-2.5 text-slate-800">
                   <div class="flex items-center justify-between">
                     <div class="flex items-center gap-1.5 text-emerald-700 font-bold text-xs">
@@ -194,7 +194,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, nextTick, onMounted, watch } from 'vue'
+import { ref, reactive, computed, nextTick, onMounted, watch } from 'vue'
 import { Sparkles, Bot, Send, Loader2, CheckCircle2, Paperclip, X } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 import { useAuthModal } from '~/composables/useAuthModal'
@@ -252,6 +252,15 @@ const messages = ref([
     content: `হ্যালো! আপনার অনলাইন সিঙ্গেল-প্রোডাক্ট স্টোরের জন্য আপনি কোন প্রোডাক্টটি বিক্রি করতে চান? লিখে জানান, প্লিজ!`
   }
 ])
+
+const latestReadyMessageIndex = computed(() => {
+  for (let i = messages.value.length - 1; i >= 0; i--) {
+    if (messages.value[i].readyToGenerate) {
+      return i
+    }
+  }
+  return -1
+})
 
 const extractedData = reactive({
   product_title: '',
