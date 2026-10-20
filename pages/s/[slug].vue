@@ -458,38 +458,38 @@
             <div class="grid grid-cols-1 gap-1.5 mt-2.5">
               <button 
                 type="button" 
-                @click="applySuggestion('থিম কালার এম্বার / মধু গোল্ডেন করো')" 
+                @click="applySuggestion('থিম কালার পরিবর্তন করতে চাই')" 
                 class="text-left px-2.5 py-1.5 rounded-xl bg-white/90 hover:bg-white border border-amber-200 text-amber-900 text-[11px] font-medium transition-colors cursor-pointer flex items-center gap-1.5"
               >
-                <span>🎨 "থিম কালার এম্বার / মধু গোল্ডেন করো"</span>
+                <span>🎨 "থিম কালার পরিবর্তন করতে চাই"</span>
               </button>
               <button 
                 type="button" 
-                @click="applySuggestion('দাম ১০০০ থেকে কমিয়ে ৯৫০ টাকা করো')" 
+                @click="applySuggestion('দাম কমাও')" 
                 class="text-left px-2.5 py-1.5 rounded-xl bg-white/90 hover:bg-white border border-amber-200 text-amber-900 text-[11px] font-medium transition-colors cursor-pointer flex items-center gap-1.5"
               >
-                <span>🏷️ "দাম ১০০০ থেকে কমিয়ে ৯৫০ টাকা করো"</span>
+                <span>🏷️ "দাম কমাও"</span>
               </button>
               <button 
                 type="button" 
-                @click="applySuggestion('উপরের লাল অফার বারটা লুকিয়ে ফেলো')" 
+                @click="applySuggestion('উপরের বার হাইড করো')" 
                 class="text-left px-2.5 py-1.5 rounded-xl bg-white/90 hover:bg-white border border-amber-200 text-amber-900 text-[11px] font-medium transition-colors cursor-pointer flex items-center gap-1.5"
               >
-                <span>🔥 "উপরের লাল অফার বারটা লুকিয়ে ফেলো"</span>
+                <span>🔥 "উপরের বার হাইড করো"</span>
               </button>
               <button 
                 type="button" 
-                @click="applySuggestion('রিভিউ বা টেস্টিমোনিয়াল সেকশন মুছে দাও')" 
+                @click="applySuggestion('নতুন রিভিউ যুক্ত করো')" 
                 class="text-left px-2.5 py-1.5 rounded-xl bg-white/90 hover:bg-white border border-amber-200 text-amber-900 text-[11px] font-medium transition-colors cursor-pointer flex items-center gap-1.5"
               >
-                <span>⭐ "রিভিউ বা টেস্টিমোনিয়াল সেকশন মুছে দাও"</span>
+                <span>⭐ "নতুন রিভিউ যুক্ত করো"</span>
               </button>
               <button 
                 type="button" 
-                @click="applySuggestion('অর্ডার বাটনের লেখা পরিবর্তন করে এখনই কিনুন করো')" 
+                @click="applySuggestion('ডিটেইলস পরিবর্তন করো')" 
                 class="text-left px-2.5 py-1.5 rounded-xl bg-white/90 hover:bg-white border border-amber-200 text-amber-900 text-[11px] font-medium transition-colors cursor-pointer flex items-center gap-1.5"
               >
-                <span>🛒 "অর্ডার বাটনের লেখা 'এখনই কিনুন' করো"</span>
+                <span>📝 "ডিটেইলস পরিবর্তন করো"</span>
               </button>
             </div>
           </div>
