@@ -1,9 +1,9 @@
 /**
  * AI Store Configuration Generator with Intelligent Image Placement and Reel Support
  */
-import { GoogleGenAI } from '@google/genai'
 import { memoryStore } from '../../utils/memoryStore'
 import { getSupabaseClient } from '../../utils/supabase'
+import { generateAiContent } from '../../utils/aiClient'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -53,10 +53,8 @@ export default defineEventHandler(async (event) => {
 
   let generatedConfig: any = null
 
-  if (apiKey) {
-    try {
-      const ai = new GoogleGenAI({ apiKey })
-      const prompt = `You are Bangladesh's top e-commerce landing page copywriter and conversion strategist.
+  try {
+    const prompt = `You are Bangladesh's top e-commerce landing page copywriter and conversion strategist.
 Generate an irresistible, emotionally persuasive sales page JSON in natural colloquial Bengali for:
 
 Product: ${product_title}
@@ -98,18 +96,14 @@ Respond ONLY with a strictly valid JSON matching this schema:
   ]
 }`
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash-lite',
-        contents: prompt,
-        config: {
-          responseMimeType: 'application/json'
-        }
-      })
+    const rawResponse = await generateAiContent({
+      prompt,
+      jsonMode: true
+    })
 
-      generatedConfig = JSON.parse(response.text || '{}')
-    } catch (err: any) {
-      console.error('Failed to generate with Gemini, using fallback:', err)
-    }
+    generatedConfig = JSON.parse(rawResponse || '{}')
+  } catch (err: any) {
+    console.warn('AI Generate Provider error, using fallback:', err?.message || err)
   }
 
   if (!generatedConfig || !generatedConfig.headline) {

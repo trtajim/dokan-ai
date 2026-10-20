@@ -3,9 +3,9 @@
  * Answers buyer questions on the live landing page. Context is strictly
  * locked to the product specifications, pricing, delivery, and guarantees.
  */
-import { GoogleGenAI } from '@google/genai'
 import { memoryStore } from '../../utils/memoryStore'
 import { getSupabaseClient } from '../../utils/supabase'
+import { generateAiChat } from '../../utils/aiClient'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -30,18 +30,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, message: 'Store not found' })
   }
 
-  const config = useRuntimeConfig()
-  const apiKey = config.geminiApiKey || process.env.GEMINI_API_KEY
+  try {
+    // Real dynamic delivery charges from store
+    const insideFee = Number(store.config?.delivery_fee_inside || store.delivery_fee_inside) || 70
+    const outsideFee = Number(store.config?.delivery_fee_outside || store.delivery_fee_outside) || 130
 
-  if (apiKey) {
-    try {
-      const ai = new GoogleGenAI({ apiKey })
-
-      // Real dynamic delivery charges from store
-      const insideFee = Number(store.config?.delivery_fee_inside || store.delivery_fee_inside) || 70
-      const outsideFee = Number(store.config?.delivery_fee_outside || store.delivery_fee_outside) || 130
-
-      const systemPrompt = `You are the polite, direct, and helpful Bangladeshi in-store sales assistant for the online store "${store.product_title}".
+    const systemPrompt = `You are the polite, direct, and helpful Bangladeshi in-store sales assistant for the online store "${store.product_title}".
 Store Information:
 - Product Name: ${store.product_title}
 - Current Offer Price: ৳${store.price} (Regular was: ৳${store.regular_price || Math.round(store.price * 1.4)})
@@ -58,29 +52,28 @@ Rules:
 5. Always use the EXACT delivery fees mentioned above (Inside Dhaka: ৳${insideFee}, Outside Dhaka: ৳${outsideFee}). NEVER hallucinate other charges!
 6. Do not make up fake specs not mentioned above.`
 
-      const contents: any[] = [{ role: 'user', parts: [{ text: systemPrompt }] }]
-      if (Array.isArray(history)) {
-        history.forEach((h: any) => {
-          contents.push({
-            role: h.role === 'user' ? 'user' : 'model',
-            parts: [{ text: h.text }]
-          })
+    const chatMessages: any[] = []
+    if (Array.isArray(history)) {
+      history.forEach((h: any) => {
+        chatMessages.push({
+          role: h.role === 'user' ? 'user' : 'model',
+          content: h.text || ''
         })
-      }
-      contents.push({ role: 'user', parts: [{ text: message }] })
-
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash-lite',
-        contents
       })
-
-      return {
-        success: true,
-        reply: response.text || 'ধন্যবাদ! আপনার কোনো প্রশ্ন থাকলে জানাতে পারেন।'
-      }
-    } catch (err: any) {
-      console.error('Chat Gemini error:', err)
     }
+    chatMessages.push({ role: 'user', content: message })
+
+    const replyText = await generateAiChat({
+      systemPrompt,
+      messages: chatMessages
+    })
+
+    return {
+      success: true,
+      reply: replyText || 'ধন্যবাদ! আপনার কোনো প্রশ্ন থাকলে জানাতে পারেন।'
+    }
+  } catch (err: any) {
+    console.warn('AI Chat Provider error, using fallback:', err?.message || err)
   }
 
   // Fallback intelligent response matcher
