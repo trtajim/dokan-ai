@@ -127,11 +127,11 @@
               <span>{{ store.config?.badge_text || store.product_title }}</span>
             </div>
 
-            <h1 class="text-xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-[1.25] tracking-tight !mt-1">
+            <h1 class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 leading-[1.3] tracking-tight !mt-1">
               {{ store.config?.headline }}
             </h1>
 
-            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal pt-0.5">
               {{ store.config?.subheadline }}
             </p>
 

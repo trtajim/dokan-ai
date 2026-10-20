@@ -17,13 +17,13 @@ useHead({
   link: [
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
     { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-    { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap' }
+    { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Noto+Sans+Bengali:wght@400;500;600;700;800;900&family=Hind+Siliguri:wght@400;500;600;700&display=swap' }
   ]
 })
 </script>
 
 <style>
 body {
-  font-family: 'Plus Jakarta Sans', 'Hind Siliguri', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Noto Sans Bengali', 'Hind Siliguri', sans-serif;
 }
 </style>
