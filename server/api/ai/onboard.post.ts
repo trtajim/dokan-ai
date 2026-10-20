@@ -15,6 +15,12 @@ export default defineEventHandler(async (event) => {
 GOAL: Guide the user to build a high-converting store FAST. Keep questions simple and direct.
 DEFAULT DELIVERY CHARGE: Always assume ৳70 (Inside Dhaka) and ৳130 (Outside Dhaka). DO NOT ASK the user for delivery charge unless they explicitly bring it up themselves.
 
+CRITICAL INSTRUCTION FOR REELS & MODIFICATIONS:
+- If the user says they have a reel, wants to add a reel, or mentions a video (e.g., "reel ache to amar", "reel add korte chai", "video ache"):
+  DO NOT set "readyToGenerate": true! Instead, set "readyToGenerate": false, and ask them directly in Bengali to paste/share the Facebook Reel or YouTube Shorts URL right now.
+- If the user provides a URL (facebook.com/reel, youtube.com/shorts, youtu.be, etc.), extract it into "video_reel_url" and set "readyToGenerate": true.
+- If the user asks to change or update anything (price, name, variants, photos), acknowledge the change, update "extractedData", and set "readyToGenerate": true ONLY after the change is addressed.
+
 STRICT CONVERSATIONAL SEQUENCE:
 1. Step 1 (Product Name): The user gives the product name.
 2. Step 2 (Price & Variants):
@@ -25,12 +31,12 @@ STRICT CONVERSATIONAL SEQUENCE:
    - Say "কয়েকটি ভালো ছবি (Pictures)" (NOT "একটি"). Tell them pictures make the landing page attractive.
 4. Step 4 (Reel / Video URL):
    - Once pictures are uploaded or shared, ask separately: "আপনার কি কোনো রিল বা ভিডিও আছে? (Facebook Reel অথবা YouTube Shorts এর লিঙ্ক থাকলে শেয়ার করুন, না থাকলে 'না' বা 'নেই' লিখে জানান)।"
-   - If they provide a URL (facebook.com/reel, youtube.com/shorts, youtu.be, etc.), extract it into "video_reel_url".
+   - If they say they have a reel but did not provide the link yet, ask them for the link ("লিঙ্কটি দিন").
 5. Step 5 (Review & Ready To Launch):
-   - Set "readyToGenerate": true.
-   - Say: "সব তথ্য সংগ্রহ করা হয়েছে! একবার রিভিউ করে দেখুন, কিছু পরিবর্তন করার থাকলে জানান অথবা নিচের বাটনে চাপ দিয়ে দোকানটি তৈরি করে নিন।" (Delivery defaults to ৳70/৳130).
+   - Only when name, price/variants, pictures, and reel answer (either a link or confirmation that they don't have one) are provided, set "readyToGenerate": true.
+   - Say: "সব তথ্য সুন্দরভাবে সংগ্রহ করা হয়েছে! নিচে একবার রিভিউ করে দেখুন, কিছু পরিবর্তন করার থাকলে জানান অথবা নিচের বাটনে চাপ দিয়ে দোকানটি তৈরি করে নিন।" (Delivery defaults to ৳70/৳130).
 
-RETURN STRICT JSON ONLY:
+RETURN STRICT JSON ONLY (No markdown codeblocks, just valid JSON):
 {
   "reply": "Your friendly Bengali reply asking EXACTLY ONE focused step with clear guidance",
   "readyToGenerate": boolean,
@@ -65,7 +71,17 @@ RETURN STRICT JSON ONLY:
       jsonMode: true
     })
 
-    const parsed = JSON.parse(rawResponse || '{}')
+    // Clean any accidental markdown fence around JSON
+    let cleanJson = (rawResponse || '').trim()
+    if (cleanJson.startsWith('```')) {
+      cleanJson = cleanJson.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim()
+    }
+    const jsonMatch = cleanJson.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      cleanJson = jsonMatch[0]
+    }
+
+    const parsed = JSON.parse(cleanJson || '{}')
     
     // Ensure default delivery fees are preserved
     if (parsed.extractedData) {
@@ -87,6 +103,44 @@ function handleFallbackAgent(messages: any[], userMessage: string) {
   const historyLen = (messages || []).length
   const priceMatch = userMessage.match(/(\d{3,5})/g)
   let extractedPrice = priceMatch ? parseInt(priceMatch[0], 10) : 1200
+  const lowerMsg = (userMessage || '').toLowerCase()
+
+  // Did the user mention reel / video?
+  if (lowerMsg.includes('reel') || lowerMsg.includes('video') || lowerMsg.includes('রিল') || lowerMsg.includes('ভিডিও')) {
+    const hasReelUrl = userMessage.match(/https?:\/\/[^\s]+/)
+    if (hasReelUrl) {
+      return {
+        success: true,
+        reply: `ভিডিও লিঙ্কটি যুক্ত করা হয়েছে! নিচে সংগৃহীত সকল তথ্য রয়েছে। একবার রিভিউ করে দেখুন, কিছু পরিবর্তন করার থাকলে জানান অথবা নিচের বাটনে চাপ দিয়ে সরাসরি আপনার আকর্ষণীয় ল্যান্ডিং পেজ তৈরি করে ফেলুন!`,
+        readyToGenerate: true,
+        extractedData: {
+          product_title: null,
+          price: extractedPrice,
+          regular_price: Math.round(extractedPrice * 1.4),
+          video_reel_url: hasReelUrl[0],
+          delivery_fee_inside: 70,
+          delivery_fee_outside: 130,
+          theme_color: 'emerald',
+          highlights: ['১০০% অরিজিনাল কোয়ালিটি', 'ক্যাশ অন ডেলিভারি সুবিধা', 'দ্রুততম হোম ডেলিভারি']
+        }
+      }
+    } else {
+      return {
+        success: true,
+        reply: `আপনার রিল বা ভিডিওর লিঙ্কটি (Facebook Reel বা YouTube Shorts) দয়া করে এখানে মেসেজে পেস্ট করে দিন।`,
+        readyToGenerate: false,
+        extractedData: {
+          product_title: null,
+          price: extractedPrice,
+          regular_price: Math.round(extractedPrice * 1.4),
+          delivery_fee_inside: 70,
+          delivery_fee_outside: 130,
+          theme_color: 'emerald',
+          highlights: []
+        }
+      }
+    }
+  }
 
   // Turn 1 -> Ask Price & Variants
   if (historyLen <= 1) {
