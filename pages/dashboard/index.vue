@@ -413,18 +413,35 @@
           </p>
         </div>
 
-        <div class="space-y-1.5 text-xs">
-          <label class="block font-bold text-slate-700">Meta Pixel ID (পিক্সেল আইডি):</label>
-          <input 
-            type="text"
-            v-model="pixelModal.value"
-            @keyup.enter="confirmPixelUpdate"
-            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-mono font-bold text-slate-900 focus:outline-none focus:border-indigo-500 bg-slate-50"
-            placeholder="যেমন: 123456789012345"
-            autoFocus
-          />
-          <p class="text-[11px] text-slate-400 leading-normal pt-1">
-            💡 COD অর্ডারে রিটার্ন/বাতিলের কারণে ভুয়া পারচেজ এড়াতে ফর্ম সাবমিটে নিরাপদ <strong>Lead</strong> ইভেন্ট ফায়ার করা হয়।
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Meta Pixel ID (পিক্সেল আইডি):</label>
+            <input 
+              type="text"
+              v-model="pixelModal.value"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-mono font-bold text-slate-900 focus:outline-none focus:border-indigo-500 bg-slate-50"
+              placeholder="যেমন: 123456789012345"
+            />
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">
+              Conversions API (CAPI) Access Token:
+              <span class="text-slate-400 font-normal">(অপশনাল)</span>
+            </label>
+            <input 
+              type="password"
+              v-model="pixelModal.accessToken"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-mono text-slate-900 focus:outline-none focus:border-indigo-500 bg-slate-50"
+              placeholder="EAA..."
+            />
+            <p class="text-[10px] text-slate-400 leading-normal mt-1">
+              🔑 টোকেন দিলে অ্যাডমিন যখন কোনো অর্ডারকে <strong>"কনফার্মড"</strong> করবেন, সাথে সাথে সার্ভার থেকে মেটায় অফিসিয়াল <strong>Purchase</strong> ইভেন্ট চলে যাবে।
+            </p>
+          </div>
+
+          <p class="text-[11px] text-slate-500 leading-normal pt-1 bg-amber-50 p-2.5 rounded-xl border border-amber-200/60">
+            💡 <strong>স্মার্ট COD ট্র্যাকিং:</strong> কাস্টমার অর্ডার সাবমিট করলে সুরক্ষিত <strong>Lead</strong> ইভেন্ট ফায়ার হয়, এবং ফোনে কনফার্ম করার পর CAPI দিয়ে <strong>Purchase</strong> ইভেন্ট যায়।
           </p>
         </div>
 
@@ -624,6 +641,7 @@ const pixelModal = reactive({
   isOpen: false,
   store: null,
   value: '',
+  accessToken: '',
   isSubmitting: false
 })
 
@@ -762,19 +780,22 @@ const openStockPrompt = (st) => {
 const openPixelModal = (st) => {
   pixelModal.store = st
   pixelModal.value = st.config?.pixel_id || ''
+  pixelModal.accessToken = st.config?.meta_access_token || ''
   pixelModal.isOpen = true
 }
 
 const confirmPixelUpdate = async () => {
   if (!pixelModal.store) return
   const cleanId = pixelModal.value.trim()
+  const cleanToken = pixelModal.accessToken.trim()
   pixelModal.isSubmitting = true
   try {
     await $fetch('/api/stores', {
       method: 'PATCH',
       body: { 
         slug: pixelModal.store.slug, 
-        pixel_id: cleanId || null 
+        pixel_id: cleanId || null,
+        meta_access_token: cleanToken || null
       }
     })
     
@@ -783,11 +804,12 @@ const confirmPixelUpdate = async () => {
     if (match) {
       if (!match.config) match.config = {}
       match.config.pixel_id = cleanId || null
+      match.config.meta_access_token = cleanToken || null
     }
     
     pixelModal.isOpen = false
     if (cleanId) {
-      toast.success('মেটা পিক্সেল সফলভাবে সেভ করা হয়েছে!')
+      toast.success('মেটা পিক্সেল ও কনভার্সন API সফলভাবে সেভ করা হয়েছে!')
     } else {
       toast.success('মেটা পিক্সেল নিষ্ক্রিয় করা হয়েছে।')
     }

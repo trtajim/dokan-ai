@@ -90,7 +90,7 @@ export default defineEventHandler(async (event) => {
   // PATCH: Quick stock or pixel update from dashboard
   if (method === 'PATCH') {
     const body = await readBody(event)
-    const { slug, stock, pixel_id } = body
+    const { slug, stock, pixel_id, meta_access_token } = body
 
     if (!slug) {
       throw createError({ statusCode: 400, message: 'slug is required' })
@@ -107,6 +107,7 @@ export default defineEventHandler(async (event) => {
       if (!currentStore.config) currentStore.config = {}
       if (typeof stock === 'number') currentStore.config.stock = updatedStock
       if (pixel_id !== undefined) currentStore.config.pixel_id = pixel_id ? String(pixel_id).trim() : null
+      if (meta_access_token !== undefined) currentStore.config.meta_access_token = meta_access_token ? String(meta_access_token).trim() : null
       memoryStore.setStore(slug, currentStore)
     }
 
@@ -118,6 +119,7 @@ export default defineEventHandler(async (event) => {
           const cfg = store.config || {}
           if (typeof stock === 'number') cfg.stock = updatedStock
           if (pixel_id !== undefined) cfg.pixel_id = pixel_id ? String(pixel_id).trim() : null
+          if (meta_access_token !== undefined) cfg.meta_access_token = meta_access_token ? String(meta_access_token).trim() : null
           await supabase.from('stores').update({ config: cfg }).eq('slug', slug)
         }
       } catch (e) {
@@ -128,7 +130,8 @@ export default defineEventHandler(async (event) => {
     return { 
       success: true, 
       stock: updatedStock,
-      pixel_id: pixel_id !== undefined ? (pixel_id ? String(pixel_id).trim() : null) : undefined
+      pixel_id: pixel_id !== undefined ? (pixel_id ? String(pixel_id).trim() : null) : undefined,
+      meta_access_token: meta_access_token !== undefined ? (meta_access_token ? String(meta_access_token).trim() : null) : undefined
     }
   }
 
