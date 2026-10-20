@@ -61,34 +61,12 @@
 
       <!-- Multi-Store Shelf & Live Stock Management -->
       <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <h2 class="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
-              <Boxes class="w-4 h-4 text-emerald-600" />
-              <span>আপনার পরিচালিত দোকানসমূহ <span v-if="!isLoading">({{ userStores.length }} টি স্টোর)</span></span>
-            </h2>
-            <p class="text-xs text-slate-400 mt-0.5">যে কোনো স্টোরে ক্লিক করে নির্দিষ্ট অর্ডার তালিকা ফিল্টার করুন</p>
-          </div>
-
-          <!-- Store Switcher Filter -->
-          <div v-if="!isLoading" class="flex items-center gap-1.5 overflow-x-auto text-xs">
-            <button 
-              @click="selectedStoreFilter = 'all'"
-              class="px-3 py-1.5 rounded-lg font-bold transition-colors"
-              :class="selectedStoreFilter === 'all' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-            >
-              সকল দোকান
-            </button>
-            <button 
-              v-for="st in userStores"
-              :key="st.id"
-              @click="selectedStoreFilter = st.slug"
-              class="px-3 py-1.5 rounded-lg font-bold transition-colors truncate max-w-[140px]"
-              :class="selectedStoreFilter === st.slug ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-            >
-              {{ st.product_title }}
-            </button>
-          </div>
+        <div>
+          <h2 class="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
+            <Boxes class="w-4 h-4 text-emerald-600" />
+            <span>আপনার পরিচালিত দোকানসমূহ <span v-if="!isLoading">({{ userStores.length }} টি স্টোর)</span></span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">নিচে দোকানের লাইভ স্টক পরিবর্তন করুন অথবা ভিজিট করুন</p>
         </div>
 
         <!-- Skeleton loading state for stores -->
@@ -105,7 +83,6 @@
             v-for="st in userStores" 
             :key="st.id" 
             class="p-3 sm:p-4 hover:bg-slate-50/80 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-            :class="selectedStoreFilter === st.slug ? 'bg-emerald-50/30' : ''"
           >
             <!-- Store Details -->
             <div class="flex items-center gap-3 min-w-0">
@@ -173,7 +150,7 @@
 
       <!-- Realtime Incoming Orders Table -->
       <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
-        <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
             <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -184,17 +161,32 @@
             </p>
           </div>
 
-          <!-- Status Filter buttons -->
-          <div class="flex items-center gap-1.5 overflow-x-auto text-xs">
-            <button 
-              v-for="flt in statusFilterOptions" 
-              :key="flt.value"
-              @click="activeStatusFilter = flt.value"
-              class="px-3 py-1.5 rounded-lg font-bold transition-colors whitespace-nowrap"
-              :class="activeStatusFilter === flt.value ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-            >
-              {{ flt.label }}
-            </button>
+          <!-- Filters: Store Selector Dropdown & Order Status Selector Dropdown -->
+          <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
+            <!-- Store Selection Dropdown -->
+            <div class="relative w-full sm:w-auto">
+              <select 
+                v-model="selectedStoreFilter"
+                class="w-full sm:w-auto px-3 py-1.5 text-xs font-bold rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 focus:outline-none focus:border-emerald-500 cursor-pointer shadow-xs transition-colors"
+              >
+                <option value="all">সকল দোকান (All Stores)</option>
+                <option v-for="st in userStores" :key="st.id" :value="st.slug">
+                  {{ st.product_title }} (/s/{{ st.slug }})
+                </option>
+              </select>
+            </div>
+
+            <!-- Order Status Filter Dropdown -->
+            <div class="relative w-full sm:w-auto">
+              <select 
+                v-model="activeStatusFilter"
+                class="w-full sm:w-auto px-3 py-1.5 text-xs font-bold rounded-xl border border-slate-200 bg-slate-900 text-white focus:outline-none cursor-pointer shadow-xs transition-colors"
+              >
+                <option v-for="flt in statusFilterOptions" :key="flt.value" :value="flt.value">
+                  {{ flt.label }}
+                </option>
+              </select>
+            </div>
           </div>
         </div>
 
