@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
   const outsideFee = Number(delivery_fee_outside) || 130
   const productPrice = Number(price) || 999
   const oldPrice = Number(regular_price) || Math.round(productPrice * 1.4)
-  const initialStock = Number(stock) || 20
+  const initialStock = Number(stock) || 50
 
   const allImages = Array.isArray(images) && images.length > 0 
     ? images 
