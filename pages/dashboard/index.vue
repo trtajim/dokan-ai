@@ -267,15 +267,30 @@
               <span class="font-black text-slate-900">৳{{ order.total_price }} ({{ order.quantity }}টি)</span>
             </div>
 
-            <!-- Mobile Footer: Details Button & Delete -->
-            <div class="flex items-center justify-between pt-1">
-              <button 
-                @click="viewOrderDetails(order)"
-                class="px-2.5 py-1 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
-              >
-                <Eye class="w-3.5 h-3.5" />
-                <span>বিস্তারিত দেখুন</span>
-              </button>
+            <!-- Mobile Footer: Courier Button, Details Button & Delete -->
+            <div class="flex items-center justify-between pt-1 gap-2 flex-wrap">
+              <div class="flex items-center gap-1.5">
+                <!-- Courier Action Button on Mobile -->
+                <button 
+                  v-if="!order.courier_data && order.status !== 'cancelled'"
+                  @click="openDispatchModal(order)"
+                  class="px-2 py-1 text-[11px] font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
+                >
+                  <Truck class="w-3 h-3 text-amber-600" />
+                  <span>কুরিয়ার</span>
+                </button>
+                <span v-else-if="order.courier_data" class="text-[10px] font-mono font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded">
+                  {{ order.courier_data.tracking_code }}
+                </span>
+
+                <button 
+                  @click="viewOrderDetails(order)"
+                  class="px-2.5 py-1 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
+                >
+                  <Eye class="w-3.5 h-3.5" />
+                  <span>বিস্তারিত</span>
+                </button>
+              </div>
 
               <button 
                 v-if="order.status !== 'cancelled'"
@@ -301,13 +316,14 @@
                 <th class="py-3 px-4">দোকান</th>
                 <th class="py-3 px-4">পরিমাণ ও বিল</th>
                 <th class="py-3 px-4">স্ট্যাটাস</th>
+                <th class="py-3 px-4 text-center">কুরিয়ার</th>
                 <th class="py-3 px-4 text-center">বিস্তারিত</th>
                 <th class="py-3 px-4 text-right">ডিলিট</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
               <tr v-if="finalDisplayOrders.length === 0">
-                <td colspan="8" class="py-12 text-center text-slate-400 font-semibold">
+                <td colspan="9" class="py-12 text-center text-slate-400 font-semibold">
                   কোনো অর্ডার খুঁজে পাওয়া যায়নি।
                 </td>
               </tr>
@@ -364,6 +380,30 @@
                     <option value="delivered">ডেলিভার্ড</option>
                     <option value="cancelled">বাতিল</option>
                   </select>
+                </td>
+
+                <!-- Courier Action Button in Row -->
+                <td class="py-3.5 px-4 text-center">
+                  <!-- Already Dispatched Badge -->
+                  <div v-if="order.courier_data" class="inline-flex flex-col items-center gap-0.5">
+                    <span class="text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                      <Truck class="w-3 h-3 text-amber-600" />
+                      <span>{{ order.courier_data.courier_slug === 'pathao' ? 'Pathao' : order.courier_data.courier_slug === 'redx' ? 'RedX' : 'Steadfast' }}</span>
+                    </span>
+                    <span class="font-mono text-[10px] font-bold text-slate-500">{{ order.courier_data.tracking_code }}</span>
+                  </div>
+
+                  <!-- 1-Click Dispatch Button in Row -->
+                  <button 
+                    v-else-if="order.status !== 'cancelled'"
+                    @click="openDispatchModal(order)"
+                    class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-2xs"
+                    title="কুরিয়ারে পাঠান"
+                  >
+                    <Truck class="w-3.5 h-3.5 text-amber-600" />
+                    <span>কুরিয়ারে পাঠান</span>
+                  </button>
+                  <span v-else class="text-xs text-slate-300">-</span>
                 </td>
 
                 <!-- Details Button -->
