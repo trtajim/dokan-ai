@@ -15,6 +15,7 @@
         </div>
 
         <button 
+          v-if="isDismissible"
           @click="closeLogin"
           class="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
         >
@@ -93,7 +94,7 @@ import { useAuthModal } from '~/composables/useAuthModal'
 import { useAuth } from '~/composables/useAuth'
 import { useAppToast } from '~/composables/useAppToast'
 
-const { isOpen, redirectPath, closeLogin } = useAuthModal()
+const { isOpen, redirectPath, isDismissible, closeLogin } = useAuthModal()
 const { loginAsGuest, loginWithEmail } = useAuth()
 const toast = useAppToast()
 const router = useRouter()
@@ -108,7 +109,7 @@ const enterAsGuest = async () => {
   isGuestLoading.value = true
   try {
     await loginAsGuest()
-    closeLogin()
+    isOpen.value = false
     toast.success('সফলভাবে প্রবেশ করা হয়েছে!')
     if (redirectPath.value && redirectPath.value !== window.location.pathname) {
       router.push(redirectPath.value)
@@ -123,7 +124,7 @@ const handleEmailLogin = async () => {
   isEmailLoading.value = true
   try {
     await loginWithEmail(email.value, password.value)
-    closeLogin()
+    isOpen.value = false
     toast.success('সফলভাবে প্রবেশ করা হয়েছে!')
     if (redirectPath.value && redirectPath.value !== window.location.pathname) {
       router.push(redirectPath.value)
