@@ -27,61 +27,61 @@
           </p>
         </div>
 
-        <!-- Core Merchant Superpowers (5 Distinct Cards) -->
-        <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto text-left">
+        <!-- Core Merchant Superpowers (Clean 5-Item Grid with Punchy, Concise Copy) -->
+        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 max-w-5xl mx-auto text-left">
           
           <!-- Benefit 1: Telegram Alerts -->
-          <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-emerald-300 transition-all flex items-start gap-3.5">
-            <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
-              <Send class="w-5 h-5" />
-            </div>
+          <div class="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-emerald-300 transition-all flex flex-col justify-between">
             <div>
-              <h3 class="font-bold text-slate-900 text-sm">টেলিগ্রাম ইনস্ট্যান্ট অ্যালার্ট</h3>
-              <p class="text-xs text-slate-500 mt-0.5 leading-snug">অর্ডার হওয়া মাত্র ফোনে রিংটোন সহ কাস্টমারের নাম, ফোন ও ঠিকানা নোটিফিকেশন।</p>
+              <div class="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center mb-2.5">
+                <Send class="w-4 h-4" />
+              </div>
+              <h3 class="font-bold text-slate-900 text-xs sm:text-sm">টেলিগ্রাম অ্যালার্ট</h3>
+              <p class="text-[11px] text-slate-500 mt-1 leading-snug">অর্ডার হওয়া মাত্র ফোনে শব্দ সহ নাম, ফোন ও ঠিকানা নোটিফিকেশন।</p>
             </div>
           </div>
 
           <!-- Benefit 2: Courier Automation -->
-          <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-emerald-300 transition-all flex items-start gap-3.5">
-            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-              <Truck class="w-5 h-5" />
-            </div>
+          <div class="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-emerald-300 transition-all flex flex-col justify-between">
             <div>
-              <h3 class="font-bold text-slate-900 text-sm">১-ক্লিক কুরিয়ার বুকিং</h3>
-              <p class="text-xs text-slate-500 mt-0.5 leading-snug">Steadfast, Pathao ও RedX এ সরাসরি এক ক্লিকে পার্সেল বুক করার সুবিধা।</p>
+              <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-2.5">
+                <Truck class="w-4 h-4" />
+              </div>
+              <h3 class="font-bold text-slate-900 text-xs sm:text-sm">কুরিয়ার বুকিং</h3>
+              <p class="text-[11px] text-slate-500 mt-1 leading-snug">Steadfast, Pathao ও RedX এ সরাসরি ১-ক্লিকে পার্সেল বুকিং।</p>
             </div>
           </div>
 
           <!-- Benefit 3: Meta Pixel Tracking -->
-          <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-emerald-300 transition-all flex items-start gap-3.5">
-            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-              <Target class="w-5 h-5" />
-            </div>
+          <div class="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-emerald-300 transition-all flex flex-col justify-between">
             <div>
-              <h3 class="font-bold text-slate-900 text-sm">ফুল মেটা পিক্সেল ট্র্যাকিং</h3>
-              <p class="text-xs text-slate-500 mt-0.5 leading-snug">ViewContent, Checkout ও Purchase ইভেন্ট স্বয়ংক্রিয় ট্র্যাক হয়ে অ্যাডের ROAS বাড়ে।</p>
+              <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2.5">
+                <Target class="w-4 h-4" />
+              </div>
+              <h3 class="font-bold text-slate-900 text-xs sm:text-sm">মেটা পিক্সেল</h3>
+              <p class="text-[11px] text-slate-500 mt-1 leading-snug">ViewContent, Checkout ও Purchase স্বয়ংক্রিয় ট্র্যাকিং।</p>
             </div>
           </div>
 
           <!-- Benefit 4: Real-time Stock Management -->
-          <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-emerald-300 transition-all flex items-start gap-3.5">
-            <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
-              <Boxes class="w-5 h-5" />
-            </div>
+          <div class="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-emerald-300 transition-all flex flex-col justify-between">
             <div>
-              <h3 class="font-bold text-slate-900 text-sm">লাইভ স্টক ম্যানেজমেন্ট</h3>
-              <p class="text-xs text-slate-500 mt-0.5 leading-snug">প্রতি অর্ডারে ইনভেন্টরি অটো-ডিডাক্ট, আউট-অব-স্টক গার্ড ও পেজে লাইভ কাউন্টার আর্জেন্সি।</p>
+              <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mb-2.5">
+                <Boxes class="w-4 h-4" />
+              </div>
+              <h3 class="font-bold text-slate-900 text-xs sm:text-sm">স্টক ম্যানেজমেন্ট</h3>
+              <p class="text-[11px] text-slate-500 mt-1 leading-snug">অটো স্টক ডিডাকশন ও পেজে লাইভ কাউন্টার আর্জেন্সি।</p>
             </div>
           </div>
 
           <!-- Benefit 5: 24/7 AI Sales Agent -->
-          <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-emerald-300 transition-all flex items-start gap-3.5 sm:col-span-2 lg:col-span-2">
-            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-              <Bot class="w-5 h-5" />
-            </div>
+          <div class="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-emerald-300 transition-all flex flex-col justify-between sm:col-span-2 lg:col-span-1">
             <div>
-              <h3 class="font-bold text-slate-900 text-sm">২৪/৭ AI সেলস এজেন্ট</h3>
-              <p class="text-xs text-slate-500 mt-0.5 leading-snug">পণ্য সম্পর্কে কাস্টমারের যে কোনো দ্বিধা ও প্রশ্নের খাঁটি বাংলায় উত্তর দিয়ে সরাসরি অর্ডার কনফার্ম করে।</p>
+              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2.5">
+                <Bot class="w-4 h-4" />
+              </div>
+              <h3 class="font-bold text-slate-900 text-xs sm:text-sm">AI সেলস বট</h3>
+              <p class="text-[11px] text-slate-500 mt-1 leading-snug">২৪/৭ কাস্টমারের প্রশ্নের উত্তর দিয়ে সরাসরি অর্ডার করায়।</p>
             </div>
           </div>
 
