@@ -5,7 +5,7 @@
  * - Verified Seller Badge (১০০% ভেরিফাইড বিক্রেতা)
  * - FAQs, Testimonials, Features, Reel Video, or Badges
  */
-import { GoogleGenAI } from '@google/genai'
+import { generateAiContent } from '../../utils/aiClient'
 import { memoryStore } from '../../utils/memoryStore'
 import { getSupabaseClient } from '../../utils/supabase'
 
@@ -30,12 +30,12 @@ export default defineEventHandler(async (event) => {
   }
 
   const config = useRuntimeConfig()
-  const apiKey = config.geminiApiKey || process.env.GEMINI_API_KEY
+  const hasAiKey = (config.aiProvider === 'groq' || process.env.AI_PROVIDER === 'groq')
+    ? (config.groqApiKey || process.env.GROQ_API_KEY)
+    : (config.geminiApiKey || process.env.GEMINI_API_KEY)
 
-  if (apiKey) {
+  if (hasAiKey) {
     try {
-      const ai = new GoogleGenAI({ apiKey })
-
       const prompt = `You are "DokanAI Master Store Editor & Consultant".
 The merchant is asking for modifications, design feedback, or questions about their live store.
 
@@ -103,13 +103,12 @@ RETURN STRICT JSON ONLY:
   "variants": [{"name": "...", "price": number}]
 }`
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash-lite',
-        contents: prompt,
-        config: { responseMimeType: 'application/json' }
+      const rawResponse = await generateAiContent({
+        prompt,
+        jsonMode: true
       })
 
-      const parsed = JSON.parse(response.text || '{}')
+      const parsed = JSON.parse(rawResponse || '{}')
 
       const updatedConfig = {
         ...currentStore.config,

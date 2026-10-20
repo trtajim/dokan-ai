@@ -1,22 +1,13 @@
 /**
  * Step-by-Step Patient Onboarding Agent with Explicit Image & Reel Inquiry
  */
-import { GoogleGenAI } from '@google/genai'
+import { generateAiChat } from '../../utils/aiClient'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { messages, userMessage } = body
 
-  const config = useRuntimeConfig()
-  const apiKey = config.geminiApiKey || process.env.GEMINI_API_KEY
-
-  if (!apiKey) {
-    return handleFallbackAgent(messages, userMessage)
-  }
-
   try {
-    const ai = new GoogleGenAI({ apiKey })
-
     const systemPrompt = `You are "DokanAI Assistant" (দোকান এআই), an expert conversational e-commerce consultant for Bangladeshi single-product Cash-on-Delivery (COD) stores.
 
 CRITICAL RULES:
@@ -54,35 +45,29 @@ RETURN STRICT JSON ONLY:
   }
 }`
 
-    const chatHistory = (messages || []).map((m: any) => ({
+    const chatHistory: any[] = (messages || []).map((m: any) => ({
       role: m.role === 'user' ? 'user' : 'model',
-      parts: [{ text: m.content }]
+      content: m.content || ''
     }))
 
     chatHistory.push({
       role: 'user',
-      parts: [{ text: userMessage }]
+      content: userMessage || ''
     })
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash-lite',
-      contents: [
-        { role: 'user', parts: [{ text: systemPrompt }] },
-        ...chatHistory
-      ],
-      config: {
-        responseMimeType: 'application/json'
-      }
+    const rawResponse = await generateAiChat({
+      systemPrompt,
+      messages: chatHistory,
+      jsonMode: true
     })
 
-    const text = response.text || '{}'
-    const parsed = JSON.parse(text)
+    const parsed = JSON.parse(rawResponse || '{}')
     return {
       success: true,
       ...parsed
     }
   } catch (err: any) {
-    console.error('Gemini error in onboarding:', err)
+    console.warn('AI Onboard Provider error, using fallback:', err?.message || err)
     return handleFallbackAgent(messages, userMessage)
   }
 })
