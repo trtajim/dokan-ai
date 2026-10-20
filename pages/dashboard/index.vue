@@ -196,8 +196,81 @@
           </div>
         </div>
 
-        <!-- Orders Table -->
-        <div class="overflow-x-auto">
+        <!-- Orders: Responsive Card View on Mobile, Table on Desktop -->
+        <!-- Mobile Orders List (< md) -->
+        <div class="md:hidden divide-y divide-slate-100">
+          <div v-if="finalDisplayOrders.length === 0" class="py-10 text-center text-slate-400 font-semibold text-xs">
+            কোনো অর্ডার খুঁজে পাওয়া যায়নি।
+          </div>
+          <div v-for="order in finalDisplayOrders" :key="'mob_' + order.id" class="p-4 space-y-2.5">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <h4 class="font-bold text-slate-900 text-sm">{{ order.customer_name }}</h4>
+                <a :href="`tel:${order.customer_phone}`" class="inline-flex items-center gap-1 text-emerald-700 text-xs font-mono font-bold mt-0.5">
+                  <PhoneCall class="w-3 h-3 text-emerald-600" />
+                  <span>{{ order.customer_phone }}</span>
+                </a>
+              </div>
+              <span 
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shrink-0"
+                :class="{
+                  'bg-amber-100 text-amber-800': order.status === 'pending',
+                  'bg-emerald-100 text-emerald-800': order.status === 'confirmed',
+                  'bg-blue-100 text-blue-800': order.status === 'shipped',
+                  'bg-red-100 text-red-800': order.status === 'cancelled'
+                }"
+              >
+                {{ order.status }}
+              </span>
+            </div>
+
+            <div class="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200/70 space-y-1">
+              <div class="flex justify-between text-[11px]">
+                <span class="text-slate-400">স্টোর / ভ্যারিয়েন্ট:</span>
+                <span class="font-bold text-slate-800">/shop/{{ order.store_slug }} {{ order.selected_variant ? `(${order.selected_variant})` : '' }}</span>
+              </div>
+              <div class="flex justify-between text-[11px]">
+                <span class="text-slate-400">বিল (পরিমাণ):</span>
+                <span class="font-black text-slate-900">৳{{ order.total_price }} ({{ order.quantity }}টি)</span>
+              </div>
+              <div class="text-[11px] text-slate-500 pt-1 border-t border-slate-200/50 truncate">
+                📍 {{ order.customer_address }}
+              </div>
+            </div>
+
+            <!-- Mobile Action Row -->
+            <div class="flex items-center justify-between pt-1">
+              <span class="text-[10px] text-slate-400">{{ formatTime(order.created_at) }}</span>
+              <div class="flex items-center gap-1.5">
+                <button 
+                  v-if="order.status === 'pending'"
+                  @click="changeStatus(order.id, 'confirmed')"
+                  class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-xs active:scale-95"
+                >
+                  কনফার্ম
+                </button>
+                <button 
+                  v-else-if="order.status === 'confirmed'"
+                  @click="changeStatus(order.id, 'shipped')"
+                  class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold shadow-xs active:scale-95"
+                >
+                  শিপড
+                </button>
+                <button 
+                  v-if="order.status !== 'cancelled'"
+                  @click="changeStatus(order.id, 'cancelled')"
+                  class="p-1.5 text-slate-400 hover:text-red-600 rounded-lg"
+                  title="অর্ডার বাতিল"
+                >
+                  <Trash2 class="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orders Table (Desktop >= md) -->
+        <div class="hidden md:block overflow-x-auto">
           <table class="w-full text-left text-xs sm:text-sm">
             <thead class="bg-slate-50/80 text-slate-500 font-bold border-b border-slate-200/70 text-[11px] uppercase tracking-wider">
               <tr>

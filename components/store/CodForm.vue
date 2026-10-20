@@ -168,7 +168,7 @@
       >
         <Loader2 v-if="submitting" class="w-5 h-5 animate-spin" />
         <ShoppingBag v-else class="w-5 h-5" />
-        <span>{{ submitting ? 'অর্ডার প্রসেস হচ্ছে...' : 'অর্ডার কনফার্ম করুন (ক্যাশ অন ডেলিভারি)' }}</span>
+        <span>{{ submitting ? 'অর্ডার প্রসেস হচ্ছে...' : 'অর্ডার কনফার্ম করুন' }}</span>
       </button>
 
       <p class="text-center text-[11px] text-slate-400">

@@ -40,7 +40,7 @@
               <span>লগইন হচ্ছে...</span>
             </template>
             <template v-else>
-              <span>গেস্ট ডেমো হিসেবে প্রবেশ করুন (Guest Demo)</span>
+              <span>গেস্ট হিসেবে প্রবেশ করুন</span>
               <ArrowRight class="w-4 h-4" />
             </template>
           </button>

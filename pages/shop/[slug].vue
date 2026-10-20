@@ -160,7 +160,7 @@
                   class="px-2.5 py-0.5 rounded-full font-bold text-[10px] sm:text-[11px]"
                   :class="currentStock > 5 ? 'bg-emerald-100 text-emerald-800' : currentStock > 0 ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800'"
                 >
-                  {{ currentStock > 0 ? `${currentStock} টি এভেইলেবল আছে` : 'স্টক শেষ (Out of Stock)' }}
+                  {{ currentStock > 0 ? `${currentStock} টি এভেইলেবল আছে` : 'স্টক শেষ' }}
                 </span>
               </div>
             </div>
@@ -188,7 +188,7 @@
                 :class="primaryBgClass"
               >
                 <ShoppingBag class="w-5 h-5" />
-                <span>{{ store.config?.cta_button_text || 'এখনই অর্ডার করুন (ক্যাশ অন ডেলিভারি)' }}</span>
+                <span>{{ store.config?.cta_button_text || 'এখনই অর্ডার করুন' }}</span>
               </button>
               <div v-else class="w-full py-3.5 sm:py-4 bg-slate-200 text-slate-500 font-black text-center rounded-2xl cursor-not-allowed text-sm">
                 পণ্যটির স্টক সাময়িকভাবে শেষ

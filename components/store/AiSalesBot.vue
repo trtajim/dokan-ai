@@ -11,7 +11,7 @@
         <Bot class="w-4 h-4 sm:w-5 sm:h-5" />
         <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-300 rounded-full animate-ping"></span>
       </div>
-      <span>প্রশ্ন করুন (AI Chat)</span>
+      <span>AI সহায়ক</span>
     </button>
 
     <!-- Chat Modal Window (Mobile Fullscreen Sheet / Desktop floating) -->
