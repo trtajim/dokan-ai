@@ -106,6 +106,94 @@
       </div>
     </section>
 
+    <!-- Merchant Power Tools & Automation Showcase -->
+    <section class="py-16 lg:py-24 bg-slate-50 border-b border-slate-200/80">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-14">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-3">
+            <Zap class="w-3.5 h-3.5" />
+            <span>স্মার্ট মার্চেন্ট ইকোসিস্টেম</span>
+          </div>
+          <h2 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+            অর্ডার থেকে ডেলিভারি — সব কিছু অটোমেটেড
+          </h2>
+          <p class="text-sm sm:text-base text-slate-600 mt-3 font-normal">
+            শুধু ল্যান্ডিং পেজ নয়, বাংলাদেশি অনলাইন ব্যবসায়ীদের বিক্রয় ও পরিচালনা সহজ করতে প্রয়োজনীয় সব টুলস সংযুক্ত রয়েছে।
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- 1. Telegram Instant Order Alerts -->
+          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+            <div>
+              <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+                <Send class="w-6 h-6" />
+              </div>
+              <h3 class="text-base font-bold text-slate-900 mb-2">টেলিগ্রাম ইনস্ট্যান্ট অ্যালার্ট</h3>
+              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                ওয়েবসাইটে অর্ডার হওয়া মাত্রই আপনার পার্সোনাল টেলিগ্রামে শব্দ সহ কাস্টমারের নাম, ফোন নম্বর ও ফুল অ্যাড্রেসের নোটিফিকেশন পৌঁছে যাবে।
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] font-bold text-sky-600">
+              <CheckCircle2 class="w-3.5 h-3.5" />
+              <span>১-ক্লিকে টেলিগ্রাম বট পেয়ারিং</span>
+            </div>
+          </div>
+
+          <!-- 2. BD Courier Integration -->
+          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+            <div>
+              <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+                <Truck class="w-6 h-6" />
+              </div>
+              <h3 class="text-base font-bold text-slate-900 mb-2">কুরিয়ার ডিসপ্যাচ সুবিধা</h3>
+              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Steadfast, Pathao ও RedX কুরিয়ার অটোমেশন। ড্যাশবোর্ডের অর্ডার রো থেকে সরাসরি এক ক্লিকে পার্সেল বুক করার রেডি ইন্টারফেস।
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] font-bold text-amber-600">
+              <CheckCircle2 class="w-3.5 h-3.5" />
+              <span>Steadfast · Pathao · RedX</span>
+            </div>
+          </div>
+
+          <!-- 3. Meta Pixel & Conversion API -->
+          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+            <div>
+              <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+                <Target class="w-6 h-6" />
+              </div>
+              <h3 class="text-base font-bold text-slate-900 mb-2">মেটা পিক্সেল ট্র্যাকিং</h3>
+              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                ফেসবুক অ্যাড ট্র্যাকিংয়ের জন্য ১-ক্লিকে পিক্সেল আইডি যুক্ত করুন। ViewContent, InitiateCheckout ও Purchase ইভেন্ট স্বয়ংক্রিয় ট্র্যাক হয়।
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] font-bold text-indigo-600">
+              <CheckCircle2 class="w-3.5 h-3.5" />
+              <span>স্মার্ট কনভার্সন অপটিমাইজেশন</span>
+            </div>
+          </div>
+
+          <!-- 4. Real-time Stock Management -->
+          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+            <div>
+              <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+                <Boxes class="w-6 h-6" />
+              </div>
+              <h3 class="text-base font-bold text-slate-900 mb-2">লাইভ স্টক ম্যানেজমেন্ট</h3>
+              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                প্রতিটি অর্ডারে ইনভেন্টরি অটো-ডিডাক্ট হয়। ড্যাশবোর্ড থেকে রিয়েল-টাইম স্টক আপডেট ও লাইভ কাউন্টার ব্যানার কাস্টমারদের মধ্যে আর্জেন্সি তৈরি করে।
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] font-bold text-emerald-600">
+              <CheckCircle2 class="w-3.5 h-3.5" />
+              <span>অটো স্টক ডিডাকশন ও আর্জেন্সি বার</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Bottom CTA banner -->
     <section class="py-16 max-w-5xl mx-auto px-4 sm:px-6">
       <div class="rounded-3xl bg-gradient-to-tr from-slate-900 via-slate-800 to-emerald-950 p-8 sm:p-12 text-center text-white shadow-2xl relative overflow-hidden">
@@ -124,5 +212,5 @@
 </template>
 
 <script setup>
-import { Rocket, ArrowRight, ExternalLink } from 'lucide-vue-next'
+import { Rocket, ArrowRight, ExternalLink, Zap, Send, Truck, Target, Boxes, CheckCircle2 } from 'lucide-vue-next'
 </script>
