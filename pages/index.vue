@@ -1,210 +1,188 @@
 <template>
-  <div>
+  <div class="bg-[#faf9f5] min-h-screen font-sans-bn selection:bg-emerald-500 selection:text-white">
     <Navbar />
 
-    <!-- Hero Section -->
-    <section class="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28">
-      <div class="absolute inset-0 -z-10 bg-[radial-gradient(45rem_50rem_at_top,theme(colors.emerald.100),white)] opacity-60"></div>
+    <!-- Hero Section with Clear Upfront Value Proposition -->
+    <section class="relative overflow-hidden pt-8 pb-16 lg:pt-14 lg:pb-24">
+      <div class="absolute inset-0 -z-10 bg-[radial-gradient(50rem_50rem_at_top,theme(colors.emerald.100),transparent)] opacity-70"></div>
       
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <!-- Live Pill -->
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-8 shadow-sm">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-          <span>Bangladesh's Top Autonomous COD Store Generator</span>
-        </div>
-
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.15]">
-          এক মিনিটে তৈরি করুন <br />
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">
-            হাই-কনভার্টিং COD ল্যান্ডিং পেজ
-          </span>
-        </h1>
-
-        <p class="mt-6 text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto font-normal leading-relaxed">
-          কোনো কোডিং বা ওয়ার্ডপ্রেস ছাড়াই আপনার সিঙ্গেল প্রোডাক্টের বর্ণনা দিন। 
-          AI তৈরি করবে স্বয়ংক্রিয় বাংলা ল্যান্ডিং পেজ, ক্যাশ অন ডেলিভারি ফর্ম এবং কাস্টমার ক্লোজিং সেলস চ্যাটবট।
-        </p>
-
-        <!-- CTA Buttons -->
-        <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <NuxtLink to="/create" class="w-full sm:w-auto px-8 py-4 text-base font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-95 rounded-2xl shadow-xl shadow-emerald-600/30 transition-all flex items-center justify-center gap-2.5">
-            <Rocket class="w-5 h-5" />
-            <span>AI দিয়ে ফ্রি স্টোর তৈরি করুন</span>
-            <ArrowRight class="w-5 h-5" />
-          </NuxtLink>
-
-          <NuxtLink to="/s/t900-ultra-smartwatch" target="_blank" class="w-full sm:w-auto px-7 py-4 text-base font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2">
-            <ExternalLink class="w-4 h-4 text-slate-500" />
-            <span>লাইভ ডেমো স্টোর দেখুন</span>
-          </NuxtLink>
-        </div>
-
-        <!-- Trust stats -->
-        <div class="mt-14 pt-10 border-t border-slate-200/60 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-4xl mx-auto">
-          <div>
-            <div class="text-2xl sm:text-3xl font-black text-slate-900">৳0 খরচ</div>
-            <div class="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">কোনো হোস্টিং ফি নেই</div>
-          </div>
-          <div>
-            <div class="text-2xl sm:text-3xl font-black text-emerald-600">৩০ সেকেন্ড</div>
-            <div class="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">ইনস্ট্যান্ট লাইভ লিংক</div>
-          </div>
-          <div>
-            <div class="text-2xl sm:text-3xl font-black text-slate-900">COD Form</div>
-            <div class="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">সহজ ও দ্রুত অর্ডার</div>
-          </div>
-          <div>
-            <div class="text-2xl sm:text-3xl font-black text-emerald-600">AI Sales Bot</div>
-            <div class="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">২৪/৭ কাস্টমার ডাউট সলভার</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Merchant Power Tools & Automation Showcase (Moved above How It Works) -->
-    <section class="py-16 lg:py-20 bg-slate-50 border-b border-slate-200/80">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-2xl mx-auto mb-14">
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-3">
-            <Zap class="w-3.5 h-3.5" />
-            <span>স্মার্ট মার্চেন্ট ইকোসিস্টেম</span>
+        
+        <!-- Header Text -->
+        <div class="text-center max-w-3xl mx-auto">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-6 shadow-xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            <span>বাংলাদেশের প্রথম সেলফ-ড্রাইভিং COD ল্যান্ডিং পেজ প্ল্যাটফর্ম</span>
           </div>
-          <h2 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-            অর্ডার থেকে ডেলিভারি — সব কিছু অটোমেটেড
-          </h2>
-          <p class="text-sm sm:text-base text-slate-600 mt-3 font-normal">
-            শুধু ল্যান্ডিং পেজ নয়, বাংলাদেশি অনলাইন ব্যবসায়ীদের বিক্রয় ও পরিচালনা সহজ করতে প্রয়োজনীয় সব টুলস সংযুক্ত রয়েছে।
+
+          <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.18] font-serif-bn">
+            ওয়ার্ডপ্রেস বা কোডিং ছাড়াই <br />
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700">
+              হাইপার-কনভার্টিং ল্যান্ডিং পেজ
+            </span>
+          </h1>
+
+          <p class="mt-5 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto font-normal leading-relaxed">
+            ফেসবুক ও টিকটক বিজ্ঞাপনের জন্য সবচেয়ে দ্রুতগতির সিঙ্গেল প্রোডাক্ট স্টোর। 
+            শুধুমাত্র প্রডাক্টের নাম বলুন — AI স্বয়ংক্রিয়ভাবে তৈরি করবে হাই-কনভার্টিং বাংলা কপি, ক্যাশ অন ডেলিভারি ফর্ম এবং সেলস চ্যাটবট।
           </p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <!-- 1. Telegram Instant Order Alerts -->
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
-            <div>
-              <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
-                <Send class="w-6 h-6" />
-              </div>
-              <h3 class="text-base font-bold text-slate-900 mb-2">টেলিগ্রাম ইনস্ট্যান্ট অ্যালার্ট</h3>
-              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                ওয়েবসাইটে অর্ডার হওয়া মাত্রই আপনার পার্সোনাল টেলিগ্রামে শব্দ সহ কাস্টমারের নাম, ফোন নম্বর ও ফুল অ্যাড্রেসের নোটিফিকেশন পৌঁছে যাবে।
-              </p>
+        <!-- 4 Core Merchant Superpowers (Clearly show benefits BEFORE action) -->
+        <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto text-left">
+          
+          <!-- Benefit 1: Telegram Alerts -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-emerald-300 transition-all flex items-start gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+              <Send class="w-5 h-5" />
             </div>
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] font-bold text-sky-600">
-              <CheckCircle2 class="w-3.5 h-3.5" />
-              <span>১-ক্লিকে টেলিগ্রাম বট পেয়ারিং</span>
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">টেলিগ্রাম ইনস্ট্যান্ট অ্যালার্ট</h3>
+              <p class="text-xs text-slate-500 mt-0.5 leading-snug">অর্ডার হওয়া মাত্র ফোনে রিংটোন সহ কাস্টমারের নাম, ফোন ও ঠিকানা নোটিফিকেশন।</p>
             </div>
           </div>
 
-          <!-- 2. BD Courier Integration -->
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
-            <div>
-              <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
-                <Truck class="w-6 h-6" />
-              </div>
-              <h3 class="text-base font-bold text-slate-900 mb-2">কুরিয়ার ডিসপ্যাচ সুবিধা</h3>
-              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Steadfast, Pathao ও RedX কুরিয়ার অটোমেশন। ড্যাশবোর্ডের অর্ডার রো থেকে সরাসরি এক ক্লিকে পার্সেল বুক করার রেডি ইন্টারফেস।
-              </p>
+          <!-- Benefit 2: Courier Automation -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-emerald-300 transition-all flex items-start gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+              <Truck class="w-5 h-5" />
             </div>
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] font-bold text-amber-600">
-              <CheckCircle2 class="w-3.5 h-3.5" />
-              <span>Steadfast · Pathao · RedX</span>
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">১-ক্লিক কুরিয়ার বুকিং</h3>
+              <p class="text-xs text-slate-500 mt-0.5 leading-snug">Steadfast, Pathao ও RedX এ সরাসরি এক ক্লিকে পার্সেল বুক করার সুবিধা।</p>
             </div>
           </div>
 
-          <!-- 3. Meta Pixel & Conversion API -->
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
-            <div>
-              <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
-                <Target class="w-6 h-6" />
-              </div>
-              <h3 class="text-base font-bold text-slate-900 mb-2">মেটা পিক্সেল ট্র্যাকিং</h3>
-              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                ফেসবুক অ্যাড ট্র্যাকিংয়ের জন্য ১-ক্লিকে পিক্সেল আইডি যুক্ত করুন। ViewContent, InitiateCheckout ও Purchase ইভেন্ট স্বয়ংক্রিয় ট্র্যাক হয়।
-              </p>
+          <!-- Benefit 3: Meta Pixel Tracking -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-emerald-300 transition-all flex items-start gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+              <Target class="w-5 h-5" />
             </div>
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] font-bold text-indigo-600">
-              <CheckCircle2 class="w-3.5 h-3.5" />
-              <span>স্মার্ট কনভার্সন অপটিমাইজেশন</span>
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">ফুল মেটা পিক্সেল ট্র্যাকিং</h3>
+              <p class="text-xs text-slate-500 mt-0.5 leading-snug">ViewContent, Checkout ও Purchase ইভেন্ট স্বয়ংক্রিয় ট্র্যাক হয়ে অ্যাডের ROAS বাড়ে।</p>
             </div>
           </div>
 
-          <!-- 4. Real-time Stock Management -->
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+          <!-- Benefit 4: Stock & AI Sales Bot -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-emerald-300 transition-all flex items-start gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <Sparkles class="w-5 h-5" />
+            </div>
             <div>
-              <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
-                <Boxes class="w-6 h-6" />
-              </div>
-              <h3 class="text-base font-bold text-slate-900 mb-2">লাইভ স্টক ম্যানেজমেন্ট</h3>
-              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                প্রতিটি অর্ডারে ইনভেন্টরি অটো-ডিডাক্ট হয়। ড্যাশবোর্ড থেকে রিয়েল-টাইম স্টক আপডেট ও লাইভ কাউন্টার ব্যানার কাস্টমারদের মধ্যে আর্জেন্সি তৈরি করে।
-              </p>
+              <h3 class="font-bold text-slate-900 text-sm">লাইভ স্টক ও AI সেলস বট</h3>
+              <p class="text-xs text-slate-500 mt-0.5 leading-snug">স্টক আর্জেন্সি বার ও ২৪/৭ বাংলা এআই চ্যাটবট কাস্টমারের ডাউট সমাধান করে অর্ডার কনফার্ম করায়।</p>
             </div>
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] font-bold text-emerald-600">
-              <CheckCircle2 class="w-3.5 h-3.5" />
-              <span>অটো স্টক ডিডাকশন ও আর্জেন্সি বার</span>
-            </div>
+          </div>
+
+        </div>
+
+        <!-- High-Impact Primary Call to Action -->
+        <div class="mt-9 text-center">
+          <div class="inline-flex flex-col sm:flex-row items-center gap-3.5">
+            <NuxtLink 
+              to="/create" 
+              class="w-full sm:w-auto px-9 py-4 text-base sm:text-lg font-black text-white bg-emerald-600 hover:bg-emerald-700 active:scale-95 rounded-2xl shadow-xl shadow-emerald-600/30 transition-all flex items-center justify-center gap-2.5 cursor-pointer"
+            >
+              <Rocket class="w-5 h-5" />
+              <span>AI দিয়ে ফ্রি স্টোর তৈরি করুন</span>
+              <ArrowRight class="w-5 h-5" />
+            </NuxtLink>
+
+            <NuxtLink 
+              to="/s/t900-ultra-smartwatch" 
+              target="_blank" 
+              class="w-full sm:w-auto px-7 py-4 text-sm sm:text-base font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-2xl shadow-xs transition-all flex items-center justify-center gap-2"
+            >
+              <ExternalLink class="w-4 h-4 text-slate-500" />
+              <span>লাইভ ডেমো স্টোর দেখুন</span>
+            </NuxtLink>
+          </div>
+
+          <p class="mt-3 text-xs text-slate-500 font-medium">
+            ⚡ কোনো ক্রেডিট কার্ড বা হোস্টিং চার্জ প্রয়োজন নেই · ৩০ সেকেন্ডেই লাইভ
+          </p>
+        </div>
+
+        <!-- Trust Stats Bar -->
+        <div class="mt-12 pt-8 border-t border-slate-200/70 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto text-center">
+          <div class="p-2">
+            <div class="text-xl sm:text-2xl font-black text-slate-900">৳০ খরচ</div>
+            <div class="text-xs text-slate-500 mt-0.5 font-medium">কোনো হোস্টিং ফি নেই</div>
+          </div>
+          <div class="p-2">
+            <div class="text-xl sm:text-2xl font-black text-emerald-600">৩০ সেকেন্ড</div>
+            <div class="text-xs text-slate-500 mt-0.5 font-medium">ইনস্ট্যান্ট লাইভ লিংক</div>
+          </div>
+          <div class="p-2">
+            <div class="text-xl sm:text-2xl font-black text-slate-900">১০০% COD</div>
+            <div class="text-xs text-slate-500 mt-0.5 font-medium">দ্রুত ক্যাশ অন ডেলিভারি</div>
+          </div>
+          <div class="p-2">
+            <div class="text-xl sm:text-2xl font-black text-emerald-600">২৪/৭ AI চ্যাট</div>
+            <div class="text-xs text-slate-500 mt-0.5 font-medium">কাস্টমার সেলস কনভার্সন</div>
           </div>
         </div>
+
       </div>
     </section>
 
-    <!-- How It Works Section -->
+    <!-- Detailed Workflow / How It Works -->
     <section class="py-16 bg-white border-y border-slate-200/70">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-xl mx-auto mb-14">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-2">সহজ ৩টি ধাপ</h2>
-          <p class="text-3xl font-extrabold text-slate-900">কীভাবে কাজ করে DokanAI?</p>
+        <div class="text-center max-w-xl mx-auto mb-12">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-1.5">সহজ ৩টি ধাপ</h2>
+          <p class="text-2xl sm:text-3xl font-extrabold text-slate-900 font-serif-bn">কীভাবে কাজ করে DokanAI?</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           <!-- Step 1 -->
-          <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 hover:shadow-lg transition-shadow">
-            <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-lg mb-4">
+          <div class="p-6 rounded-3xl bg-[#faf9f5] border border-slate-200/80 hover:shadow-md transition-shadow">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-black text-base mb-4">
               ১
             </div>
-            <h3 class="text-lg font-bold text-slate-900 mb-2">প্রোডাক্টের বিবরণ দিন</h3>
-            <p class="text-sm text-slate-600 leading-relaxed">
-              আপনার প্রোডাক্টের নাম, দাম এবং অন্যান্য তথ্য লিখুন। DokanAI অনবোর্ডিং এজেন্ট বাকি সব নিজে সাজিয়ে নিবে।
+            <h3 class="text-base font-bold text-slate-900 mb-1.5">পণ্য ও দাম বলুন</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              অনবোর্ডিং চ্যাটে আপনার পণ্যের নাম, দাম ও কয়েকটি ছবি শেয়ার করুন। কোনো টেকনিক্যাল সেটিংসের ঝামেলা নেই।
             </p>
           </div>
 
           <!-- Step 2 -->
-          <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 hover:shadow-lg transition-shadow">
-            <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center font-black text-lg mb-4">
+          <div class="p-6 rounded-3xl bg-[#faf9f5] border border-slate-200/80 hover:shadow-md transition-shadow">
+            <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center font-black text-base mb-4">
               ২
             </div>
-            <h3 class="text-lg font-bold text-slate-900 mb-2">স্বয়ংক্রিয় স্টোর জেনারেট</h3>
-            <p class="text-sm text-slate-600 leading-relaxed">
-              হাইপার-কনভার্টিং বাংলা হেডলাইন, ট্রাস্ট ব্যাজ, এফএকিউ এবং ক্যাশ অন ডেলিভারি ফর্ম সহ সম্পূর্ণ পেজ তৈরি হবে নিমেষেই।
+            <h3 class="text-base font-bold text-slate-900 mb-1.5">AI স্বয়ংক্রিয় পেজ তৈরি করবে</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              পণ্য অনুযায়ী মানানসই কালার থিম, আকর্ষণীয় বাংলা হেডলাইন, ট্রাস্ট ব্যাজ এবং COD ফর্ম সহ পেজ তৈরি হবে।
             </p>
           </div>
 
           <!-- Step 3 -->
-          <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 hover:shadow-lg transition-shadow">
-            <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-black text-lg mb-4">
+          <div class="p-6 rounded-3xl bg-[#faf9f5] border border-slate-200/80 hover:shadow-md transition-shadow">
+            <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-800 flex items-center justify-center font-black text-base mb-4">
               ৩
             </div>
-            <h3 class="text-lg font-bold text-slate-900 mb-2">অর্ডার পান ড্যাশবোর্ডে</h3>
-            <p class="text-sm text-slate-600 leading-relaxed">
-              ফেসবুক অ্যাড বা বায়োতে লিংক শেয়ার করুন। গ্রাহক অর্ডার করলেই ড্যাশবোর্ডে রিয়েল-টাইম নোটিফিকেশন চলে আসবে।
+            <h3 class="text-base font-bold text-slate-900 mb-1.5">বিজ্ঞাপন চালান ও অর্ডার নিন</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              পেজের লিংক নিয়ে ফেসবুক বিজ্ঞাপনে সেট করুন। অর্ডার এলে সরাসরি টেলিগ্রাম ও ড্যাশবোর্ডে কাস্টমারের ডাটা পাবেন।
             </p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Bottom CTA banner -->
+    <!-- Bottom Action Banner -->
     <section class="py-16 max-w-5xl mx-auto px-4 sm:px-6">
       <div class="rounded-3xl bg-gradient-to-tr from-slate-900 via-slate-800 to-emerald-950 p-8 sm:p-12 text-center text-white shadow-2xl relative overflow-hidden">
         <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-        <h2 class="text-2xl sm:text-4xl font-black mb-4">আজই আপনার প্রথম COD স্টোর লাইভ করুন</h2>
-        <p class="text-slate-300 max-w-lg mx-auto text-sm sm:text-base mb-8">
-          কোন ক্রেডিট কার্ড বা ফি ছাড়াই শুরু করুন। আপনার ব্যবসার বিক্রি বাড়ান ডাবল গতিতে।
+        <h2 class="text-2xl sm:text-4xl font-black mb-3 font-serif-bn">আজই আপনার প্রথম COD স্টোর লাইভ করুন</h2>
+        <p class="text-slate-300 max-w-lg mx-auto text-xs sm:text-base mb-7 font-normal">
+          কোনো ওয়ার্ডপ্রেস সেটআপ বা মাসিক ফি ছাড়া। আপনার ব্যবসার প্রতিটি প্রোডাক্টের জন্য তৈরি করুন আলাদা হাই-কনভার্টিং ল্যান্ডিং পেজ।
         </p>
-        <NuxtLink to="/create" class="inline-flex items-center gap-2 px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
+        <NuxtLink to="/create" class="inline-flex items-center gap-2 px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer">
           <Rocket class="w-4 h-4" />
-          <span>এখনই শুরু করুন</span>
+          <span>এখনই শুরু করুন (ফ্রি)</span>
         </NuxtLink>
       </div>
     </section>
@@ -212,5 +190,5 @@
 </template>
 
 <script setup>
-import { Rocket, ArrowRight, ExternalLink, Zap, Send, Truck, Target, Boxes, CheckCircle2 } from 'lucide-vue-next'
+import { Rocket, ArrowRight, ExternalLink, Zap, Send, Truck, Target, Sparkles, CheckCircle2 } from 'lucide-vue-next'
 </script>
