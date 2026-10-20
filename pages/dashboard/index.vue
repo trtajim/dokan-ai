@@ -4,28 +4,16 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
       
-      <!-- Top Title & Quick Actions -->
+      <!-- Top Title -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">মার্চেন্ট ড্যাশবোর্ড</h1>
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-700">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
               {{ currentUser?.displayName }}
             </span>
           </div>
           <p class="text-xs sm:text-sm text-slate-500 mt-1">আপনার সকল সক্রিয় দোকান, লাইভ স্টক ও কাস্টমারদের ক্যাশ অন ডেলিভারি অর্ডার তালিকা</p>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <button @click="refreshData" class="px-3.5 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-100 flex items-center gap-1.5 transition-colors">
-            <RefreshCw class="w-3.5 h-3.5" :class="{ 'animate-spin': isRefreshing }" />
-            <span>রিফ্রেশ</span>
-          </button>
-
-          <NuxtLink to="/create" class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm flex items-center gap-1.5 transition-all">
-            <Plus class="w-4 h-4" />
-            <span>নতুন আরেকটি দোকান বানান</span>
-          </NuxtLink>
         </div>
       </div>
 
@@ -104,52 +92,51 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Stores Row List -->
+        <div class="divide-y divide-slate-100 border border-slate-200/80 rounded-2xl overflow-hidden bg-white">
           <div 
             v-for="st in userStores" 
             :key="st.id" 
-            class="p-4 rounded-2xl bg-slate-50 border-2 transition-all flex flex-col justify-between gap-3"
-            :class="selectedStoreFilter === st.slug ? 'border-emerald-500 shadow-sm bg-emerald-50/20' : 'border-slate-200/80 hover:border-slate-300'"
+            class="p-3 sm:p-4 hover:bg-slate-50/80 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+            :class="selectedStoreFilter === st.slug ? 'bg-emerald-50/30' : ''"
           >
-            <div>
-              <div class="flex items-center justify-between gap-2">
-                <h3 class="font-bold text-slate-900 text-sm truncate">{{ st.product_title }}</h3>
-                <span 
-                  class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider"
-                  :class="getStoreStock(st) > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'"
-                >
-                  {{ getStoreStock(st) > 0 ? 'ইন স্টক' : 'স্টক আউট' }}
-                </span>
+            <!-- Store Details -->
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black shrink-0">
+                <Store class="w-4 h-4" />
               </div>
-              <p class="text-xs text-slate-500 font-semibold mt-0.5">৳{{ st.price }} | /shop/{{ st.slug }}</p>
-            </div>
-
-            <!-- In-card stock adjust buttons -->
-            <div class="flex items-center justify-between pt-2 border-t border-slate-200/60 text-xs">
-              <span class="font-bold text-slate-700">স্টক সংখ্যা:</span>
-              <div class="flex items-center gap-2">
-                <button 
-                  @click="quickAdjustStock(st.slug, getStoreStock(st) - 1)" 
-                  class="w-7 h-7 rounded-lg bg-white border border-slate-300 font-bold flex items-center justify-center hover:bg-slate-100 active:scale-95"
-                >
-                  -
-                </button>
-                <span class="font-extrabold text-sm w-6 text-center text-slate-900">{{ getStoreStock(st) }}</span>
-                <button 
-                  @click="quickAdjustStock(st.slug, getStoreStock(st) + 1)" 
-                  class="w-7 h-7 rounded-lg bg-white border border-slate-300 font-bold flex items-center justify-center hover:bg-slate-100 active:scale-95"
-                >
-                  +
-                </button>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <h3 class="font-bold text-slate-900 text-sm truncate">{{ st.product_title }}</h3>
+                  <span 
+                    class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shrink-0"
+                    :class="getStoreStock(st) > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'"
+                  >
+                    {{ getStoreStock(st) > 0 ? 'ইন স্টক' : 'স্টক শেষ' }}
+                  </span>
+                </div>
+                <p class="text-xs text-slate-400 font-medium truncate mt-0.5">
+                  ৳{{ st.price }} · <span class="font-mono text-slate-600">/s/{{ st.slug }}</span>
+                </p>
               </div>
             </div>
 
-            <!-- Actions row -->
-            <div class="flex items-center justify-between pt-1">
+            <!-- Stock & Actions Row -->
+            <div class="flex items-center justify-between sm:justify-end gap-2.5 shrink-0 pt-2 sm:pt-0 border-t sm:border-0 border-slate-100">
+              <!-- Stock count with clean prompt alert -->
+              <button 
+                @click="openStockPrompt(st)"
+                class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold text-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+                title="স্টক পরিবর্তন করতে ক্লিক করুন"
+              >
+                <span class="text-slate-400 font-normal">স্টক:</span>
+                <span class="font-black text-slate-900">{{ getStoreStock(st) }}টি</span>
+              </button>
+
               <NuxtLink 
-                :to="`/shop/${st.slug}`" 
+                :to="`/s/${st.slug}`" 
                 target="_blank" 
-                class="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+                class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors"
               >
                 <span>স্টোর ভিজিট</span>
                 <ExternalLink class="w-3.5 h-3.5" />
@@ -157,14 +144,13 @@
 
               <button 
                 @click="copyStoreLink(st.slug)" 
-                class="px-2.5 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold flex items-center gap-1"
+                class="px-2.5 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
                 title="লিংক কপি করুন"
               >
                 <Copy class="w-3.5 h-3.5" />
                 <span>লিংক</span>
               </button>
             </div>
-
           </div>
         </div>
       </div>
@@ -178,20 +164,20 @@
               <span>লাইভ ক্যাশ অন ডেলিভারি অর্ডার তালিকা</span>
             </h2>
             <p class="text-xs text-slate-500 mt-0.5">
-              {{ selectedStoreFilter === 'all' ? 'সকল দোকানের সম্মিলিত অর্ডার' : `ফিল্টার্ড স্টোর: /shop/${selectedStoreFilter}` }}
+              {{ selectedStoreFilter === 'all' ? 'সকল দোকানের সম্মিলিত অর্ডার' : `ফিল্টার্ড স্টোর: /s/${selectedStoreFilter}` }}
             </p>
           </div>
 
           <!-- Status Filter buttons -->
           <div class="flex items-center gap-1.5 overflow-x-auto text-xs">
             <button 
-              v-for="flt in ['all', 'pending', 'confirmed', 'shipped']" 
-              :key="flt"
-              @click="activeStatusFilter = flt"
-              class="px-3 py-1.5 rounded-lg font-bold capitalize transition-colors"
-              :class="activeStatusFilter === flt ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+              v-for="flt in statusFilterOptions" 
+              :key="flt.value"
+              @click="activeStatusFilter = flt.value"
+              class="px-3 py-1.5 rounded-lg font-bold transition-colors whitespace-nowrap"
+              :class="activeStatusFilter === flt.value ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
             >
-              {{ flt }}
+              {{ flt.label }}
             </button>
           </div>
         </div>
@@ -211,23 +197,24 @@
                   <span>{{ order.customer_phone }}</span>
                 </a>
               </div>
-              <span 
-                class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shrink-0"
-                :class="{
-                  'bg-amber-100 text-amber-800': order.status === 'pending',
-                  'bg-emerald-100 text-emerald-800': order.status === 'confirmed',
-                  'bg-blue-100 text-blue-800': order.status === 'shipped',
-                  'bg-red-100 text-red-800': order.status === 'cancelled'
-                }"
+              <!-- Status Select Dropdown on Mobile -->
+              <select 
+                :value="order.status"
+                @change="changeStatus(order.id, $event.target.value)"
+                class="px-2 py-1 text-[11px] font-bold rounded-lg border border-slate-200 bg-white text-slate-700 focus:outline-none focus:border-emerald-500"
               >
-                {{ order.status }}
-              </span>
+                <option value="pending">পেন্ডিং (Pending)</option>
+                <option value="confirmed">কনফার্মড (Confirmed)</option>
+                <option value="under_courier">কুরিয়ারে আছে (Under Courier)</option>
+                <option value="delivered">ডেলিভার্ড (Delivered)</option>
+                <option value="cancelled">বাতিল (Cancelled)</option>
+              </select>
             </div>
 
             <div class="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200/70 space-y-1">
               <div class="flex justify-between text-[11px]">
                 <span class="text-slate-400">স্টোর / ভ্যারিয়েন্ট:</span>
-                <span class="font-bold text-slate-800">/shop/{{ order.store_slug }} {{ order.selected_variant ? `(${order.selected_variant})` : '' }}</span>
+                <span class="font-bold text-slate-800">/s/{{ order.store_slug }} {{ order.selected_variant ? `(${order.selected_variant})` : '' }}</span>
               </div>
               <div class="flex justify-between text-[11px]">
                 <span class="text-slate-400">বিল (পরিমাণ):</span>
@@ -238,33 +225,18 @@
               </div>
             </div>
 
-            <!-- Mobile Action Row -->
+            <!-- Mobile Footer Row -->
             <div class="flex items-center justify-between pt-1">
               <span class="text-[10px] text-slate-400">{{ formatTime(order.created_at) }}</span>
-              <div class="flex items-center gap-1.5">
-                <button 
-                  v-if="order.status === 'pending'"
-                  @click="changeStatus(order.id, 'confirmed')"
-                  class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-xs active:scale-95"
-                >
-                  কনফার্ম
-                </button>
-                <button 
-                  v-else-if="order.status === 'confirmed'"
-                  @click="changeStatus(order.id, 'shipped')"
-                  class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold shadow-xs active:scale-95"
-                >
-                  শিপড
-                </button>
-                <button 
-                  v-if="order.status !== 'cancelled'"
-                  @click="changeStatus(order.id, 'cancelled')"
-                  class="p-1.5 text-slate-400 hover:text-red-600 rounded-lg"
-                  title="অর্ডার বাতিল"
-                >
-                  <Trash2 class="w-3.5 h-3.5" />
-                </button>
-              </div>
+              <button 
+                v-if="order.status !== 'cancelled'"
+                @click="changeStatus(order.id, 'cancelled')"
+                class="text-xs text-slate-400 hover:text-red-600 flex items-center gap-1"
+                title="অর্ডার বাতিল"
+              >
+                <Trash2 class="w-3 h-3" />
+                <span>বাতিল</span>
+              </button>
             </div>
           </div>
         </div>
@@ -279,8 +251,8 @@
                 <th class="py-3 px-4">দোকান ও ভ্যারিয়েন্ট</th>
                 <th class="py-3 px-4">ঠিকানা ও এরিয়া</th>
                 <th class="py-3 px-4">পরিমাণ ও মোট বিল</th>
-                <th class="py-3 px-4">স্ট্যাটাস</th>
-                <th class="py-3 px-4 text-right">অ্যাকশন</th>
+                <th class="py-3 px-4">অর্ডার স্ট্যাটাস</th>
+                <th class="py-3 px-4 text-right">ডিলিট</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
@@ -306,7 +278,7 @@
 
                 <!-- Store & Variant -->
                 <td class="py-3.5 px-4">
-                  <div class="text-xs font-bold text-slate-800">/shop/{{ order.store_slug }}</div>
+                  <div class="text-xs font-bold text-slate-800">/s/{{ order.store_slug }}</div>
                   <span v-if="order.selected_variant" class="text-[11px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold">
                     {{ order.selected_variant }}
                   </span>
@@ -326,47 +298,38 @@
                   <span class="text-[11px] text-slate-400">{{ order.quantity }} টি আইটেম</span>
                 </td>
 
-                <!-- Status Badge -->
+                <!-- Status Select Dropdown (Interactive update) -->
                 <td class="py-3.5 px-4">
-                  <span 
-                    class="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider"
+                  <select 
+                    :value="order.status"
+                    @change="changeStatus(order.id, $event.target.value)"
+                    class="px-2.5 py-1 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-800 focus:outline-none focus:border-emerald-500 cursor-pointer shadow-xs"
                     :class="{
-                      'bg-amber-100 text-amber-800': order.status === 'pending',
-                      'bg-emerald-100 text-emerald-800': order.status === 'confirmed',
-                      'bg-blue-100 text-blue-800': order.status === 'shipped',
-                      'bg-red-100 text-red-800': order.status === 'cancelled'
+                      'text-amber-700 bg-amber-50/50 border-amber-200': order.status === 'pending',
+                      'text-emerald-700 bg-emerald-50/50 border-emerald-200': order.status === 'confirmed',
+                      'text-indigo-700 bg-indigo-50/50 border-indigo-200': order.status === 'under_courier',
+                      'text-blue-700 bg-blue-50/50 border-blue-200': order.status === 'delivered',
+                      'text-red-700 bg-red-50/50 border-red-200': order.status === 'cancelled'
                     }"
                   >
-                    {{ order.status }}
-                  </span>
+                    <option value="pending">পেন্ডিং (Pending)</option>
+                    <option value="confirmed">কনফার্মড (Confirmed)</option>
+                    <option value="under_courier">কুরিয়ারে আছে (Under Courier)</option>
+                    <option value="delivered">ডেলিভার্ড (Delivered)</option>
+                    <option value="cancelled">বাতিল (Cancelled)</option>
+                  </select>
                 </td>
 
-                <!-- Action Dropdown / Buttons -->
+                <!-- Delete / Cancel Button -->
                 <td class="py-3.5 px-4 text-right">
-                  <div class="inline-flex items-center gap-1.5">
-                    <button 
-                      v-if="order.status === 'pending'"
-                      @click="changeStatus(order.id, 'confirmed')"
-                      class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm"
-                    >
-                      কনফার্ম
-                    </button>
-                    <button 
-                      v-else-if="order.status === 'confirmed'"
-                      @click="changeStatus(order.id, 'shipped')"
-                      class="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm"
-                    >
-                      শিপড
-                    </button>
-                    <button 
-                      v-if="order.status !== 'cancelled'"
-                      @click="changeStatus(order.id, 'cancelled')"
-                      class="p-1.5 text-slate-400 hover:text-red-600 rounded-lg"
-                      title="অর্ডার বাতিল"
-                    >
-                      <Trash2 class="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+                  <button 
+                    v-if="order.status !== 'cancelled'"
+                    @click="changeStatus(order.id, 'cancelled')"
+                    class="p-1.5 text-slate-400 hover:text-red-600 rounded-lg transition-colors cursor-pointer"
+                    title="অর্ডার বাতিল"
+                  >
+                    <Trash2 class="w-3.5 h-3.5" />
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -483,8 +446,29 @@ const formatTime = (isoString) => {
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
+const statusFilterOptions = [
+  { value: 'all', label: 'সকল অর্ডার (All)' },
+  { value: 'pending', label: 'পেন্ডিং (Pending)' },
+  { value: 'confirmed', label: 'কনফার্মড (Confirmed)' },
+  { value: 'under_courier', label: 'কুরিয়ারে আছে (Under Courier)' },
+  { value: 'delivered', label: 'ডেলিভার্ড (Delivered)' },
+  { value: 'cancelled', label: 'বাতিল (Cancelled)' }
+]
+
+const openStockPrompt = async (st) => {
+  const current = getStoreStock(st)
+  const input = prompt(`"${st.product_title}"-এর নতুন স্টক সংখ্যা কত দিতে চান?`, current.toString())
+  if (input === null) return
+  const num = parseInt(input.trim(), 10)
+  if (isNaN(num) || num < 0) {
+    alert('দয়া করে সঠিক সংখ্যা প্রদান করুন।')
+    return
+  }
+  await quickAdjustStock(st.slug, num)
+}
+
 const copyStoreLink = (slug) => {
-  const url = `${window.location.origin}/shop/${slug}`
+  const url = `${window.location.origin}/s/${slug}`
   navigator.clipboard.writeText(url)
   alert(`স্টোর লিংক কপি হয়েছে:\n${url}`)
 }

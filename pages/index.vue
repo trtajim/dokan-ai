@@ -33,7 +33,7 @@
             <ArrowRight class="w-5 h-5" />
           </NuxtLink>
 
-          <NuxtLink to="/shop/t900-ultra-smartwatch" target="_blank" class="w-full sm:w-auto px-7 py-4 text-base font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2">
+          <NuxtLink to="/s/t900-ultra-smartwatch" target="_blank" class="w-full sm:w-auto px-7 py-4 text-base font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2">
             <ExternalLink class="w-4 h-4 text-slate-500" />
             <span>লাইভ ডেমো স্টোর দেখুন</span>
           </NuxtLink>

@@ -23,11 +23,15 @@ export default defineEventHandler(async (event) => {
     images
   } = body
 
-  const slug = (product_title || 'shop')
+  // Clean human-friendly slug without leading hyphen:
+  const cleanTitle = (product_title || 'shop')
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
+    .replace(/[^\w\s]/g, '')
     .trim()
-    .replace(/\s+/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000)
+    .replace(/\s+/g, '')
+
+  const randomNum = Math.floor(100000 + Math.random() * 900000)
+  const slug = cleanTitle.length > 0 ? `${cleanTitle}${randomNum}` : `store${randomNum}`
 
   const config = useRuntimeConfig()
   const apiKey = config.geminiApiKey || process.env.GEMINI_API_KEY
@@ -211,6 +215,6 @@ Respond ONLY with a strictly valid JSON matching this schema:
   return {
     success: true,
     store: storeData,
-    store_url: `/shop/${slug}`
+    store_url: `/s/${slug}`
   }
 })

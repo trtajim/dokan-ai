@@ -306,7 +306,7 @@ const generateFullStore = async () => {
     })
 
     if (res && res.store && res.store.slug) {
-      router.push(`/shop/${res.store.slug}?created=1`)
+      router.push(`/s/${res.store.slug}?created=1`)
     }
   } catch (err) {
     console.error('Store generation failed:', err)
