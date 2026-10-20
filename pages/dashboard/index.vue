@@ -227,7 +227,7 @@
 
             <!-- Essential Info Row: Dokan & Poriman -->
             <div class="flex items-center justify-between text-xs bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200/60">
-              <span class="text-slate-600 font-bold truncate max-w-[140px]">/s/{{ order.store_slug }}</span>
+              <span class="text-slate-800 font-bold truncate max-w-[150px]">{{ getStoreName(order.store_slug) }}</span>
               <span class="font-black text-slate-900">৳{{ order.total_price }} ({{ order.quantity }}টি)</span>
             </div>
 
@@ -290,7 +290,8 @@
 
                 <!-- Dokan -->
                 <td class="py-3.5 px-4">
-                  <span class="font-bold text-slate-800">/s/{{ order.store_slug }}</span>
+                  <div class="font-bold text-slate-900 truncate max-w-[160px]">{{ getStoreName(order.store_slug) }}</div>
+                  <span class="text-[11px] text-slate-400 font-mono">/s/{{ order.store_slug }}</span>
                 </td>
 
                 <!-- Poriman -->
@@ -465,9 +466,9 @@
           <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/70 space-y-2">
             <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">অর্ডার সারসংক্ষেপ</div>
             <div class="flex justify-between items-center text-xs">
-              <span class="text-slate-500">দোকান লিংক:</span>
+              <span class="text-slate-500">দোকান:</span>
               <NuxtLink :to="`/s/${orderModal.order.store_slug}`" target="_blank" class="font-bold text-emerald-600 hover:underline">
-                /s/{{ orderModal.order.store_slug }}
+                {{ getStoreName(orderModal.order.store_slug) }} (/s/{{ orderModal.order.store_slug }})
               </NuxtLink>
             </div>
             <div v-if="orderModal.order.selected_variant" class="flex justify-between items-center text-xs">
@@ -611,6 +612,11 @@ const finalDisplayOrders = computed(() => {
   if (activeStatusFilter.value === 'all') return filteredOrdersByStore.value
   return filteredOrdersByStore.value.filter(o => o.status === activeStatusFilter.value)
 })
+
+const getStoreName = (slug) => {
+  const match = stores.value.find(s => s.slug === slug)
+  return match?.product_title || slug
+}
 
 const getStoreStock = (st) => {
   if (typeof st.stock === 'number') return st.stock
