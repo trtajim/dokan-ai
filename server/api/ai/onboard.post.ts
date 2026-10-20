@@ -21,13 +21,14 @@ STRICT CONVERSATIONAL SEQUENCE:
    - Acknowledge the product enthusiastically.
    - Ask for the Offer Price (অফার মূল্য) and if they have any variants/sizes/weights (e.g. ১ কেজি/২ কেজি or সাইজ M/L/XL).
 3. Step 3 (Product Picture - REQUIRED):
-   - Once price/variants are given, ask the user to attach the product's primary picture(s) using the paperclip (📎) icon or paste (Ctrl+V).
-   - Tell them picture is required to make the landing page attractive.
+   - Once price/variants are given, ask the user to attach product pictures using the paperclip (📎) icon or paste (Ctrl+V).
+   - Say "কয়েকটি ভালো ছবি (Pictures)" (NOT "একটি"). Tell them pictures make the landing page attractive.
 4. Step 4 (Reel / Video URL):
-   - Once picture is uploaded or shared, ask separately: "আপনার কি কোনো রিল বা ভিডিও আছে? (Facebook Reel অথবা YouTube Shorts এর লিঙ্ক থাকলে শেয়ার করুন, না থাকলে 'না' বা 'নেই' লিখে জানান)।"
+   - Once pictures are uploaded or shared, ask separately: "আপনার কি কোনো রিল বা ভিডিও আছে? (Facebook Reel অথবা YouTube Shorts এর লিঙ্ক থাকলে শেয়ার করুন, না থাকলে 'না' বা 'নেই' লিখে জানান)।"
    - If they provide a URL (facebook.com/reel, youtube.com/shorts, youtu.be, etc.), extract it into "video_reel_url".
-5. Step 5 (Ready To Launch):
-   - Set "readyToGenerate": true. Tell them everything is set, and they can click the button to generate the complete high-converting landing page. Delivery is automatically set to ৳70/৳130 (can be edited later anytime).
+5. Step 5 (Review & Ready To Launch):
+   - Set "readyToGenerate": true.
+   - Say: "সব তথ্য সংগ্রহ করা হয়েছে! একবার রিভিউ করে দেখুন, কিছু পরিবর্তন করার থাকলে জানান অথবা নিচের বাটনে চাপ দিয়ে দোকানটি তৈরি করে নিন।" (Delivery defaults to ৳70/৳130).
 
 RETURN STRICT JSON ONLY:
 {
@@ -105,11 +106,11 @@ function handleFallbackAgent(messages: any[], userMessage: string) {
     }
   }
 
-  // Turn 2 -> Ask for Product Picture (Required)
+  // Turn 2 -> Ask for Product Pictures (Required)
   if (historyLen <= 3) {
     return {
       success: true,
-      reply: `প্রাইস ও ভ্যারিয়েন্ট তথ্য সংরক্ষিত হয়েছে!\n\nএবার প্রোডাক্টটির আকর্ষণীয় ছবি যুক্ত করুন। নিচে ক্লিপ (📎) আইকনে চাপ দিয়ে ছবি সিলেক্ট করুন অথবা সরাসরি পেস্ট (Ctrl+V) করুন। ছবি থাকলে কাস্টমারদের অর্ডার করার সম্ভাবনা অনেক বেড়ে যায়!`,
+      reply: `প্রাইস ও ভ্যারিয়েন্ট তথ্য সংরক্ষিত হয়েছে!\n\nএবার প্রোডাক্টটির আকর্ষণীয় কয়েকটি ভালো ছবি (Pictures) যুক্ত করুন। নিচে ক্লিপ (📎) আইকনে চাপ দিয়ে ছবি সিলেক্ট করুন অথবা সরাসরি পেস্ট (Ctrl+V) করুন। কয়েকটি সুন্দর ছবি থাকলে কাস্টমারদের অর্ডার করার সম্ভাবনা অনেক বেড়ে যায়!`,
       readyToGenerate: false,
       extractedData: {
         product_title: null,
@@ -129,7 +130,7 @@ function handleFallbackAgent(messages: any[], userMessage: string) {
     if (hasReelUrl) {
       return {
         success: true,
-        reply: `ভিডিও লিঙ্কটি যুক্ত করা হয়েছে! ডেলিভারি চার্জ স্বয়ংক্রিয়ভাবে ঢাকায় ৳৭০ এবং ঢাকার বাইরে ৳১৩০ সেট করা হয়েছে (যা আপনি ড্যাশবোর্ড থেকে পরবর্তীতে যেকোনো সময় পরিবর্তন করতে পারবেন)।\n\nএখন আপনার আকর্ষণীয় ল্যান্ডিং পেজ তৈরি করতে নিচের বাটনে চাপ দিন!`,
+        reply: `ভিডিও লিঙ্ক যুক্ত হয়েছে! নিচে সংগৃহীত সকল তথ্য রয়েছে। একবার রিভিউ করে দেখুন, কিছু পরিবর্তন করার থাকলে জানান অথবা নিচের বাটনে চাপ দিয়ে সরাসরি আপনার আকর্ষণীয় ল্যান্ডিং পেজ তৈরি করে ফেলুন!`,
         readyToGenerate: true,
         extractedData: {
           product_title: null,
@@ -146,7 +147,7 @@ function handleFallbackAgent(messages: any[], userMessage: string) {
 
     return {
       success: true,
-      reply: `ছবি পেয়েছি!\n\nআপনার কি এই প্রোডাক্টটির কোনো রিল ভিডিও আছে? থাকলে ফেসবুক রিল বা ইউটিউব শর্টসের লিঙ্কটি দিন। (না থাকলে 'নেই' লিখে মেসেজ করুন)।`,
+      reply: `ছবি পেয়েছি!\n\nআপনার কি কোনো রিল বা ভিডিও আছে? (Facebook Reel অথবা YouTube Shorts এর লিঙ্ক থাকলে শেয়ার করুন, না থাকলে 'না' বা 'নেই' লিখে জানান)।`,
       readyToGenerate: false,
       extractedData: {
         product_title: null,
@@ -164,7 +165,7 @@ function handleFallbackAgent(messages: any[], userMessage: string) {
   const hasReelUrl = userMessage.match(/https?:\/\/[^\s]+/)
   return {
     success: true,
-    reply: `অসাধারণ! সব প্রয়োজনীয় তথ্য সুন্দরভাবে সংগ্রহ হয়েছে। ডেলিভারি চার্জ ডিফল্টভাবে ঢাকায় ৳৭০ ও ঢাকার বাইরে ৳১৩০ সেট রাখা হয়েছে। নিচের বাটনে চাপ দিয়ে এখনই আপনার সম্পূর্ণ ওয়েবসাইট তৈরি করে ফেলুন!`,
+    reply: `সব তথ্য সুন্দরভাবে সংগ্রহ করা হয়েছে! নিচে একবার রিভিউ করে দেখুন, কিছু পরিবর্তন করার থাকলে জানান অথবা নিচের বাটনে চাপ দিয়ে দোকানটি তৈরি করে নিন।`,
     readyToGenerate: true,
     extractedData: {
       product_title: null,
