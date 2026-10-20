@@ -93,22 +93,27 @@
         ></textarea>
       </div>
 
-      <!-- Quantity Selector -->
+      <!-- Quantity Selector with Live Stock Limit -->
       <div class="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl border border-slate-200/80">
-        <span class="font-bold text-slate-800">অর্ডার পরিমাণ:</span>
+        <div>
+          <span class="font-bold text-slate-800 block">অর্ডার পরিমাণ:</span>
+          <span class="text-[11px] text-slate-400">সর্বোচ্চ {{ maxAvailableStock }} টি অর্ডার করা যাবে</span>
+        </div>
         <div class="flex items-center gap-3">
           <button 
             type="button" 
             @click="decrementQty"
-            class="w-8 h-8 rounded-lg bg-white border border-slate-300 text-slate-700 font-bold flex items-center justify-center hover:bg-slate-100 active:scale-95"
+            :disabled="form.quantity <= 1"
+            class="w-8 h-8 rounded-lg bg-white border border-slate-300 text-slate-700 font-bold flex items-center justify-center hover:bg-slate-100 active:scale-95 disabled:opacity-40 cursor-pointer"
           >
             -
           </button>
           <span class="font-extrabold text-base w-4 text-center">{{ form.quantity }}</span>
           <button 
             type="button" 
-            @click="form.quantity++"
-            class="w-8 h-8 rounded-lg bg-white border border-slate-300 text-slate-700 font-bold flex items-center justify-center hover:bg-slate-100 active:scale-95"
+            @click="incrementQty"
+            :disabled="form.quantity >= maxAvailableStock"
+            class="w-8 h-8 rounded-lg bg-white border border-slate-300 text-slate-700 font-bold flex items-center justify-center hover:bg-slate-100 active:scale-95 disabled:opacity-40 cursor-pointer"
           >
             +
           </button>
@@ -235,6 +240,20 @@ const feeOutside = computed(() => {
 const deliveryFee = computed(() => form.delivery_zone === 'outside_dhaka' ? feeOutside.value : feeInside.value)
 const totalBill = computed(() => (unitItemPrice.value * form.quantity) + deliveryFee.value)
 
+const maxAvailableStock = computed(() => {
+  if (typeof props.store?.stock === 'number') return props.store.stock
+  if (typeof props.store?.config?.stock === 'number') return props.store.config.stock
+  return 15
+})
+
+const incrementQty = () => {
+  if (form.quantity < maxAvailableStock.value) {
+    form.quantity++
+  } else {
+    toast.warning(`স্টকে সর্বোচ্চ ${maxAvailableStock.value}টি আইটেম অবশিষ্ট আছে।`)
+  }
+}
+
 const decrementQty = () => {
   if (form.quantity > 1) form.quantity--
 }
@@ -284,6 +303,12 @@ const submitOrder = async () => {
   const cleanPhone = form.customer_phone.replace(/\D/g, '')
   if (cleanPhone.length < 11) {
     phoneError.value = true
+    return
+  }
+
+  if (form.quantity > maxAvailableStock.value) {
+    toast.error(`দুঃখিত, স্টকে মাত্র ${maxAvailableStock.value}টি আইটেম আছে।`)
+    form.quantity = maxAvailableStock.value
     return
   }
 

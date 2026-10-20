@@ -51,6 +51,31 @@ export default defineEventHandler(async (event) => {
     const deliveryFee = delivery_zone === 'outside_dhaka' ? 130 : 70
     const totalPrice = (price * qty) + deliveryFee
 
+    // Check available stock before accepting order
+    const supabase = getSupabaseClient()
+    let availableStock = 25
+
+    if (supabase) {
+      try {
+        const { data: store } = await supabase.from('stores').select('config').eq('slug', store_slug).single()
+        if (store) {
+          const cfg = store.config || {}
+          if (typeof cfg.stock === 'number') availableStock = cfg.stock
+        }
+      } catch (e) {}
+    } else {
+      const mem = memoryStore.getStore(store_slug)
+      if (mem && typeof mem.stock === 'number') availableStock = mem.stock
+    }
+
+    if (availableStock <= 0) {
+      throw createError({ statusCode: 400, message: 'দুঃখিত! এই পণ্যটির স্টক শেষ হয়ে গেছে।' })
+    }
+
+    if (qty > availableStock) {
+      throw createError({ statusCode: 400, message: `স্টকে সর্বোচ্চ ${availableStock}টি আইটেম অবশিষ্ট আছে।` })
+    }
+
     const newOrder: OrderRecord = {
       id: 'ord-' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5),
       store_slug,
@@ -68,7 +93,6 @@ export default defineEventHandler(async (event) => {
     // Automatically decrement live stock
     memoryStore.decrementStock(store_slug, qty)
 
-    const supabase = getSupabaseClient()
     if (supabase) {
       try {
         await supabase.from('orders').insert({
