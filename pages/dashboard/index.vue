@@ -231,27 +231,33 @@
         <!-- Orders: Responsive Card View on Mobile, Table on Desktop -->
         <template v-else>
         <!-- Mobile Orders List (< md) -->
-        <div class="md:hidden divide-y divide-slate-100">
-          <div v-if="finalDisplayOrders.length === 0" class="py-10 text-center text-slate-400 font-semibold text-xs">
+        <div class="md:hidden space-y-3 p-3 bg-slate-100/60 rounded-2xl">
+          <div v-if="finalDisplayOrders.length === 0" class="py-10 text-center text-slate-400 font-semibold text-xs bg-white rounded-2xl border border-slate-200/80">
             কোনো অর্ডার খুঁজে পাওয়া যায়নি।
           </div>
-          <div v-for="order in finalDisplayOrders" :key="'mob_' + order.id" class="p-3.5 space-y-2">
-            <div class="flex items-start justify-between gap-2">
-              <div>
-                <div class="flex items-center gap-1.5">
-                  <span class="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">#{{ order.id }}</span>
-                  <h4 class="font-bold text-slate-900 text-sm">{{ order.customer_name }}</h4>
-                </div>
-                <a :href="`tel:${order.customer_phone}`" class="inline-flex items-center gap-1 text-emerald-700 text-xs font-mono font-bold mt-0.5">
-                  <PhoneCall class="w-3 h-3 text-emerald-600" />
-                  <span>{{ order.customer_phone }}</span>
-                </a>
-              </div>
+          <div 
+            v-for="order in finalDisplayOrders" 
+            :key="'mob_' + order.id" 
+            class="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-3 transition-all"
+          >
+            <!-- Card Top: Order ID & Status -->
+            <div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+              <span class="font-mono text-xs font-black text-slate-800 bg-slate-100 px-2 py-0.5 rounded-md">
+                #{{ order.id }}
+              </span>
+
               <!-- Status Select Dropdown on Mobile -->
               <select 
                 :value="order.status"
                 @change="changeStatus(order.id, $event.target.value)"
-                class="px-2 py-1 text-[11px] font-bold rounded-lg border border-slate-200 bg-white text-slate-700 focus:outline-none focus:border-emerald-500"
+                class="px-2.5 py-1 text-xs font-bold rounded-lg border border-slate-200 bg-white focus:outline-none focus:border-emerald-500 cursor-pointer shadow-2xs"
+                :class="{
+                  'text-amber-700 bg-amber-50/50 border-amber-200': order.status === 'pending',
+                  'text-emerald-700 bg-emerald-50/50 border-emerald-200': order.status === 'confirmed',
+                  'text-indigo-700 bg-indigo-50/50 border-indigo-200': order.status === 'under_courier',
+                  'text-blue-700 bg-blue-50/50 border-blue-200': order.status === 'delivered',
+                  'text-red-700 bg-red-50/50 border-red-200': order.status === 'cancelled'
+                }"
               >
                 <option value="pending">পেন্ডিং</option>
                 <option value="confirmed">কনফার্মড</option>
@@ -261,45 +267,69 @@
               </select>
             </div>
 
-            <!-- Essential Info Row: Dokan & Poriman -->
-            <div class="flex items-center justify-between text-xs bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200/60">
-              <span class="text-slate-800 font-bold truncate max-w-[150px]">{{ getStoreName(order.store_slug) }}</span>
-              <span class="font-black text-slate-900">৳{{ order.total_price }} ({{ order.quantity }}টি)</span>
+            <!-- Customer Details -->
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <h4 class="font-bold text-slate-900 text-sm leading-tight">{{ order.customer_name }}</h4>
+                <a :href="`tel:${order.customer_phone}`" class="inline-flex items-center gap-1.5 text-emerald-700 text-xs font-mono font-bold mt-1 hover:underline">
+                  <PhoneCall class="w-3.5 h-3.5 text-emerald-600" />
+                  <span>{{ order.customer_phone }}</span>
+                </a>
+              </div>
+
+              <!-- Dokan Badge -->
+              <div class="text-right">
+                <span class="text-[11px] text-slate-400 block font-medium">দোকান</span>
+                <span class="text-xs font-bold text-slate-800 truncate max-w-[140px] block">{{ getStoreName(order.store_slug) }}</span>
+              </div>
             </div>
 
-            <!-- Mobile Footer: Courier Button, Details Button & Delete -->
-            <div class="flex items-center justify-between pt-1 gap-2 flex-wrap">
-              <div class="flex items-center gap-1.5">
-                <!-- Courier Action Button on Mobile -->
+            <!-- Price & Quantity Bar -->
+            <div class="flex items-center justify-between text-xs bg-slate-50 px-3 py-2 rounded-xl border border-slate-200/70">
+              <span class="text-slate-500">পরিমাণ: <strong class="text-slate-800">{{ order.quantity }}টি</strong></span>
+              <span class="font-black text-slate-900 text-sm">৳{{ order.total_price }}</span>
+            </div>
+
+            <!-- Courier Tracking Tag if available -->
+            <div v-if="order.courier_data" class="flex items-center justify-between bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200 text-xs">
+              <span class="text-amber-800 font-bold flex items-center gap-1.5">
+                <Truck class="w-3.5 h-3.5 text-amber-600" />
+                <span>{{ order.courier_data.courier_slug === 'pathao' ? 'Pathao' : order.courier_data.courier_slug === 'redx' ? 'RedX' : 'Steadfast' }}</span>
+              </span>
+              <span class="font-mono font-bold text-amber-900">{{ order.courier_data.tracking_code }}</span>
+            </div>
+
+            <!-- Mobile Footer Actions -->
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100 gap-2">
+              <div class="flex items-center gap-2">
+                <!-- 1-Click Courier Button -->
                 <button 
                   v-if="!order.courier_data && order.status !== 'cancelled'"
                   @click="openDispatchModal(order)"
-                  class="px-2 py-1 text-[11px] font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
+                  class="px-2.5 py-1.5 text-xs font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
                 >
-                  <Truck class="w-3 h-3 text-amber-600" />
-                  <span>কুরিয়ার</span>
+                  <Truck class="w-3.5 h-3.5 text-amber-600" />
+                  <span>কুরিয়ার পাঠান</span>
                 </button>
-                <span v-else-if="order.courier_data" class="text-[10px] font-mono font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded">
-                  {{ order.courier_data.tracking_code }}
-                </span>
 
+                <!-- Details Button -->
                 <button 
                   @click="viewOrderDetails(order)"
-                  class="px-2.5 py-1 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
+                  class="px-2.5 py-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60 rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
                 >
                   <Eye class="w-3.5 h-3.5" />
                   <span>বিস্তারিত</span>
                 </button>
               </div>
 
+              <!-- Cancel Button -->
               <button 
                 v-if="order.status !== 'cancelled'"
                 @click="changeStatus(order.id, 'cancelled')"
-                class="text-xs text-slate-400 hover:text-red-600 flex items-center gap-1 p-1"
+                class="text-xs font-medium text-slate-400 hover:text-red-600 p-1 transition-colors"
                 title="অর্ডার বাতিল"
               >
-                <Trash2 class="w-3 h-3" />
-                <span>বাতিল</span>
+                <Trash2 class="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
@@ -699,25 +729,29 @@
         <!-- Fake API Configuration Inputs -->
         <div class="space-y-3 pt-1 text-xs">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">API Key / Merchant Client ID:</label>
+            <label class="block font-bold text-slate-700 mb-1">
+              {{ courierModal.selected === 'pathao' ? 'Pathao Client ID:' : courierModal.selected === 'redx' ? 'RedX App Key:' : 'Steadfast API Key:' }}
+            </label>
             <input 
-              type="password"
+              type="text"
               v-model="courierModal.apiKey"
-              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-slate-800 focus:outline-none focus:border-amber-500 bg-slate-50"
-              placeholder="st_live_94827410928471"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-slate-800 focus:outline-none focus:border-amber-500 bg-white"
+              :placeholder="courierModal.selected === 'pathao' ? 'যেমন: client_id_...' : 'যেমন: st_api_...'"
             />
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Secret Key / Token:</label>
+            <label class="block font-bold text-slate-700 mb-1">
+              {{ courierModal.selected === 'pathao' ? 'Client Secret / Bearer Token:' : courierModal.selected === 'redx' ? 'RedX Access Secret:' : 'Secret Key:' }}
+            </label>
             <input 
               type="password"
               v-model="courierModal.secretKey"
-              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-slate-800 focus:outline-none focus:border-amber-500 bg-slate-50"
-              placeholder="••••••••••••••••••••••••••••"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-slate-800 focus:outline-none focus:border-amber-500 bg-white"
+              placeholder="আপনার কুরিয়ার প্যানেল থেকে কপি করে পেস্ট করুন"
             />
           </div>
-          <p class="text-[11px] text-slate-400 leading-tight">
-            💡 মার্চেন্ট অ্যাকাউন্টে লাইভ API ক্রেডেনশিয়াল সেভ থাকলে যেকোনো অর্ডারের পাশে ১-ক্লিকেই পার্সেল তৈরি হবে।
+          <p class="text-[11px] text-slate-500 leading-tight">
+            💡 আপনার কুরিয়ার অ্যাকাউন্ট ড্যাশবোর্ড থেকে API Key ও Secret দিয়ে সেভ করুন।
           </p>
         </div>
 
@@ -797,7 +831,26 @@
           </div>
         </div>
 
+        <!-- If API credentials not configured, block and prompt to setup -->
+        <div v-if="!hasCourierCredentials" class="p-4 bg-amber-50 rounded-2xl border border-amber-200 space-y-2.5 text-xs text-amber-900">
+          <div class="flex items-center gap-2 font-bold text-amber-950">
+            <Truck class="w-4 h-4 text-amber-600" />
+            <span>কুরিয়ার API কানেক্ট করা নেই</span>
+          </div>
+          <p class="leading-relaxed text-[11px] text-amber-800">
+            পার্সেল বুকিং করতে প্রথমে আপনার কুরিয়ার সার্ভিসের API Key ও Secret দিয়ে ইন্টিগ্রেশন সম্পন্ন করুন।
+          </p>
+          <button
+            type="button"
+            @click="dispatchModal.isOpen = false; courierModal.isOpen = true"
+            class="w-full py-2 px-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer text-center"
+          >
+            ⚙️ কুরিয়ার API সেটআপ করুন
+          </button>
+        </div>
+
         <button
+          v-else
           @click="confirmDispatch"
           :disabled="dispatchModal.isLoading"
           class="w-full py-2.5 px-3 bg-amber-500 hover:bg-amber-600 disabled:opacity-75 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
@@ -1025,8 +1078,12 @@ const telegramModal = reactive({
 const courierModal = reactive({
   isOpen: false,
   selected: 'steadfast',
-  apiKey: 'st_live_8927419204812',
-  secretKey: '••••••••••••••••••••'
+  apiKey: '',
+  secretKey: ''
+})
+
+const hasCourierCredentials = computed(() => {
+  return !!(courierModal.apiKey && courierModal.secretKey)
 })
 
 const dispatchModal = reactive({
@@ -1037,6 +1094,17 @@ const dispatchModal = reactive({
 })
 
 const saveCourierSettings = () => {
+  if (!courierModal.apiKey || !courierModal.secretKey) {
+    toast.error('API Key ও Secret Key উভয়ই প্রদান করুন')
+    return
+  }
+  if (import.meta.client) {
+    localStorage.setItem('dokan_courier_settings', JSON.stringify({
+      selected: courierModal.selected,
+      apiKey: courierModal.apiKey,
+      secretKey: courierModal.secretKey
+    }))
+  }
   courierModal.isOpen = false
   toast.success('কুরিয়ার API সেটিংস সফলভাবে সংরক্ষিত হয়েছে!')
 }
@@ -1096,6 +1164,19 @@ onMounted(async () => {
     isLoading.value = false
     return
   }
+
+  // Load saved courier settings if any
+  if (import.meta.client) {
+    try {
+      const savedCourier = JSON.parse(localStorage.getItem('dokan_courier_settings') || '{}')
+      if (savedCourier.apiKey && savedCourier.secretKey) {
+        courierModal.selected = savedCourier.selected || 'steadfast'
+        courierModal.apiKey = savedCourier.apiKey
+        courierModal.secretKey = savedCourier.secretKey
+      }
+    } catch (e) {}
+  }
+
   await refreshData()
   isLoading.value = false
   const interval = setInterval(refreshData, 15000)
