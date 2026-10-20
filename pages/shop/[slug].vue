@@ -16,8 +16,9 @@
 
   <div v-else class="min-h-screen bg-slate-50/70 pb-28 sm:pb-16 font-sans">
     
-    <!-- Top Floating Urgency Bar -->
+    <!-- Top Floating Urgency Bar (Can be removed/hidden by AI) -->
     <div 
+      v-if="showUrgencyBar"
       class="text-white text-xs sm:text-sm font-black py-2.5 px-4 text-center sticky top-0 z-30 shadow-md flex items-center justify-center gap-2"
       :class="currentStock <= 0 ? 'bg-red-700' : 'bg-gradient-to-r from-red-600 via-amber-600 to-red-600'"
     >
@@ -31,7 +32,7 @@
     </div>
 
     <!-- Store Navigation -->
-    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200/80 py-3.5 px-4 sm:px-8 sticky top-9 z-20">
+    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200/80 py-3.5 px-4 sm:px-8 sticky top-0 z-20" :class="{ 'top-9': showUrgencyBar }">
       <div class="max-w-5xl mx-auto flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white font-black shadow-md shadow-emerald-500/20" :class="primaryBgClass">
@@ -41,7 +42,10 @@
             <span class="font-black text-slate-900 tracking-tight text-base sm:text-lg block leading-tight">
               {{ store.product_title }}
             </span>
-            <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">১০০% ভেরিফাইড বিক্রেতা</span>
+            <!-- Verified Seller Badge (Can be toggled by AI) -->
+            <span v-if="showVerifiedBadge" class="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">
+              ১০০% ভেরিফাইড বিক্রেতা
+            </span>
           </div>
         </div>
 
@@ -202,12 +206,10 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
-          <!-- Optional Secondary showcase photo in the middle/side -->
           <div v-if="store.config?.secondary_image && productImages.length > 1" class="rounded-3xl overflow-hidden border border-slate-200/80 shadow-sm md:col-span-1 hidden md:block">
             <img :src="store.config.secondary_image" class="w-full h-full object-cover" />
           </div>
 
-          <!-- Feature Cards -->
           <div class="space-y-3.5" :class="store.config?.secondary_image && productImages.length > 1 ? 'md:col-span-2' : 'md:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4 space-y-0'">
             <div 
               v-for="(feat, fIdx) in store.config.features" 
@@ -226,8 +228,8 @@
         </div>
       </section>
 
-      <!-- TESTIMONIALS & SOCIAL PROOF -->
-      <section v-if="store.config?.testimonials?.length" class="space-y-6">
+      <!-- TESTIMONIALS & SOCIAL PROOF (Can be hidden by AI) -->
+      <section v-if="showTestimonials && store.config?.testimonials?.length" class="space-y-6">
         <div class="text-center max-w-lg mx-auto">
           <h2 class="text-xl sm:text-2xl font-black text-slate-900">সম্মানিত ক্রেতাদের মতামত</h2>
           <p class="text-xs sm:text-sm text-slate-500 mt-1">যারা ইতিমধ্যে ব্যবহার করে সন্তুষ্ট</p>
@@ -253,8 +255,8 @@
         </div>
       </section>
 
-      <!-- FAQS ACCORDION -->
-      <section v-if="store.config?.faqs?.length" class="space-y-4">
+      <!-- FAQS ACCORDION (Can be hidden by AI) -->
+      <section v-if="showFaqs && store.config?.faqs?.length" class="space-y-4">
         <div class="text-center max-w-lg mx-auto mb-6">
           <h2 class="text-xl sm:text-2xl font-black text-slate-900">সাধারণ কিছু প্রশ্নের উত্তর</h2>
           <p class="text-xs sm:text-sm text-slate-500 mt-1">অর্ডার করার পূর্বে জেনে নিন</p>
@@ -308,7 +310,7 @@
     </div>
 
     <!-- CONVERSATIONAL AI STORE EDITOR MODAL -->
-    <div v-if="isEditingStore" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div v-if="isEditingStore" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
       <div class="bg-white rounded-3xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
         
         <!-- Editor Modal Header -->
@@ -319,7 +321,7 @@
             </div>
             <div>
               <h3 class="text-sm font-black">AI লাইভ স্টোর এডিটর</h3>
-              <p class="text-[10px] text-slate-300">যেকোনো পরিবর্তন মুখে বা টেক্সটে বলুন — AI নিজে পরিবর্তন করবে</p>
+              <p class="text-[10px] text-slate-300">যেকোনো সেকশন সরাতে, লুকোতে বা পরিবর্তন করতে বলুন</p>
             </div>
           </div>
           <button @click="isEditingStore = false" class="p-1 rounded-lg text-slate-300 hover:text-white">
@@ -331,13 +333,13 @@
         <div ref="editorScroll" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50/50 text-xs sm:text-sm">
           <div class="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl leading-relaxed">
             👋 <strong>আমি DokanAI এডিটর!</strong><br />
-            দোকানের যেকোনো কিছু পরিবর্তন করতে বলুন। যেমন:
+            দোকানের যেকোনো সেকশন বাদ দিতে বা পরিবর্তন করতে বলুন। যেমন:
             <ul class="list-disc pl-4 mt-1.5 space-y-0.5 text-emerald-800 text-xs">
-              <li>"হেডলাইনটা একটু বেশি আকর্ষণীয় করে দাও"</li>
-              <li>"দাম ১০০০ টাকা থেকে বাড়িয়ে ১২৫০ টাকা করো"</li>
-              <li>"ঢাকার বাইরে ডেলিভারি চার্জ ১৫০ টাকা করো"</li>
-              <li>"স্টক সংখ্যা ২৫ টি করো"</li>
-              <li>"ইউটিউব রিল লিঙ্ক যোগ করো: https://..."</li>
+              <li>"উপরের লাল অফার বারটা (Urgency Bar) বাদ দাও"</li>
+              <li>"১০০% ভেরিফাইড বিক্রেতা লেখাটি লুকিয়ে ফেলো"</li>
+              <li>"রিভিউ / টেস্টিমোনিয়াল সেকশন মুছে দাও"</li>
+              <li>"দাম ১০০০ থেকে কমিয়ে ৯৫০ টাকা করো"</li>
+              <li>"রিভিউতে নতুন এক কাস্টমারের নাম ও মন্তব্য যোগ করো"</li>
             </ul>
           </div>
 
@@ -363,7 +365,7 @@
             <input 
               v-model="aiInstruction" 
               type="text" 
-              placeholder="কী পরিবর্তন করতে চান বলুন..." 
+              placeholder="যেমন: উপরের অফার বারটা মুছে দাও..." 
               class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-emerald-500 font-medium"
               :disabled="isAiEditing"
             />
@@ -394,6 +396,22 @@ const slug = route.params.slug
 const { data, pending, refresh } = await useFetch(`/api/stores?slug=${slug}`)
 
 const store = computed(() => data.value?.store)
+
+const showUrgencyBar = computed(() => {
+  return store.value?.config?.show_urgency_bar !== false
+})
+
+const showVerifiedBadge = computed(() => {
+  return store.value?.config?.show_verified_badge !== false
+})
+
+const showTestimonials = computed(() => {
+  return store.value?.config?.show_testimonials !== false
+})
+
+const showFaqs = computed(() => {
+  return store.value?.config?.show_faqs !== false
+})
 
 const currentStock = computed(() => {
   if (typeof store.value?.stock === 'number') return store.value.stock

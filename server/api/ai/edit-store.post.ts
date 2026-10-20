@@ -1,7 +1,9 @@
 /**
- * Conversational AI Store Editor API
- * Can modify EVERYTHING: FAQs, Reviews/Testimonials, Features,
- * Headlines, Stock, Delivery, Variants, and Badges using pure natural language.
+ * Conversational AI Store Editor API with Section Visibility Toggles
+ * Can show, hide, edit, or remove:
+ * - Top Urgency Bar (🔥 অফারটি সীমিত সময়ের জন্য...)
+ * - Verified Seller Badge (১০০% ভেরিফাইড বিক্রেতা)
+ * - FAQs, Testimonials, Features, Reel Video, or Badges
  */
 import { GoogleGenAI } from '@google/genai'
 import { memoryStore } from '../../utils/memoryStore'
@@ -35,33 +37,34 @@ export default defineEventHandler(async (event) => {
       const ai = new GoogleGenAI({ apiKey })
 
       const prompt = `You are "DokanAI Master Store Editor".
-The merchant is speaking to you to edit or customize their live store.
-EVERYTHING on the page can be changed: FAQs, Customer Reviews/Testimonials, Features, Headline, Subheadline, Price, Stock, Badges, Delivery fees, or Reel link.
+The merchant is giving you natural language commands to customize or remove/hide sections on their live single-product store page.
 
-Merchant's Instruction in Bengali/Banglish: "${instruction}"
+Merchant's Instruction: "${instruction}"
 
 Current Store Data:
 - Product Title: "${currentStore.product_title}"
 - Price: ${currentStore.price}
 - Regular Price: ${currentStore.regular_price}
 - Stock: ${currentStore.stock ?? 20}
+- Show Urgency Top Bar: ${currentStore.config?.show_urgency_bar ?? true}
+- Show Verified Badge: ${currentStore.config?.show_verified_badge ?? true}
+- Show Video Reel: ${currentStore.config?.show_video_reel ?? true}
+- Show Testimonials / Reviews: ${currentStore.config?.show_testimonials ?? true}
+- Show FAQs: ${currentStore.config?.show_faqs ?? true}
 - Delivery Fee Inside Dhaka: ${currentStore.config?.delivery_fee_inside ?? 70}
 - Delivery Fee Outside Dhaka: ${currentStore.config?.delivery_fee_outside ?? 130}
-- Video Reel URL: "${currentStore.config?.video_reel_url ?? ''}"
 - Headline: "${currentStore.config?.headline ?? ''}"
 - Subheadline: "${currentStore.config?.subheadline ?? ''}"
 - Features: ${JSON.stringify(currentStore.config?.features ?? [])}
 - Trust Badges: ${JSON.stringify(currentStore.config?.trust_badges ?? [])}
 - FAQs: ${JSON.stringify(currentStore.config?.faqs ?? [])}
-- Testimonials / Reviews: ${JSON.stringify(currentStore.config?.testimonials ?? [])}
-- Variants: ${JSON.stringify(currentStore.config?.variants ?? [])}
+- Testimonials: ${JSON.stringify(currentStore.config?.testimonials ?? [])}
 
-RULES:
-1. If the merchant asks to change/add/remove a Review or Testimonial, update the "testimonials" array.
-2. If they ask to change/add/remove an FAQ (প্রশ্ন ও উত্তর), update the "faqs" array.
-3. If they ask to change features, headlines, price, or anything else, update accordingly.
-4. Keep untouched fields exactly as they are.
-5. Provide a warm, clear 1-sentence Bengali confirmation of the exact change made.
+RULES FOR SECTION VISIBILITY:
+- If the merchant asks to remove/hide the top urgency bar ("অফার বারটা সরাও" / "স্টক নোটিশ সরাও"), set "show_urgency_bar": false.
+- If they ask to remove/hide the verified seller badge ("১০০% ভেরিফাইড বিক্রেতা লেখাটি বাদ দাও"), set "show_verified_badge": false.
+- If they ask to remove the reviews or FAQs, set "show_testimonials": false or "show_faqs": false, or empty the arrays.
+- If they ask to bring it back ("আবার যোগ করো"), set to true.
 
 RETURN STRICT JSON ONLY:
 {
@@ -70,6 +73,10 @@ RETURN STRICT JSON ONLY:
   "price": number,
   "regular_price": number,
   "stock": number,
+  "show_urgency_bar": boolean,
+  "show_verified_badge": boolean,
+  "show_testimonials": boolean,
+  "show_faqs": boolean,
   "theme_color": "emerald" | "indigo" | "rose" | "amber",
   "delivery_fee_inside": number,
   "delivery_fee_outside": number,
@@ -91,9 +98,12 @@ RETURN STRICT JSON ONLY:
 
       const parsed = JSON.parse(response.text || '{}')
 
-      // Apply updates to the store's full configuration
       const updatedConfig = {
         ...currentStore.config,
+        show_urgency_bar: parsed.show_urgency_bar !== undefined ? parsed.show_urgency_bar : (currentStore.config?.show_urgency_bar ?? true),
+        show_verified_badge: parsed.show_verified_badge !== undefined ? parsed.show_verified_badge : (currentStore.config?.show_verified_badge ?? true),
+        show_testimonials: parsed.show_testimonials !== undefined ? parsed.show_testimonials : (currentStore.config?.show_testimonials ?? true),
+        show_faqs: parsed.show_faqs !== undefined ? parsed.show_faqs : (currentStore.config?.show_faqs ?? true),
         headline: parsed.headline || currentStore.config?.headline,
         subheadline: parsed.subheadline || currentStore.config?.subheadline,
         delivery_fee_inside: parsed.delivery_fee_inside ?? currentStore.config?.delivery_fee_inside,
@@ -133,7 +143,7 @@ RETURN STRICT JSON ONLY:
 
       return {
         success: true,
-        reply: parsed.reply || 'আপনার নির্দেশনা অনুযায়ী রিভিউ ও তথ্য আপডেট করা হয়েছে!',
+        reply: parsed.reply || 'আপনার নির্দেশনা অনুযায়ী সেকশনটি আপডেট করা হয়েছে!',
         store: currentStore
       }
     } catch (err: any) {
@@ -141,7 +151,6 @@ RETURN STRICT JSON ONLY:
     }
   }
 
-  // Fallback heuristic editor if no API key
   memoryStore.setStore(slug, currentStore)
 
   return {
