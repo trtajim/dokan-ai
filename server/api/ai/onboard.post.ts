@@ -1,7 +1,6 @@
 /**
- * Step-by-Step Fast Onboarding Agent
- * Streamlined: Product Name -> Price & Variants -> Product Images (Required) -> Reel URL Inquiry -> Ready!
- * Delivery fee defaults to 70 (inside) and 130 (outside) automatically without nagging the user.
+ * DokanAI Onboarding Conversation Handler
+ * Powered directly by Groq / Gemini LLMs without hardcoded conversational mocks.
  */
 import { generateAiChat } from '../../utils/aiClient'
 
@@ -9,36 +8,50 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { messages, userMessage } = body
 
-  try {
-    const systemPrompt = `You are "DokanAI Assistant" (দোকান এআই), an expert conversational e-commerce consultant for Bangladeshi single-product Cash-on-Delivery (COD) stores.
+  // Format valid multi-turn chat history for OpenAI / Groq / Gemini
+  const chatHistory: { role: 'user' | 'assistant'; content: string }[] = []
 
-GOAL: Guide the user to build a high-converting store FAST. Keep questions simple and direct.
-DEFAULT DELIVERY CHARGE: Always assume ৳70 (Inside Dhaka) and ৳130 (Outside Dhaka). DO NOT ASK the user for delivery charge unless they explicitly bring it up themselves.
+  if (Array.isArray(messages)) {
+    for (const m of messages) {
+      if (!m || !m.content) continue
+      const role: 'user' | 'assistant' = (m.role === 'user') ? 'user' : 'assistant'
+      chatHistory.push({
+        role,
+        content: String(m.content)
+      })
+    }
+  }
 
-CRITICAL INSTRUCTION FOR REELS & MODIFICATIONS:
-- If the user says they have a reel, wants to add a reel, or mentions a video (e.g., "reel ache to amar", "reel add korte chai", "video ache"):
-  DO NOT set "readyToGenerate": true! Instead, set "readyToGenerate": false, and ask them directly in Bengali to paste/share the Facebook Reel or YouTube Shorts URL right now.
-- If the user provides a URL (facebook.com/reel, youtube.com/shorts, youtu.be, etc.), extract it into "video_reel_url" and set "readyToGenerate": true.
-- If the user asks to change or update anything (price, name, variants, photos), acknowledge the change, update "extractedData", and set "readyToGenerate": true ONLY after the change is addressed.
+  // Ensure current user message is appended if not already the latest
+  const lastMsg = chatHistory[chatHistory.length - 1]
+  if (!lastMsg || lastMsg.role !== 'user' || lastMsg.content !== userMessage) {
+    if (userMessage) {
+      chatHistory.push({
+        role: 'user',
+        content: String(userMessage)
+      })
+    }
+  }
 
-STRICT CONVERSATIONAL SEQUENCE:
-1. Step 1 (Product Name): The user gives the product name.
-2. Step 2 (Price & Variants):
-   - Acknowledge the product enthusiastically.
-   - Ask for the Offer Price (অফার মূল্য) and if they have any variants/sizes/weights (e.g. ১ কেজি/২ কেজি or সাইজ M/L/XL).
-3. Step 3 (Product Picture - REQUIRED):
-   - Once price/variants are given, ask the user to attach product pictures using the paperclip (📎) icon or paste (Ctrl+V).
-   - Say "কয়েকটি ভালো ছবি (Pictures)" (NOT "একটি"). Tell them pictures make the landing page attractive.
-4. Step 4 (Reel / Video URL):
-   - Once pictures are uploaded or shared, ask separately: "আপনার কি কোনো রিল বা ভিডিও আছে? (Facebook Reel অথবা YouTube Shorts এর লিঙ্ক থাকলে শেয়ার করুন, না থাকলে 'না' বা 'নেই' লিখে জানান)।"
-   - If they say they have a reel but did not provide the link yet, ask them for the link ("লিঙ্কটি দিন").
-5. Step 5 (Review & Ready To Launch):
-   - Only when name, price/variants, pictures, and reel answer (either a link or confirmation that they don't have one) are provided, set "readyToGenerate": true.
-   - Say: "সব তথ্য সুন্দরভাবে সংগ্রহ করা হয়েছে! নিচে একবার রিভিউ করে দেখুন, কিছু পরিবর্তন করার থাকলে জানান অথবা নিচের বাটনে চাপ দিয়ে দোকানটি তৈরি করে নিন।" (Delivery defaults to ৳70/৳130).
+  const systemPrompt = `You are "DokanAI Assistant" (দোকান এআই), a conversational AI store consultant helping Bangladeshi merchants build a single-product Cash-on-Delivery (COD) landing page.
 
-RETURN STRICT JSON ONLY (No markdown codeblocks, just valid JSON):
+CONVERSATION PRINCIPLES:
+1. Speak in friendly, natural colloquial Bengali (Banglish/Bengali understood).
+2. Answer ANY question, confusion, clarification, or objection the user has naturally.
+3. Your goal is to collect:
+   - Product title / name
+   - Offer price & variants (if any)
+   - Product pictures (uploaded via clip or pasted)
+   - Reel / video link (Facebook Reel or YouTube Shorts, optional)
+4. Default delivery fee is always ৳70 (Inside Dhaka) and ৳130 (Outside Dhaka). Do NOT ask for delivery fees unless the merchant wants to customize it.
+5. "readyToGenerate" condition:
+   - ONLY set "readyToGenerate": true when product name, pricing, and pictures have been provided, AND the reel question has either been answered (with a link or saying they don't have one).
+   - If the user asks a question (like "ki?", "kiser chobi?", "kivabe dibo?"), is confused, wants to add or change something, or says "reel ache": DO NOT set readyToGenerate to true! Set "readyToGenerate": false and guide them conversationally.
+
+RESPONSE FORMAT:
+You MUST respond with a valid JSON object only. No markdown fences around it.
 {
-  "reply": "Your friendly Bengali reply asking EXACTLY ONE focused step with clear guidance",
+  "reply": "Your natural Bengali conversational response to the user",
   "readyToGenerate": boolean,
   "extractedData": {
     "product_title": "string or null",
@@ -50,32 +63,18 @@ RETURN STRICT JSON ONLY (No markdown codeblocks, just valid JSON):
     ],
     "delivery_fee_inside": 70,
     "delivery_fee_outside": 130,
-    "theme_color": "emerald" | "indigo" | "rose" | "amber",
-    "highlights": ["benefit 1", "benefit 2"]
+    "theme_color": "emerald"
   }
 }`
 
-    const chatHistory: any[] = (messages || []).map((m: any) => ({
-      role: m.role === 'user' ? 'user' : 'assistant',
-      content: m.content || ''
-    }))
-
-    // Avoid duplicate user message if already present in messages array
-    const lastMsg = chatHistory[chatHistory.length - 1]
-    if (!lastMsg || lastMsg.role !== 'user' || lastMsg.content !== userMessage) {
-      chatHistory.push({
-        role: 'user',
-        content: userMessage || ''
-      })
-    }
-
+  try {
     const rawResponse = await generateAiChat({
       systemPrompt,
       messages: chatHistory,
       jsonMode: true
     })
 
-    // Clean any accidental markdown fence around JSON
+    // Clean any markdown code blocks or wrapper whitespace
     let cleanJson = (rawResponse || '').trim()
     if (cleanJson.startsWith('```')) {
       cleanJson = cleanJson.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim()
@@ -85,113 +84,29 @@ RETURN STRICT JSON ONLY (No markdown codeblocks, just valid JSON):
       cleanJson = jsonMatch[0]
     }
 
-    const parsed = JSON.parse(cleanJson || '{}')
-    
-    // Ensure default delivery fees are preserved
-    if (parsed.extractedData) {
-      if (parsed.extractedData.delivery_fee_inside == null) parsed.extractedData.delivery_fee_inside = 70
-      if (parsed.extractedData.delivery_fee_outside == null) parsed.extractedData.delivery_fee_outside = 130
+    const parsed = JSON.parse(cleanJson)
+
+    // Ensure delivery fees default correctly
+    if (!parsed.extractedData) {
+      parsed.extractedData = {}
     }
+    if (parsed.extractedData.delivery_fee_inside == null) parsed.extractedData.delivery_fee_inside = 70
+    if (parsed.extractedData.delivery_fee_outside == null) parsed.extractedData.delivery_fee_outside = 130
 
     return {
       success: true,
-      ...parsed
+      reply: parsed.reply || 'আমি বুঝতে পেরেছি। দয়া করে পরবর্তী তথ্যটি দিন।',
+      readyToGenerate: Boolean(parsed.readyToGenerate),
+      extractedData: parsed.extractedData
     }
   } catch (err: any) {
-    console.warn('AI Onboard Provider error, using fallback:', err?.message || err)
-    return handleFallbackAgent(messages, userMessage)
-  }
-})
-
-function handleFallbackAgent(messages: any[], userMessage: string) {
-  const lowerMsg = (userMessage || '').trim().toLowerCase()
-  const priceMatch = userMessage.match(/(\d{3,5})/g)
-  let extractedPrice = priceMatch ? parseInt(priceMatch[0], 10) : 1200
-
-  // 1. If user says 'ki?', 'kiser chobi?', 'bujhlam na' or asks a question about pictures:
-  if (lowerMsg === 'ki?' || lowerMsg === 'ki' || lowerMsg.includes('কিসের') || lowerMsg.includes('বুঝলাম না') || lowerMsg.includes('bujhlam na')) {
+    console.error('[AI Onboard Error]', err)
+    // If the entire 6-key rotation fails, return error rather than faking dialogue
     return {
-      success: true,
-      reply: `আপনার প্রোডাক্টটির বাস্তব কয়েকটি ছবি যুক্ত করতে হবে (যেমন: প্যাকেট বা পণ্যের ছবি)। নিচে ক্লিপ (📎) আইকনে চাপ দিয়ে আপনার মোবাইল বা কম্পিউটার থেকে ছবি সিলেক্ট করুন, অথবা ছবি পেস্ট (Ctrl+V) করুন।`,
+      success: false,
+      reply: 'সার্ভারে সাময়িক সমস্যা হচ্ছে। অনুগ্রহ করে আরেকবার চেষ্টা করুন।',
       readyToGenerate: false,
       extractedData: {}
     }
   }
-
-  // 2. Did the user mention reel / video?
-  if (lowerMsg.includes('reel') || lowerMsg.includes('video') || lowerMsg.includes('রিল') || lowerMsg.includes('ভিডিও')) {
-    const hasReelUrl = userMessage.match(/https?:\/\/[^\s]+/)
-    if (hasReelUrl) {
-      return {
-        success: true,
-        reply: `ভিডিও লিঙ্কটি যুক্ত করা হয়েছে! নিচে সংগৃহীত সকল তথ্য রয়েছে। একবার রিভিউ করে দেখুন, কিছু পরিবর্তন করার থাকলে জানান অথবা নিচের বাটনে চাপ দিয়ে সরাসরি আপনার আকর্ষণীয় ল্যান্ডিং পেজ তৈরি করে ফেলুন!`,
-        readyToGenerate: true,
-        extractedData: {
-          product_title: null,
-          price: extractedPrice,
-          regular_price: Math.round(extractedPrice * 1.4),
-          video_reel_url: hasReelUrl[0],
-          delivery_fee_inside: 70,
-          delivery_fee_outside: 130,
-          theme_color: 'emerald',
-          highlights: ['১০০% অরিজিনাল কোয়ালিটি', 'ক্যাশ অন ডেলিভারি সুবিধা', 'দ্রুততম হোম ডেলিভারি']
-        }
-      }
-    } else {
-      return {
-        success: true,
-        reply: `আপনার রিল বা ভিডিওর লিঙ্কটি (Facebook Reel বা YouTube Shorts) দয়া করে এখানে মেসেজে পেস্ট করে দিন।`,
-        readyToGenerate: false,
-        extractedData: {}
-      }
-    }
-  }
-
-  // 3. Inspect conversation context rather than blind history length:
-  const allText = (messages || []).map(m => m.content || '').join(' ').toLowerCase()
-  const hasImages = (messages || []).some(m => m.images && m.images.length > 0) || lowerMsg.includes('ছবি যুক্ত') || lowerMsg.includes('ছবি দিয়েছি')
-
-  if (!hasImages) {
-    // Photos not yet provided! Keep asking for photos, never jump ahead
-    return {
-      success: true,
-      reply: `আপনার ল্যান্ডিং পেজে দেখানোর জন্য প্রোডাক্টটির কয়েকটি ভালো ছবি প্রয়োজন। নিচে ক্লিপ (📎) আইকন ব্যবহার করে ছবি আপলোড করুন অথবা সরাসরি পেস্ট করুন।`,
-      readyToGenerate: false,
-      extractedData: {
-        price: extractedPrice
-      }
-    }
-  }
-
-  // 4. Photos exist, check if reel has been addressed:
-  const hasReelUrl = userMessage.match(/https?:\/\/[^\s]+/)
-  const hasReelMention = allText.includes('রিল') || allText.includes('reel') || allText.includes('video')
-
-  if (!hasReelMention && !hasReelUrl) {
-    return {
-      success: true,
-      reply: `আপনার কি এই প্রোডাক্টটির কোনো রিল বা ভিডিও আছে? (Facebook Reel অথবা YouTube Shorts এর লিঙ্ক থাকলে শেয়ার করুন, না থাকলে 'না' বা 'নেই' লিখে জানান)।`,
-      readyToGenerate: false,
-      extractedData: {
-        price: extractedPrice
-      }
-    }
-  }
-
-  // 5. All core info gathered -> Review card!
-  return {
-    success: true,
-    reply: `সব তথ্য সুন্দরভাবে সংগ্রহ করা হয়েছে! নিচে একবার রিভিউ করে দেখুন, কিছু পরিবর্তন করার থাকলে জানান অথবা নিচের বাটনে চাপ দিয়ে দোকানটি তৈরি করে নিন।`,
-    readyToGenerate: true,
-    extractedData: {
-      product_title: null,
-      price: extractedPrice,
-      regular_price: Math.round(extractedPrice * 1.4),
-      video_reel_url: hasReelUrl ? hasReelUrl[0] : null,
-      delivery_fee_inside: 70,
-      delivery_fee_outside: 130,
-      theme_color: 'emerald',
-      highlights: ['১০০% অরিজিনাল কোয়ালিটি', 'ক্যাশ অন ডেলিভারি সুবিধা', 'দ্রুততম হোম ডেলিভারি']
-    }
-  }
-}
+})
