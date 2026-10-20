@@ -371,29 +371,34 @@ const sendMessage = async () => {
       method: 'POST',
       body: {
         messages: messages.value,
-        userMessage: text || 'আমি ছবি দিয়েছি'
+        userMessage: text || 'আমি ছবি দিয়েছি',
+        currentState: { ...extractedData },
+        uploadedImagesCount: allUploadedImages.value.length
       }
     })
 
     if (res && res.reply) {
       if (res.extractedData) {
-        if (res.extractedData.product_title && !extractedData.product_title) {
+        if (res.extractedData.product_title) {
           extractedData.product_title = res.extractedData.product_title
         }
-        if (res.extractedData.price) {
+        if (res.extractedData.price != null) {
           extractedData.price = res.extractedData.price
           extractedData.regular_price = res.extractedData.regular_price || Math.round(res.extractedData.price * 1.4)
         }
-        if (res.extractedData.video_reel_url) {
+        if (res.extractedData.stock != null) {
+          extractedData.stock = res.extractedData.stock
+        }
+        if (res.extractedData.video_reel_url !== undefined) {
           extractedData.video_reel_url = res.extractedData.video_reel_url
         }
-        if (res.extractedData.variants) {
+        if (Array.isArray(res.extractedData.variants)) {
           extractedData.variants = res.extractedData.variants
         }
-        if (res.extractedData.delivery_fee_inside) {
+        if (res.extractedData.delivery_fee_inside != null) {
           extractedData.delivery_fee_inside = res.extractedData.delivery_fee_inside
         }
-        if (res.extractedData.delivery_fee_outside) {
+        if (res.extractedData.delivery_fee_outside != null) {
           extractedData.delivery_fee_outside = res.extractedData.delivery_fee_outside
         }
         if (res.extractedData.theme_color) {
