@@ -23,7 +23,7 @@
           </h1>
 
           <p class="mt-5 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto font-normal leading-relaxed">
-            শুধু product-এর নাম আর দাম দিন। AI বাংলায় সেলস কপি লিখবে, COD order form বানাবে, আর customer-এর প্রশ্নের উত্তর দিতে chatbot বসিয়ে দেবে। Facebook এ ad চালানোর জন্য একদম ready।
+            শুধু product-এর নাম আর দাম দিন। AI অনলাইন স্টোর বানিয়ে দেবে, কাস্টম সেলস AI এজেন্ট সহ। Facebook এ ad চালানোর জন্য একদম ready।
           </p>
         </div>
 
