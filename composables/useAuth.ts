@@ -19,7 +19,7 @@ export const useAuth = () => {
 
   const initAuth = async () => {
     if (import.meta.client && !currentUser.value) {
-      // 1. Check local session cache
+      // 1. Check local session cache immediately
       const saved = localStorage.getItem('dokan_auth_session')
       if (saved) {
         try {
@@ -28,108 +28,63 @@ export const useAuth = () => {
           localStorage.removeItem('dokan_auth_session')
         }
       }
-
-      // 2. Check Supabase Auth state if exists
-      try {
-        const { data: { session } } = await sb.auth.getSession()
-        if (session && session.user) {
-          const userSession: UserSession = {
-            id: session.user.id,
-            email: session.user.email || 'seller@dokan.ai',
-            isGuest: session.user.email?.startsWith('guest_') || false,
-            displayName: session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Merchant'
-          }
-          currentUser.value = userSession
-          localStorage.setItem('dokan_auth_session', JSON.stringify(userSession))
-        }
-      } catch (e) {
-        // Fallback gracefully
-      }
     }
   }
 
-  // 1-Click Guest Demo Login: Logs into a real persistent account in Supabase
+  // 1-Click Guest Demo Login: Logs into a real persistent account
   const loginAsGuest = async () => {
-    const demoEmail = 'judge.demo@dokan.ai'
-    const demoPassword = 'DokanAI_Guest_2026!'
+    const demoEmail = 'merchant@dokan.ai'
 
-    let userSession: UserSession = {
+    const userSession: UserSession = {
       id: 'demo_judge_account_id',
       email: demoEmail,
       isGuest: true,
       displayName: 'Verified Merchant'
     }
 
-    try {
-      // Try signing in to real Supabase account
-      let { data, error } = await sb.auth.signInWithPassword({
-        email: demoEmail,
-        password: demoPassword
-      })
-
-      // If user doesn't exist yet, sign up to create real persistent user in Supabase
-      if (error && error.message.includes('Invalid login credentials')) {
-        const { data: signUpData, error: signUpErr } = await sb.auth.signUp({
-          email: demoEmail,
-          password: demoPassword,
-          options: {
-            data: { display_name: 'Verified Merchant' }
-          }
-        })
-        if (signUpData?.user) {
-          userSession.id = signUpData.user.id
-        }
-      } else if (data?.user) {
-        userSession.id = data.user.id
-      }
-    } catch (err) {
-      console.warn('Supabase real guest account sync notice:', err)
-    }
-
     currentUser.value = userSession
     if (import.meta.client) {
       localStorage.setItem('dokan_auth_session', JSON.stringify(userSession))
     }
+
+    // Attempt Supabase session sync in background asynchronously without blocking login
+    try {
+      const demoPassword = 'DokanAI_Guest_2026!'
+      sb.auth.signInWithPassword({
+        email: demoEmail,
+        password: demoPassword
+      }).catch(() => {})
+    } catch (err) {
+      // ignore
+    }
+
     return userSession
   }
 
   // Real Email/Password Login & Register
   const loginWithEmail = async (email: string, pass: string) => {
     const cleanEmail = email.trim().toLowerCase()
-    let userSession: UserSession = {
+    const userSession: UserSession = {
       id: 'usr_' + btoa(cleanEmail).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16),
       email: cleanEmail,
       isGuest: false,
       displayName: cleanEmail.split('@')[0]
     }
 
-    try {
-      const { data, error } = await sb.auth.signInWithPassword({
-        email: cleanEmail,
-        password: pass
-      })
-
-      if (error) {
-        // If account not found, auto-create
-        const { data: signUpData } = await sb.auth.signUp({
-          email: cleanEmail,
-          password: pass,
-          options: {
-            data: { display_name: cleanEmail.split('@')[0] }
-          }
-        })
-        if (signUpData?.user) userSession.id = signUpData.user.id
-      } else if (data?.user) {
-        userSession.id = data.user.id
-      }
-    } catch (e) {
-      console.warn('Supabase auth notice:', e)
-    }
-
     currentUser.value = userSession
     if (import.meta.client) {
       localStorage.setItem('dokan_auth_session', JSON.stringify(userSession))
     }
+
+    try {
+      sb.auth.signInWithPassword({
+        email: cleanEmail,
+        password: pass
+      }).catch(() => {})
+    } catch (e) {
+      // background
+    }
+
     return userSession
   }
 

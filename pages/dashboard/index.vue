@@ -320,8 +320,8 @@ const selectedStoreFilter = ref('all')
 const stores = ref([])
 const orders = ref([])
 
-onMounted(() => {
-  initAuth()
+onMounted(async () => {
+  await initAuth()
   // Strict Login Check: If not logged in, redirect to login page immediately
   if (!currentUser.value) {
     router.push('/login?redirect=/dashboard')

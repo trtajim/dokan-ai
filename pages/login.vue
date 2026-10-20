@@ -26,10 +26,17 @@
           <button 
             type="button"
             @click="enterAsGuest"
-            class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm shadow-md shadow-emerald-600/30 active:scale-95 transition-all flex items-center justify-center gap-2"
+            :disabled="isGuestLoading"
+            class="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-75 text-white font-black rounded-xl text-sm shadow-md shadow-emerald-600/30 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
-            <span>গেস্ট ডেমো হিসেবে প্রবেশ করুন (Guest Demo)</span>
-            <ArrowRight class="w-4 h-4" />
+            <template v-if="isGuestLoading">
+              <Loader2 class="w-4 h-4 animate-spin text-white" />
+              <span>লগইন হচ্ছে...</span>
+            </template>
+            <template v-else>
+              <span>গেস্ট ডেমো হিসেবে প্রবেশ করুন (Guest Demo)</span>
+              <ArrowRight class="w-4 h-4" />
+            </template>
           </button>
         </div>
 
@@ -64,9 +71,11 @@
 
           <button 
             type="submit" 
-            class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-black rounded-xl transition-all active:scale-95 shadow-md"
+            :disabled="isEmailLoading"
+            class="w-full py-3 bg-slate-900 hover:bg-slate-800 disabled:opacity-75 text-white font-black rounded-xl transition-all active:scale-95 shadow-md flex items-center justify-center gap-2 cursor-pointer"
           >
-            প্রবেশ করুন / অ্যাকাউন্ট খুলুন
+            <Loader2 v-if="isEmailLoading" class="w-4 h-4 animate-spin text-white" />
+            <span>{{ isEmailLoading ? 'প্রবেশ করা হচ্ছে...' : 'প্রবেশ করুন / অ্যাকাউন্ট খুলুন' }}</span>
           </button>
         </form>
 
@@ -77,7 +86,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Zap, ArrowRight } from 'lucide-vue-next'
+import { Zap, ArrowRight, Loader2 } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 
 const { loginAsGuest, loginWithEmail } = useAuth()
@@ -86,17 +95,30 @@ const route = useRoute()
 
 const email = ref('')
 const password = ref('')
+const isGuestLoading = ref(false)
+const isEmailLoading = ref(false)
 
-const enterAsGuest = () => {
-  loginAsGuest()
-  const redirect = (route.query.redirect as string) || '/dashboard'
-  router.push(redirect)
+const enterAsGuest = async () => {
+  if (isGuestLoading.value) return
+  isGuestLoading.value = true
+  try {
+    await loginAsGuest()
+    const redirect = (route.query.redirect as string) || '/dashboard'
+    await router.push(redirect)
+  } finally {
+    isGuestLoading.value = false
+  }
 }
 
 const handleEmailLogin = async () => {
-  if (!email.value) return
-  await loginWithEmail(email.value, password.value)
-  const redirect = (route.query.redirect as string) || '/dashboard'
-  router.push(redirect)
+  if (!email.value || isEmailLoading.value) return
+  isEmailLoading.value = true
+  try {
+    await loginWithEmail(email.value, password.value)
+    const redirect = (route.query.redirect as string) || '/dashboard'
+    await router.push(redirect)
+  } finally {
+    isEmailLoading.value = false
+  }
 }
 </script>
