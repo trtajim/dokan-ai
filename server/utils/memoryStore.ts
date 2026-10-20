@@ -45,10 +45,15 @@ declare global {
   var __dokan_stores: Map<string, StoreRecord> | undefined
   var __dokan_orders: OrderRecord[] | undefined
   var __dokan_deleted_slugs: Set<string> | undefined
+  var __dokan_user_telegram: Map<string, string> | undefined
 }
 
 if (!globalThis.__dokan_deleted_slugs) {
   globalThis.__dokan_deleted_slugs = new Set<string>()
+}
+
+if (!globalThis.__dokan_user_telegram) {
+  globalThis.__dokan_user_telegram = new Map<string, string>()
 }
 
 if (!globalThis.__dokan_stores) {
@@ -179,5 +184,15 @@ export const memoryStore = {
       return order
     }
     return null
+  },
+  getUserTelegramChatId: (userId: string) => {
+    return globalThis.__dokan_user_telegram?.get(userId) || null
+  },
+  setUserTelegramChatId: (userId: string, chatId: string | null) => {
+    if (!chatId) {
+      globalThis.__dokan_user_telegram?.delete(userId)
+    } else {
+      globalThis.__dokan_user_telegram?.set(userId, chatId)
+    }
   }
 }

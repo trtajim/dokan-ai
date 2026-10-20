@@ -4,11 +4,26 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
       
-      <!-- Top Title -->
+      <!-- Top Title & Account Actions -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">মার্চেন্ট ড্যাশবোর্ড</h1>
           <p class="text-xs sm:text-sm text-slate-500 mt-1">আপনার সকল সক্রিয় দোকান, লাইভ স্টক ও কাস্টমারদের ক্যাশ অন ডেলিভারি অর্ডার তালিকা</p>
+        </div>
+
+        <!-- Account-Wide Telegram Alerts Button -->
+        <div class="shrink-0">
+          <button 
+            @click="openAccountTelegramModal"
+            class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all shadow-xs cursor-pointer border"
+            :class="userTelegramChatId ? 'bg-sky-50 hover:bg-sky-100 text-sky-800 border-sky-300' : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'"
+          >
+            <div class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0" :class="userTelegramChatId ? 'bg-sky-500 text-white' : 'bg-slate-100 text-slate-500'">
+              <Send class="w-3.5 h-3.5" />
+            </div>
+            <span>{{ userTelegramChatId ? 'টেলিগ্রাম নোটিফিকেশন অন' : 'টেলিগ্রাম নোটিফিকেশন যুক্ত করুন' }}</span>
+            <span v-if="userTelegramChatId" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          </button>
         </div>
       </div>
 
@@ -474,7 +489,7 @@
       </div>
     </div>
 
-    <!-- Custom Modal: Telegram 1-Click Setup -->
+    <!-- Custom Modal: Telegram Account-Wide 1-Click Setup -->
     <div v-if="telegramModal.isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
       <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in-95 duration-200">
         <div class="flex items-center justify-between">
@@ -489,30 +504,31 @@
         <div>
           <h3 class="text-base font-black text-slate-900">টেলিগ্রাম অর্ডার নোটিফিকেশন</h3>
           <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-            দোকান: <span class="font-bold text-slate-800">{{ telegramModal.store?.product_title }}</span>
+            মার্চেন্ট অ্যাকাউন্ট: <span class="font-bold text-slate-800">{{ currentUser?.displayName || 'মার্চেন্ট' }}</span>
           </p>
         </div>
 
         <!-- If bot username configured in env -->
         <div v-if="telegramBotUsername" class="space-y-3 text-xs">
           <!-- Active Status Banner if already connected -->
-          <div v-if="telegramModal.store?.config?.telegram_chat_id" class="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-2.5 text-emerald-800">
-            <div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0">
-              <CheckCircle2 class="w-4 h-4" />
+          <div v-if="userTelegramChatId" class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-900">
+            <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0">
+              <CheckCircle2 class="w-5 h-5" />
             </div>
             <div>
               <span class="font-bold text-xs block">টেলিগ্রাম সফলভাবে কানেক্টেড!</span>
-              <span class="text-[10px] text-emerald-700">Chat ID: {{ telegramModal.store?.config?.telegram_chat_id }}</span>
+              <span class="text-[11px] text-emerald-700">Chat ID: {{ userTelegramChatId }}</span>
+              <p class="text-[10px] text-slate-500 mt-0.5">আপনার সকল দোকানের অর্ডার এই টেলিগ্রামে আসবে।</p>
             </div>
           </div>
 
-          <div v-else class="p-3 bg-sky-50/70 border border-sky-100 rounded-2xl space-y-2">
+          <div v-else class="p-3.5 bg-sky-50/70 border border-sky-100 rounded-2xl space-y-2">
             <span class="font-bold text-sky-900 block">⚡ ১-ক্লিক অটোমেটিক কানেক্ট:</span>
             <p class="text-slate-600 leading-relaxed text-[11px]">
-              নিচের বাটনে ক্লিক করে টেলিগ্রাম বটে প্রবেশ করুন এবং <strong>START</strong> চাপুন। সাথে সাথে এখানে কানেক্টেড স্ট্যাটাস চলে আসবে!
+              নিচের বাটনে ক্লিক করে টেলিগ্রাম বটে প্রবেশ করে <strong>START</strong> চাপুন। আপনার অ্যাকাউন্টের <b>সকল দোকানের</b> নতুন অর্ডারের নোটিফিকেশন সরাসরি টেলিগ্রামে চলে আসবে!
             </p>
             <a 
-              :href="`https://t.me/${telegramBotUsername}?start=store_${telegramModal.store?.slug}`"
+              :href="`https://t.me/${telegramBotUsername}?start=user_${currentUser?.id || 'demo_judge_account_id'}`"
               target="_blank"
               class="w-full py-2.5 px-3 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95 text-center text-xs"
             >
@@ -550,11 +566,11 @@
 
         <div class="flex items-center justify-between pt-2 border-t border-slate-100">
           <button
-            v-if="telegramModal.store?.config?.telegram_chat_id"
+            v-if="userTelegramChatId"
             @click="disconnectTelegram"
             class="text-[11px] font-bold text-rose-600 hover:underline cursor-pointer"
           >
-            ডিসকানেক্ট
+            ডিসকানেক্ট করুন
           </button>
           <div v-else></div>
 
@@ -766,6 +782,8 @@ const telegramModal = reactive({
   isSubmitting: false
 })
 
+const userTelegramChatId = ref(null)
+
 const runtimeConfig = useRuntimeConfig()
 const telegramBotUsername = computed(() => runtimeConfig.public?.telegramBotUsername || '')
 
@@ -791,12 +809,21 @@ onMounted(async () => {
 const refreshData = async () => {
   isRefreshing.value = true
   try {
-    const [storesRes, ordersRes] = await Promise.all([
+    const promises = [
       $fetch('/api/stores'),
       $fetch('/api/orders')
-    ])
+    ]
+
+    const uid = currentUser.value?.id || 'demo_judge_account_id'
+    promises.push($fetch(`/api/user/settings?user_id=${uid}`))
+
+    const [storesRes, ordersRes, userSettingsRes] = await Promise.all(promises)
     let loadedStores = storesRes?.stores || []
     
+    if (userSettingsRes?.telegram_chat_id) {
+      userTelegramChatId.value = userSettingsRes.telegram_chat_id
+    }
+
     // Filter out client-side deleted stores
     if (import.meta.client) {
       try {
@@ -910,30 +937,24 @@ const openPixelModal = (st) => {
 
 let telegramPollingTimer = null
 
-const openTelegramModal = (st) => {
-  telegramModal.store = st
-  telegramModal.chatId = st.config?.telegram_chat_id || ''
+const openAccountTelegramModal = () => {
+  telegramModal.chatId = userTelegramChatId.value || ''
   telegramModal.isOpen = true
 
-  // Auto-poll store status every 2.5s while modal is open to detect when user taps START in Telegram
+  // Auto-poll user settings while modal is open
   if (telegramPollingTimer) clearInterval(telegramPollingTimer)
   telegramPollingTimer = setInterval(async () => {
-    if (!telegramModal.isOpen || !telegramModal.store) {
+    if (!telegramModal.isOpen) {
       clearInterval(telegramPollingTimer)
       return
     }
     try {
-      const res = await $fetch(`/api/stores?slug=${telegramModal.store.slug}`)
-      if (res && res.store?.config?.telegram_chat_id) {
-        const foundId = res.store.config.telegram_chat_id
-        if (foundId !== telegramModal.store.config?.telegram_chat_id) {
-          telegramModal.store.config.telegram_chat_id = foundId
-          telegramModal.chatId = foundId
-          const match = stores.value.find(s => s.slug === telegramModal.store.slug)
-          if (match) {
-            if (!match.config) match.config = {}
-            match.config.telegram_chat_id = foundId
-          }
+      const uid = currentUser.value?.id || 'demo_judge_account_id'
+      const res = await $fetch(`/api/user/settings?user_id=${uid}`)
+      if (res && res.telegram_chat_id) {
+        if (res.telegram_chat_id !== userTelegramChatId.value) {
+          userTelegramChatId.value = res.telegram_chat_id
+          telegramModal.chatId = res.telegram_chat_id
           toast.success('টেলিগ্রাম কানেকশন সফল হয়েছে!')
         }
       }
@@ -941,25 +962,25 @@ const openTelegramModal = (st) => {
   }, 2500)
 }
 
+const openTelegramModal = (st) => {
+  openAccountTelegramModal()
+}
+
 const confirmTelegramUpdate = async () => {
-  if (!telegramModal.store) return
   const cleanChatId = telegramModal.chatId.trim()
   telegramModal.isSubmitting = true
+  const uid = currentUser.value?.id || 'demo_judge_account_id'
+
   try {
-    await $fetch('/api/stores', {
+    await $fetch('/api/user/settings', {
       method: 'PATCH',
       body: {
-        slug: telegramModal.store.slug,
+        user_id: uid,
         telegram_chat_id: cleanChatId || null
       }
     })
 
-    const match = stores.value.find(s => s.slug === telegramModal.store.slug)
-    if (match) {
-      if (!match.config) match.config = {}
-      match.config.telegram_chat_id = cleanChatId || null
-    }
-
+    userTelegramChatId.value = cleanChatId || null
     telegramModal.isOpen = false
     if (cleanChatId) {
       toast.success('টেলিগ্রাম চ্যাট আইডি সফলভাবে সেভ করা হয়েছে!')
@@ -974,7 +995,6 @@ const confirmTelegramUpdate = async () => {
 }
 
 const disconnectTelegram = async () => {
-  if (!telegramModal.store) return
   telegramModal.chatId = ''
   await confirmTelegramUpdate()
 }

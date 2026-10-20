@@ -125,16 +125,18 @@ export default defineEventHandler(async (event) => {
 
     memoryStore.addOrder(newOrder)
 
-    // Send Telegram Notification to Merchant if chat_id is configured
+    // Send Telegram Notification to Merchant (Account-wise or Store-wise)
     try {
       let storeConfig: any = null
       let storeTitle: string = store_slug
+      let userId: string | null = null
 
       if (supabase) {
-        const { data: storeData } = await supabase.from('stores').select('product_title, config').eq('slug', store_slug).single()
+        const { data: storeData } = await supabase.from('stores').select('user_id, product_title, config').eq('slug', store_slug).single()
         if (storeData) {
           storeConfig = storeData.config
           storeTitle = storeData.product_title || store_slug
+          userId = storeData.user_id || storeData.config?.user_id
         }
       }
       if (!storeConfig) {
@@ -142,10 +144,27 @@ export default defineEventHandler(async (event) => {
         if (mem) {
           storeConfig = mem.config
           storeTitle = mem.product_title || store_slug
+          userId = mem.user_id || mem.config?.user_id
         }
       }
 
-      const telegramChatId = storeConfig?.telegram_chat_id
+      // Check account-wise telegram chat id first, then fallback to store config
+      let telegramChatId = userId ? memoryStore.getUserTelegramChatId(userId) : null
+      
+      if (!telegramChatId && userId && supabase) {
+        try {
+          const { data: profile } = await supabase.from('profiles').select('telegram_chat_id').eq('id', userId).single()
+          if (profile?.telegram_chat_id) {
+            telegramChatId = String(profile.telegram_chat_id)
+            memoryStore.setUserTelegramChatId(userId, telegramChatId)
+          }
+        } catch (e) {}
+      }
+
+      if (!telegramChatId) {
+        telegramChatId = storeConfig?.telegram_chat_id
+      }
+
       if (telegramChatId) {
         const msgText = formatOrderTelegramMessage({
           store_title: storeTitle,
