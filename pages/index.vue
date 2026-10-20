@@ -12,19 +12,18 @@
         <div class="text-center max-w-3xl mx-auto">
           <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-6 shadow-xs">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-            <span>বাংলাদেশের প্রথম সেলফ-ড্রাইভিং COD ল্যান্ডিং পেজ প্ল্যাটফর্ম</span>
+            <span>Single product বিক্রি করার সবচেয়ে সহজ উপায়</span>
           </div>
 
           <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.18] font-serif-bn">
-            ওয়ার্ডপ্রেস বা কোডিং ছাড়াই <br />
+            Product-এর নাম দিন, <br />
             <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700">
-              হাইপার-কনভার্টিং ল্যান্ডিং পেজ
+              AI বানিয়ে দেবে আপনার অনলাইন স্টোর
             </span>
           </h1>
 
           <p class="mt-5 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto font-normal leading-relaxed">
-            ফেসবুক ও টিকটক বিজ্ঞাপনের জন্য সবচেয়ে দ্রুতগতির সিঙ্গেল প্রোডাক্ট স্টোর। 
-            শুধুমাত্র প্রডাক্টের নাম বলুন — AI স্বয়ংক্রিয়ভাবে তৈরি করবে হাই-কনভার্টিং বাংলা কপি, ক্যাশ অন ডেলিভারি ফর্ম এবং সেলস চ্যাটবট।
+            শুধু product-এর নাম আর দাম দিন। AI বাংলায় সেলস কপি লিখবে, COD order form বানাবে, আর customer-এর প্রশ্নের উত্তর দিতে chatbot বসিয়ে দেবে। Facebook এ ad চালানোর জন্য একদম ready।
           </p>
         </div>
 
@@ -85,7 +84,7 @@
               class="w-full sm:w-auto px-9 py-4 text-base sm:text-lg font-black text-white bg-emerald-600 hover:bg-emerald-700 active:scale-95 rounded-2xl shadow-xl shadow-emerald-600/30 transition-all flex items-center justify-center gap-2.5 cursor-pointer"
             >
               <Rocket class="w-5 h-5" />
-              <span>AI দিয়ে ফ্রি স্টোর তৈরি করুন</span>
+              <span>ফ্রিতে অনলাইন স্টোর বানান</span>
               <ArrowRight class="w-5 h-5" />
             </NuxtLink>
 
@@ -95,12 +94,12 @@
               class="w-full sm:w-auto px-7 py-4 text-sm sm:text-base font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-2xl shadow-xs transition-all flex items-center justify-center gap-2"
             >
               <ExternalLink class="w-4 h-4 text-slate-500" />
-              <span>লাইভ ডেমো স্টোর দেখুন</span>
+              <span>Demo স্টোর দেখুন</span>
             </NuxtLink>
           </div>
 
           <p class="mt-3 text-xs text-slate-500 font-medium">
-            ⚡ কোনো ক্রেডিট কার্ড বা হোস্টিং চার্জ প্রয়োজন নেই · ৩০ সেকেন্ডেই লাইভ
+            ⚡ Credit card লাগবে না, hosting খরচ নেই। ৩০ সেকেন্ডে live
           </p>
         </div>
 
