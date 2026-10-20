@@ -103,12 +103,23 @@
                       </strong>
                     </div>
 
+                    <div class="flex items-center justify-between border-b border-slate-200/60 pb-1">
+                      <span class="text-slate-500">📊 প্রাথমিক স্টক:</span>
+                      <strong class="text-slate-800">{{ extractedData.stock || 50 }} টি</strong>
+                    </div>
+
                     <div class="flex items-center justify-between pt-0.5">
                       <span class="text-slate-500">🚚 ডেলিভারি চার্জ:</span>
                       <span class="text-slate-800 font-semibold">
                         ভেতরে ৳{{ extractedData.delivery_fee_inside }} | বাইরে ৳{{ extractedData.delivery_fee_outside }}
                       </span>
                     </div>
+                  </div>
+
+                  <!-- Helpful reminder -->
+                  <div class="flex items-center gap-1.5 px-2 py-1.5 bg-amber-50/80 border border-amber-200/70 rounded-lg text-[10px] text-amber-800 font-medium">
+                    <span>💡</span>
+                    <span>এখন কন্টিনিউ করলেও যেকোনো তথ্য পরবর্তীতে ড্যাশবোর্ড থেকে পরিবর্তন করতে পারবেন।</span>
                   </div>
 
                   <button 
@@ -266,6 +277,7 @@ const extractedData = reactive({
   product_title: '',
   price: null,
   regular_price: null,
+  stock: 50,
   delivery_fee_inside: 70,
   delivery_fee_outside: 130,
   theme_color: 'emerald',
@@ -420,6 +432,7 @@ const generateFullStore = async () => {
         product_title: extractedData.product_title || 'প্রিমিয়াম স্পেশাল প্রোডাক্ট',
         price: extractedData.price || 999,
         regular_price: extractedData.regular_price || 1400,
+        stock: extractedData.stock || 50,
         delivery_fee_inside: extractedData.delivery_fee_inside || 70,
         delivery_fee_outside: extractedData.delivery_fee_outside || 130,
         video_reel_url: extractedData.video_reel_url || '',
