@@ -43,9 +43,9 @@
             লগইন
           </NuxtLink>
 
-          <NuxtLink to="/login" class="px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all flex items-center gap-1 shadow-sm">
-            <span>গেস্ট ডেমো</span>
-            <ArrowRight class="w-3.5 h-3.5 text-emerald-400" />
+          <NuxtLink to="/create" class="px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all flex items-center gap-1 shadow-sm">
+            <span>শুরু করুন</span>
+            <ArrowRight class="w-3.5 h-3.5 text-white" />
           </NuxtLink>
         </template>
       </div>

@@ -57,7 +57,7 @@ export const useAuth = () => {
       id: 'demo_judge_account_id',
       email: demoEmail,
       isGuest: true,
-      displayName: 'Judge / Demo Merchant'
+      displayName: 'Verified Merchant'
     }
 
     try {
@@ -73,7 +73,7 @@ export const useAuth = () => {
           email: demoEmail,
           password: demoPassword,
           options: {
-            data: { display_name: 'Judge / Demo Merchant' }
+            data: { display_name: 'Verified Merchant' }
           }
         })
         if (signUpData?.user) {

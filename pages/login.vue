@@ -18,17 +18,17 @@
         <div class="p-5 bg-gradient-to-tr from-emerald-50 via-teal-50 to-emerald-50 border-2 border-emerald-300 rounded-2xl text-center space-y-2.5 shadow-sm">
           <div class="inline-flex items-center gap-1.5 text-xs font-black text-emerald-800 uppercase tracking-wider">
             <Zap class="w-4 h-4 text-emerald-600 fill-emerald-600" />
-            <span>বিচারক ও পরীক্ষার্থীদের জন্য তাৎক্ষণিক ডেমো</span>
+            <span>গেস্ট ডেমো লগইন</span>
           </div>
           <p class="text-xs text-slate-600 leading-relaxed font-medium">
-            কোনো ইমেইল পাসওয়ার্ড ছাড়াই সরাসরি ডেমো অ্যাকাউন্ট দিয়ে একাধিক দোকান তৈরি ও পরিচালনা পরীক্ষা করুন।
+            পাসওয়ার্ড ছাড়া সরাসরি এক ক্লিকে পরীক্ষামূলক মার্চেন্ট হিসেবে ড্যাশবোর্ড ও শপ ফিচার যাচাই করুন।
           </p>
           <button 
             type="button"
             @click="enterAsGuest"
             class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm shadow-md shadow-emerald-600/30 active:scale-95 transition-all flex items-center justify-center gap-2"
           >
-            <span>গেস্ট হিসেবে প্রবেশ করুন (Enter as Guest Demo)</span>
+            <span>গেস্ট ডেমো হিসেবে প্রবেশ করুন (Guest Demo)</span>
             <ArrowRight class="w-4 h-4" />
           </button>
         </div>
