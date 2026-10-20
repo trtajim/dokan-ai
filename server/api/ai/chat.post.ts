@@ -52,10 +52,11 @@ Store Information:
 
 Rules:
 1. Always reply in clear, polite Bengali (you can use natural Banglish words like 'order', 'delivery', 'check').
-2. Keep answers short and concise (1 to 2 sentences maximum).
-3. Always use the EXACT delivery fees mentioned above (Inside Dhaka: ৳${insideFee}, Outside Dhaka: ৳${outsideFee}). NEVER hallucinate other charges!
-4. If they ask about buying or ordering, enthusiastically tell them to click the order button or fill in the short form below on the page.
-5. Do not make up fake specs not mentioned above.`
+2. Keep answers direct, friendly, and very concise (1 to 2 sentences maximum).
+3. Always provide direct answers without unnecessary filler details or boilerplate explanations.
+4. DO NOT say "অর্ডার করতে চাইলে নিচের অর্ডার বাটনটিতে ক্লিক করে ফর্মটি পূরণ করুন" or instruct them to click the order button, because an interactive order button is already automatically attached below the message.
+5. Always use the EXACT delivery fees mentioned above (Inside Dhaka: ৳${insideFee}, Outside Dhaka: ৳${outsideFee}). NEVER hallucinate other charges!
+6. Do not make up fake specs not mentioned above.`
 
       const contents: any[] = [{ role: 'user', parts: [{ text: systemPrompt }] }]
       if (Array.isArray(history)) {
@@ -75,7 +76,7 @@ Rules:
 
       return {
         success: true,
-        reply: response.text || 'ধন্যবাদ! অর্ডার করতে নিচের ফর্মে আপনার নাম ও ঠিকানা লিখে সাবমিট করুন।'
+        reply: response.text || 'ধন্যবাদ! আপনার কোনো প্রশ্ন থাকলে জানাতে পারেন।'
       }
     } catch (err: any) {
       console.error('Chat Gemini error:', err)
@@ -86,16 +87,16 @@ Rules:
   const lower = message.toLowerCase()
   const insideFeeFallback = Number(store.config?.delivery_fee_inside || store.delivery_fee_inside) || 70
   const outsideFeeFallback = Number(store.config?.delivery_fee_outside || store.delivery_fee_outside) || 130
-  let reply = 'ধন্যবাদ আপনার মেসেজের জন্য! আমাদের প্রতিনিধি খুব দ্রুত যোগাযোগ করবেন। অর্ডার করতে সরাসরি নিচের ফর্মে নাম ও মোবাইল নম্বর দিয়ে কনফার্ম করুন।'
+  let reply = 'ধন্যবাদ! আপনার যেকোনো প্রশ্ন থাকলে নির্ভয়ে জানাতে পারেন।'
 
   if (lower.includes('price') || lower.includes('দাম') || lower.includes('কত') || lower.includes('koto')) {
-    reply = `প্রোডাক্টটির স্পেশাল ডিসকাউন্ট মূল্য মাত্র ৳${store.price} (আগের মূল্য ছিল ৳${store.regular_price || Math.round(store.price * 1.4)})। স্টক সীমিত সময়ের জন্য এই অফার চলছে!`
+    reply = `প্রোডাক্টটির স্পেশাল অফার মূল্য মাত্র ৳${store.price} (রেগুলার মূল্য ছিল ৳${store.regular_price || Math.round(store.price * 1.4)})।`
   } else if (lower.includes('delivery') || lower.includes('চার্জ') || lower.includes('কবে') || lower.includes('charge')) {
-    reply = `ক্যাশ অন ডেলিভারিতে পাবেন! ঢাকার ভেতরে ডেলিভারি চার্জ ${insideFeeFallback} টাকা (১-২ দিন) এবং ঢাকার বাইরে ${outsideFeeFallback} টাকা (২-৩ দিন)। পণ্য দেখে মূল্য পরিশোধের সুবিধা রয়েছে।`
+    reply = `ক্যাশ অন ডেলিভারিতে পাবেন—ঢাকার ভেতরে ডেলিভারি চার্জ ${insideFeeFallback} টাকা এবং ঢাকার বাইরে ${outsideFeeFallback} টাকা। পার্সেল খুলে চেক করে টাকা পরিশোধ করতে পারবেন।`
   } else if (lower.includes('original') || lower.includes('অরিজিনাল') || lower.includes('গ্যারান্টি') || lower.includes('check')) {
-    reply = `জি, এটি ১০০% অরিজিনাল ও পরীক্ষিত প্রোডাক্ট। ডেলিভারি ম্যানের সামনে প্যাকেট খুলে চেক করে টাকা পরিশোধ করতে পারবেন এবং ৭ দিনের রিপ্লেসমেন্ট পলিসি রয়েছে।`
+    reply = `জি, এটি শতভাগ অরিজিনাল কোয়ালিটি সম্পন্ন প্রোডাক্ট এবং সাথে ৭ দিনের রিপ্লেসমেন্ট সুবিধা পাবেন।`
   } else if (lower.includes('order') || lower.includes('অর্ডার') || lower.includes('নিব') || lower.includes('কিনব')) {
-    reply = `অর্ডার করতে পেজের নিচে দেওয়া ছোট্ট ফর্মে আপনার নাম, মোবাইল নম্বর ও ঠিকানা লিখে "অর্ডার কনফার্ম করুন" বাটনে চাপ দিন। কোনো অগ্রিম টাকা লাগবে না!`
+    reply = `ক্যাশ অন ডেলিভারিতে কোনো অগ্রিম পেমেন্ট ছাড়াই অর্ডার করতে পারবেন।`
   }
 
   return {
