@@ -1,5 +1,5 @@
 <template>
-  <div v-if="pending" class="min-h-screen flex items-center justify-center bg-slate-50">
+  <div v-if="pending && !store" class="min-h-screen flex items-center justify-center bg-slate-50">
     <div class="text-center space-y-3">
       <div class="w-10 h-10 border-4 border-slate-300 border-t-emerald-600 rounded-full animate-spin mx-auto"></div>
       <p class="text-xs sm:text-sm font-bold text-slate-600">দোকান প্রস্তুত হচ্ছে...</p>
@@ -531,7 +531,6 @@ const submitAiEdit = async () => {
         response: res.reply,
         suggestions: res.suggestions || []
       })
-      await refresh()
       await nextTick()
       if (editorScroll.value) {
         editorScroll.value.scrollTop = editorScroll.value.scrollHeight
