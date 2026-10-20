@@ -103,6 +103,9 @@ export const memoryStore = {
     if (!slug) return globalThis.__dokan_orders || []
     return (globalThis.__dokan_orders || []).filter(o => o.store_slug === slug)
   },
+  getOrder: (orderId: string) => {
+    return (globalThis.__dokan_orders || []).find(o => o.id === orderId) || null
+  },
   addOrder: (order: OrderRecord) => {
     globalThis.__dokan_orders?.unshift(order)
     return order
