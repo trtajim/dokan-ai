@@ -7,8 +7,13 @@
       <!-- Top Title & Quick Actions -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">মার্চেন্ট ড্যাশবোর্ড</h1>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1">আপনার স্টোরসমূহ, লাইভ স্টক ও কাস্টমারদের ক্যাশ অন ডেলিভারি অর্ডার তালিকা</p>
+          <div class="flex items-center gap-2">
+            <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">মার্চেন্ট ড্যাশবোর্ড</h1>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-700">
+              {{ currentUser?.displayName }}
+            </span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">আপনার সকল সক্রিয় দোকান, লাইভ স্টক ও কাস্টমারদের ক্যাশ অন ডেলিভারি অর্ডার তালিকা</p>
         </div>
 
         <div class="flex items-center gap-3">
@@ -19,7 +24,7 @@
 
           <NuxtLink to="/create" class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm flex items-center gap-1.5 transition-all">
             <Plus class="w-4 h-4" />
-            <span>নতুন দোকান বানান</span>
+            <span>নতুন আরেকটি দোকান বানান</span>
           </NuxtLink>
         </div>
       </div>
@@ -42,7 +47,7 @@
             <span class="text-xs font-bold uppercase tracking-wider text-slate-500">মোট অর্ডার</span>
             <ShoppingBag class="w-5 h-5 text-indigo-600" />
           </div>
-          <div class="text-2xl sm:text-3xl font-black text-slate-900">{{ orders.length }}</div>
+          <div class="text-2xl sm:text-3xl font-black text-slate-900">{{ filteredOrdersByStore.length }}</div>
           <span class="text-[11px] text-slate-500 font-semibold mt-1 block">সর্বমোট প্রাপ্ত অর্ডার</span>
         </div>
 
@@ -59,29 +64,52 @@
         <!-- Stores Count -->
         <div class="p-5 bg-white rounded-2xl border border-slate-200/90 shadow-sm">
           <div class="flex items-center justify-between text-slate-400 mb-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">সক্রিয় দোকান</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">আপনার সক্রিয় দোকান</span>
             <Store class="w-5 h-5 text-teal-600" />
           </div>
-          <div class="text-2xl sm:text-3xl font-black text-slate-900">{{ stores.length }}</div>
-          <span class="text-[11px] text-teal-600 font-semibold mt-1 block">লাইভ লিঙ্ক সক্রিয়</span>
+          <div class="text-2xl sm:text-3xl font-black text-slate-900">{{ userStores.length }}</div>
+          <span class="text-[11px] text-teal-600 font-semibold mt-1 block">একাধিক ওয়েবসাইট ম্যানেজ করুন</span>
         </div>
       </div>
 
-      <!-- Active Stores Shelf & Live Stock Management -->
+      <!-- Multi-Store Shelf & Live Stock Management -->
       <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm space-y-4">
-        <div class="flex items-center justify-between">
-          <h2 class="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
-            <Boxes class="w-4 h-4 text-emerald-600" />
-            <span>সক্রিয় দোকান ও লাইভ স্টক ম্যানেজমেন্ট</span>
-          </h2>
-          <span class="text-xs text-slate-400">স্টক আপডেট করলে কাস্টমার পেজে রিয়েলটাইম পরিবর্তন হবে</span>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 class="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
+              <Boxes class="w-4 h-4 text-emerald-600" />
+              <span>আপনার পরিচালিত দোকানসমূহ ({{ userStores.length }} টি স্টোর)</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">যে কোনো স্টোরে ক্লিক করে নির্দিষ্ট অর্ডার তালিকা ফিল্টার করুন</p>
+          </div>
+
+          <!-- Store Switcher Filter -->
+          <div class="flex items-center gap-1.5 overflow-x-auto text-xs">
+            <button 
+              @click="selectedStoreFilter = 'all'"
+              class="px-3 py-1.5 rounded-lg font-bold transition-colors"
+              :class="selectedStoreFilter === 'all' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+            >
+              সকল দোকান
+            </button>
+            <button 
+              v-for="st in userStores"
+              :key="st.id"
+              @click="selectedStoreFilter = st.slug"
+              class="px-3 py-1.5 rounded-lg font-bold transition-colors truncate max-w-[140px]"
+              :class="selectedStoreFilter === st.slug ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+            >
+              {{ st.product_title }}
+            </button>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div 
-            v-for="st in stores" 
+            v-for="st in userStores" 
             :key="st.id" 
-            class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between gap-3 hover:border-slate-300 transition-colors"
+            class="p-4 rounded-2xl bg-slate-50 border-2 transition-all flex flex-col justify-between gap-3"
+            :class="selectedStoreFilter === st.slug ? 'border-emerald-500 shadow-sm bg-emerald-50/20' : 'border-slate-200/80 hover:border-slate-300'"
           >
             <div>
               <div class="flex items-center justify-between gap-2">
@@ -149,17 +177,19 @@
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
               <span>লাইভ ক্যাশ অন ডেলিভারি অর্ডার তালিকা</span>
             </h2>
-            <p class="text-xs text-slate-500 mt-0.5">গ্রাহকের ফোন নম্বরে কল দিয়ে কনফার্ম করুন</p>
+            <p class="text-xs text-slate-500 mt-0.5">
+              {{ selectedStoreFilter === 'all' ? 'সকল দোকানের সম্মিলিত অর্ডার' : `ফিল্টার্ড স্টোর: /shop/${selectedStoreFilter}` }}
+            </p>
           </div>
 
-          <!-- Filter buttons -->
+          <!-- Status Filter buttons -->
           <div class="flex items-center gap-1.5 overflow-x-auto text-xs">
             <button 
               v-for="flt in ['all', 'pending', 'confirmed', 'shipped']" 
               :key="flt"
-              @click="activeFilter = flt"
+              @click="activeStatusFilter = flt"
               class="px-3 py-1.5 rounded-lg font-bold capitalize transition-colors"
-              :class="activeFilter === flt ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+              :class="activeStatusFilter === flt ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
             >
               {{ flt }}
             </button>
@@ -173,6 +203,7 @@
               <tr>
                 <th class="py-3 px-4">কাস্টমার</th>
                 <th class="py-3 px-4">ফোন নম্বর</th>
+                <th class="py-3 px-4">দোকান ও ভ্যারিয়েন্ট</th>
                 <th class="py-3 px-4">ঠিকানা ও এরিয়া</th>
                 <th class="py-3 px-4">পরিমাণ ও মোট বিল</th>
                 <th class="py-3 px-4">স্ট্যাটাস</th>
@@ -180,12 +211,12 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
-              <tr v-if="filteredOrders.length === 0">
-                <td colspan="6" class="py-12 text-center text-slate-400 font-semibold">
+              <tr v-if="finalDisplayOrders.length === 0">
+                <td colspan="7" class="py-12 text-center text-slate-400 font-semibold">
                   কোনো অর্ডার খুঁজে পাওয়া যায়নি।
                 </td>
               </tr>
-              <tr v-for="order in filteredOrders" :key="order.id" class="hover:bg-slate-50/60 transition-colors">
+              <tr v-for="order in finalDisplayOrders" :key="order.id" class="hover:bg-slate-50/60 transition-colors">
                 <!-- Customer Name -->
                 <td class="py-3.5 px-4">
                   <div class="font-bold text-slate-900">{{ order.customer_name }}</div>
@@ -200,11 +231,19 @@
                   </a>
                 </td>
 
+                <!-- Store & Variant -->
+                <td class="py-3.5 px-4">
+                  <div class="text-xs font-bold text-slate-800">/shop/{{ order.store_slug }}</div>
+                  <span v-if="order.selected_variant" class="text-[11px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold">
+                    {{ order.selected_variant }}
+                  </span>
+                </td>
+
                 <!-- Address -->
                 <td class="py-3.5 px-4 max-w-xs">
                   <div class="truncate text-xs">{{ order.customer_address }}</div>
                   <span class="text-[10px] px-2 py-0.5 rounded font-bold" :class="order.delivery_zone === 'outside_dhaka' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'">
-                    {{ order.delivery_zone === 'outside_dhaka' ? 'ঢাকার বাইরে (৳130)' : 'ঢাকার ভিতরে (৳70)' }}
+                    {{ order.delivery_zone === 'outside_dhaka' ? 'ঢাকার বাইরে' : 'ঢাকার ভিতরে' }}
                   </span>
                 </td>
 
@@ -269,12 +308,29 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { RefreshCw, Plus, Banknote, ShoppingBag, Clock, Store, Boxes, Copy, ExternalLink, PhoneCall, Trash2 } from 'lucide-vue-next'
+import { useAuth } from '~/composables/useAuth'
+
+const { currentUser, initAuth } = useAuth()
+const router = useRouter()
 
 const isRefreshing = ref(false)
-const activeFilter = ref('all')
+const activeStatusFilter = ref('all')
+const selectedStoreFilter = ref('all')
 
 const stores = ref([])
 const orders = ref([])
+
+onMounted(() => {
+  initAuth()
+  // Strict Login Check: If not logged in, redirect to login page immediately
+  if (!currentUser.value) {
+    router.push('/login?redirect=/dashboard')
+    return
+  }
+  refreshData()
+  const interval = setInterval(refreshData, 15000)
+  onUnmounted(() => clearInterval(interval))
+})
 
 const refreshData = async () => {
   isRefreshing.value = true
@@ -291,6 +347,31 @@ const refreshData = async () => {
     isRefreshing.value = false
   }
 }
+
+// User stores list (supports managing multiple stores)
+const userStores = computed(() => {
+  if (!currentUser.value) return []
+  // If demo guest, show all demo/guest stores; if custom user, filter by user_id or show all user stores
+  if (currentUser.value.isGuest) {
+    return stores.value
+  }
+  const myStores = stores.value.filter(s => s.user_id === currentUser.value?.id)
+  return myStores.length > 0 ? myStores : stores.value
+})
+
+const filteredOrdersByStore = computed(() => {
+  if (selectedStoreFilter.value === 'all') {
+    // Show orders belonging to user's stores
+    const userSlugs = new Set(userStores.value.map(s => s.slug))
+    return orders.value.filter(o => userSlugs.has(o.store_slug))
+  }
+  return orders.value.filter(o => o.store_slug === selectedStoreFilter.value)
+})
+
+const finalDisplayOrders = computed(() => {
+  if (activeStatusFilter.value === 'all') return filteredOrdersByStore.value
+  return filteredOrdersByStore.value.filter(o => o.status === activeStatusFilter.value)
+})
 
 const getStoreStock = (st) => {
   if (typeof st.stock === 'number') return st.stock
@@ -316,16 +397,11 @@ const quickAdjustStock = async (slug, newStock) => {
 }
 
 const totalRevenue = computed(() => {
-  return orders.value.reduce((acc, o) => acc + (Number(o.total_price) || 0), 0)
+  return filteredOrdersByStore.value.reduce((acc, o) => acc + (Number(o.total_price) || 0), 0)
 })
 
 const pendingCount = computed(() => {
-  return orders.value.filter(o => o.status === 'pending').length
-})
-
-const filteredOrders = computed(() => {
-  if (activeFilter.value === 'all') return orders.value
-  return orders.value.filter(o => o.status === activeFilter.value)
+  return filteredOrdersByStore.value.filter(o => o.status === 'pending').length
 })
 
 const formatTime = (isoString) => {
@@ -351,10 +427,4 @@ const changeStatus = async (orderId, newStatus) => {
     alert('স্ট্যাটাস পরিবর্তন করা সম্ভব হয়নি।')
   }
 }
-
-onMounted(() => {
-  refreshData()
-  const interval = setInterval(refreshData, 15000)
-  onUnmounted(() => clearInterval(interval))
-})
 </script>

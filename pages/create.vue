@@ -331,6 +331,10 @@ const resetChat = () => {
 
 onMounted(() => {
   initAuth()
+  if (!currentUser.value) {
+    router.push('/login?redirect=/create')
+    return
+  }
   scrollToBottom()
 })
 </script>
