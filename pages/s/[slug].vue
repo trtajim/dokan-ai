@@ -22,32 +22,45 @@
     <!-- TOP STRIP (Urgency / Stock Notice) -->
     <div 
       v-if="showUrgencyBar"
-      class="bg-[#e8a020] text-[#16251d] text-xs sm:text-sm font-semibold py-2 px-3 text-center sticky top-0 z-40 shadow-xs flex items-center justify-center gap-1.5 transition-all"
+      :style="{ backgroundColor: themeStyles.accentBg, color: themeStyles.btnText === '#16251d' ? '#16251d' : '#ffffff' }"
+      class="text-xs sm:text-sm font-semibold py-2 px-3 text-center sticky top-0 z-40 shadow-xs flex items-center justify-center gap-1.5 transition-all"
     >
       <span v-if="currentStock > 0" class="tracking-normal flex items-center gap-1.5 flex-wrap justify-center">
         <span>অফারটি সীমিত সময়ের জন্য! আর মাত্র</span>
-        <span class="bg-[#12372a] text-[#fff6e0] rounded-full px-2.5 py-0.5 text-xs font-bold inline-block">{{ currentStock }} টি</span>
+        <span 
+          :style="{ backgroundColor: themeStyles.heroBg, color: themeStyles.heroText }"
+          class="rounded-full px-2.5 py-0.5 text-xs font-bold inline-block"
+        >
+          {{ currentStock }} টি
+        </span>
         <span>স্টক বাকি আছে</span>
       </span>
-      <span v-else class="font-bold text-red-950">
+      <span v-else class="font-bold opacity-90">
         ⚠️ আজকের মতো এই পণ্যের স্টক শেষ হয়ে গেছে
       </span>
     </div>
 
     <!-- STORE HEADER NAVIGATION BAR -->
-    <header class="bg-[#12372a] text-[#fff6e0] py-3.5 px-4 sm:px-8 sticky z-30 shadow-md" :class="showUrgencyBar ? 'top-[36px]' : 'top-0'">
+    <header 
+      :style="{ backgroundColor: themeStyles.heroBg, color: themeStyles.heroText }"
+      class="py-3.5 px-4 sm:px-8 sticky z-30 shadow-md transition-colors duration-300" 
+      :class="showUrgencyBar ? 'top-[36px]' : 'top-0'"
+    >
       <div class="max-w-5xl mx-auto flex items-center justify-between">
         
         <!-- Store Brand / Identity -->
         <div class="flex items-center gap-2.5 min-w-0">
-          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-amber-300 bg-emerald-950/60 border border-emerald-800/40 shrink-0">
+          <div 
+            :class="[themeStyles.navIconBg, themeStyles.navIconBorder, themeStyles.navIconText]"
+            class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center border shrink-0 transition-colors"
+          >
             <ShoppingBag class="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div class="min-w-0">
-            <span class="font-serif-bn font-extrabold text-[#fff6e0] tracking-tight text-base sm:text-xl block truncate leading-tight">
+            <span class="font-serif-bn font-extrabold tracking-tight text-base sm:text-xl block truncate leading-tight">
               {{ store.product_title }}
             </span>
-            <div v-if="showVerifiedBadge" class="text-[11px] font-medium text-emerald-200/90 truncate">
+            <div v-if="showVerifiedBadge" :class="themeStyles.taglineText" class="text-[11px] font-medium truncate">
               {{ store.config?.seller_tagline || '১০০% খাঁটি ও গুণগত মান সম্পন্ন' }}
             </div>
           </div>
@@ -58,15 +71,16 @@
           <template v-if="isStoreOwner">
             <NuxtLink 
               to="/dashboard"
-              class="w-9 h-9 rounded-xl bg-emerald-900/60 hover:bg-emerald-900 text-emerald-200 flex items-center justify-center transition-all border border-emerald-700/50"
+              class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all border border-white/20"
               title="মার্চেন্ট ড্যাশবোর্ড"
             >
-              <LayoutDashboard class="w-4 h-4 text-emerald-400" />
+              <LayoutDashboard class="w-4 h-4" />
             </NuxtLink>
 
             <button 
               @click="isEditingStore = true"
-              class="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#e8a020] hover:bg-[#c97a0c] text-[#16251d] flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer font-sans-bn"
+              :style="{ backgroundColor: themeStyles.btnBg, color: themeStyles.btnText }"
+              class="px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer font-sans-bn"
             >
               <Sparkles class="w-3.5 h-3.5" />
               <span>AI এডিট</span>
@@ -77,7 +91,7 @@
           <button 
             v-else-if="currentStock > 0"
             @click="scrollToForm" 
-            class="px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold border border-amber-200/40 text-[#fff6e0] hover:bg-white/10 active:scale-95 transition-all flex items-center gap-1 cursor-pointer" 
+            class="px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold border border-white/40 hover:bg-white/10 active:scale-95 transition-all flex items-center gap-1 cursor-pointer" 
           >
             <span>অর্ডার করুন</span>
             <ArrowDown class="w-3.5 h-3.5 text-amber-300" />
@@ -88,12 +102,19 @@
     </header>
 
     <!-- HERO SECTION -->
-    <div class="bg-[#12372a] text-[#fff6e0] pt-6 sm:pt-10 pb-16 sm:pb-24 relative">
+    <div 
+      :style="{ backgroundColor: themeStyles.heroBg, color: themeStyles.heroText }"
+      class="pt-6 sm:pt-10 pb-16 sm:pb-24 relative transition-colors duration-300"
+    >
       <div class="max-w-5xl mx-auto px-4 sm:px-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
           
           <!-- Image Gallery with Thumbnails -->
-          <div v-if="productImages.length > 0" class="bg-[#fff6e0] p-3 sm:p-4 rounded-3xl shadow-2xl border border-amber-200/20">
+          <div 
+            v-if="productImages.length > 0" 
+            :style="{ backgroundColor: themeStyles.cardBg, borderColor: themeStyles.borderAccent }"
+            class="p-3 sm:p-4 rounded-3xl shadow-2xl border"
+          >
             <div class="aspect-square rounded-2xl overflow-hidden bg-white relative flex items-center justify-center">
               <img 
                 :src="activeHeroImage || store.config?.hero_image || store.image_url || productImages[0]" 
@@ -118,24 +139,30 @@
 
           <!-- Product Sales Copy & Quick Buy Card -->
           <div class="space-y-4">
-            <div class="inline-block bg-amber-500/20 text-amber-300 border border-amber-400/40 rounded-full px-3.5 py-1 text-xs sm:text-sm font-medium">
+            <div 
+              :class="[themeStyles.badgeBg, themeStyles.badgeText, themeStyles.badgeBorder]"
+              class="inline-block border rounded-full px-3.5 py-1 text-xs sm:text-sm font-medium"
+            >
               {{ store.config?.badge_text || store.product_title }}
             </div>
 
-            <h1 class="font-serif-bn font-extrabold text-2xl sm:text-4xl lg:text-[42px] leading-[1.3] text-[#fff6e0]">
+            <h1 class="font-serif-bn font-extrabold text-2xl sm:text-4xl lg:text-[42px] leading-[1.3]">
               {{ store.config?.headline }}
             </h1>
 
-            <p class="text-emerald-100/90 text-sm sm:text-base leading-relaxed font-normal">
+            <p :class="themeStyles.subtext" class="text-sm sm:text-base leading-relaxed font-normal">
               {{ store.config?.subheadline }}
             </p>
 
             <!-- Quick Buy Card (Reference style) -->
-            <div class="bg-[#fff6e0] text-[#16251d] rounded-2xl p-4 sm:p-5 shadow-lg border border-amber-200/40 space-y-3.5">
+            <div 
+              :style="{ backgroundColor: themeStyles.cardBg, borderColor: themeStyles.borderAccent }"
+              class="text-[#16251d] rounded-2xl p-4 sm:p-5 shadow-lg border space-y-3.5"
+            >
               
               <!-- Price display with save calculation -->
               <div class="flex items-baseline gap-3 flex-wrap">
-                <span class="font-serif-bn font-extrabold text-3xl sm:text-4xl text-[#12372a]">
+                <span :style="{ color: themeStyles.heroBg }" class="font-serif-bn font-extrabold text-3xl sm:text-4xl">
                   ৳{{ store.price }}
                 </span>
                 <s v-if="store.regular_price && store.regular_price > store.price" class="text-slate-400 text-lg sm:text-xl font-serif-bn">
@@ -143,7 +170,8 @@
                 </s>
                 <span 
                   v-if="store.regular_price && store.regular_price > store.price" 
-                  class="ml-auto bg-[#12372a] text-[#fff6e0] rounded-lg px-2.5 py-0.5 text-xs font-bold font-serif-bn"
+                  :style="{ backgroundColor: themeStyles.heroBg, color: themeStyles.heroText }"
+                  class="ml-auto rounded-lg px-2.5 py-0.5 text-xs font-bold font-serif-bn"
                 >
                   ৳{{ store.regular_price - store.price }} ছাড়
                 </span>
@@ -245,7 +273,10 @@
                 :key="fIdx"
                 class="py-4 flex items-start gap-3.5"
               >
-                <div class="w-8 h-8 rounded-full bg-[#12372a] text-amber-300 flex items-center justify-center shrink-0 mt-0.5 font-bold shadow-2xs">
+                <div 
+                  :style="{ backgroundColor: themeStyles.heroBg, color: themeStyles.badgeText.includes('orange') ? '#ea580c' : '#fbbf24' }"
+                  class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 font-bold shadow-2xs"
+                >
                   <Check class="w-4 h-4" />
                 </div>
                 <div>
@@ -258,30 +289,38 @@
         </div>
       </section>
 
-      <!-- TESTIMONIALS / SOCIAL PROOF (Dark Forest Green Card Style from reference) -->
-      <section v-if="showTestimonials && store.config?.testimonials?.length" class="bg-[#12372a] text-[#fff6e0] rounded-3xl p-6 sm:p-10 shadow-xl space-y-6">
+      <!-- TESTIMONIALS / SOCIAL PROOF -->
+      <section 
+        v-if="showTestimonials && store.config?.testimonials?.length" 
+        :style="{ backgroundColor: themeStyles.heroBg, color: themeStyles.heroText }"
+        class="rounded-3xl p-6 sm:p-10 shadow-xl space-y-6 transition-colors duration-300"
+      >
         <div>
-          <h2 class="font-serif-bn font-extrabold text-2xl sm:text-3xl text-[#fff6e0]">সম্মানিত ক্রেতাদের মতামত</h2>
-          <p class="text-emerald-200/80 text-xs sm:text-sm mt-1">যারা ইতিমধ্যে ব্যবহার করে সন্তুষ্ট</p>
+          <h2 class="font-serif-bn font-extrabold text-2xl sm:text-3xl">সম্মানিত ক্রেতাদের মতামত</h2>
+          <p :class="themeStyles.subtext" class="text-xs sm:text-sm mt-1">যারা ইতিমধ্যে ব্যবহার করে সন্তুষ্ট</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <figure 
             v-for="(testi, tIdx) in store.config.testimonials" 
             :key="tIdx"
-            class="bg-[#1f5a42] rounded-2xl p-5 shadow-xs border border-emerald-700/40 flex flex-col justify-between"
+            :style="{ backgroundColor: themeStyles.testimonialCardBg, borderColor: themeStyles.testimonialBorder }"
+            class="rounded-2xl p-5 shadow-xs border flex flex-col justify-between"
           >
             <div>
               <div class="flex items-center gap-1 text-amber-300 mb-2">
                 <Star v-for="i in 5" :key="i" class="w-4 h-4 fill-amber-300 text-amber-300" />
               </div>
-              <p class="font-serif-bn font-semibold text-base sm:text-lg text-[#fff6e0] leading-snug mb-3">
+              <p class="font-serif-bn font-semibold text-base sm:text-lg leading-snug mb-3">
                 “{{ testi.comment }}”
               </p>
             </div>
-            <div class="pt-2 border-t border-emerald-600/50 flex items-center justify-between text-xs text-emerald-200">
-              <strong class="font-bold text-[#fff6e0]">{{ testi.name }}</strong>
-              <span class="text-emerald-300/80 text-[11px]">{{ testi.location }}</span>
+            <div 
+              :style="{ borderColor: themeStyles.testimonialBorder }"
+              class="pt-2 border-t flex items-center justify-between text-xs opacity-90"
+            >
+              <strong class="font-bold">{{ testi.name }}</strong>
+              <span class="text-[11px] opacity-80">{{ testi.location }}</span>
             </div>
           </figure>
         </div>
@@ -306,7 +345,10 @@
               class="w-full text-left py-3 flex items-center justify-between gap-4 cursor-pointer select-none font-bold text-sm sm:text-base text-[#16251d]"
             >
               <span>{{ faq.q }}</span>
-              <span class="text-amber-700 text-2xl font-light shrink-0 leading-none">
+              <span 
+                :style="{ color: themeStyles.accentBg }"
+                class="text-2xl font-light shrink-0 leading-none"
+              >
                 {{ openFaqIdx === qIdx ? '–' : '+' }}
               </span>
             </button>
@@ -321,7 +363,11 @@
       </section>
 
       <!-- COD CHECKOUT FORM -->
-      <div v-if="currentStock > 0" class="max-w-2xl mx-auto bg-[#fff6e0] rounded-3xl p-2 sm:p-4 shadow-sm border border-amber-200/60">
+      <div 
+        v-if="currentStock > 0" 
+        :style="{ backgroundColor: themeStyles.cardBg, borderColor: themeStyles.borderAccent }"
+        class="max-w-2xl mx-auto rounded-3xl p-2 sm:p-4 shadow-sm border transition-colors duration-300"
+      >
         <StoreCodForm :store="store" />
       </div>
       <div v-else class="max-w-2xl mx-auto p-6 sm:p-8 bg-white border border-red-200 rounded-3xl text-center space-y-2">
@@ -343,15 +389,17 @@
     <!-- STICKY MOBILE BOTTOM BAR (Customer only) -->
     <div 
       v-if="!isStoreOwner && currentStock > 0" 
-      class="sm:hidden fixed inset-x-0 bottom-0 z-40 bg-[#12372a] px-4 py-2.5 flex items-center justify-between shadow-2xl border-t border-emerald-800/40"
+      :style="{ backgroundColor: themeStyles.heroBg, color: themeStyles.heroText }"
+      class="sm:hidden fixed inset-x-0 bottom-0 z-40 px-4 py-2.5 flex items-center justify-between shadow-2xl border-t border-white/10 transition-colors duration-300"
     >
-      <div class="leading-tight text-[#fff6e0]">
-        <small class="block text-[11px] text-emerald-200">মূল্য (COD)</small>
-        <b class="font-serif-bn text-xl text-amber-300">৳{{ store.price }}</b>
+      <div class="leading-tight">
+        <small :class="themeStyles.taglineText" class="block text-[11px]">মূল্য (COD)</small>
+        <b :style="{ color: themeStyles.accentBg }" class="font-serif-bn text-xl">৳{{ store.price }}</b>
       </div>
       <button 
         @click="scrollToForm" 
-        class="bg-[#c97a0c] hover:bg-[#b06a08] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer font-sans-bn"
+        :style="{ backgroundColor: themeStyles.btnBg, color: themeStyles.btnText }"
+        class="px-5 py-2.5 rounded-xl font-bold text-sm shadow-md active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer font-sans-bn"
       >
         <ShoppingBag class="w-4 h-4" />
         <span>অর্ডার করুন</span>
@@ -560,20 +608,118 @@ const videoEmbedUrl = computed(() => {
   return cleanUrl
 })
 
-const primaryBgClass = computed(() => {
-  const c = store.value?.theme_color
-  if (c === 'indigo') return 'bg-indigo-600 hover:bg-indigo-700'
-  if (c === 'rose') return 'bg-rose-600 hover:bg-rose-700'
-  if (c === 'amber') return 'bg-amber-600 hover:bg-amber-700'
-  return 'bg-emerald-600 hover:bg-emerald-700'
-})
+// Theme Palette Definition based on authentic high-converting e-commerce aesthetics:
+const themeStyles = computed(() => {
+  const color = store.value?.theme_color || store.value?.config?.theme_color || 'emerald'
 
-const primaryTextClass = computed(() => {
-  const c = store.value?.theme_color
-  if (c === 'indigo') return 'text-indigo-600'
-  if (c === 'rose') return 'text-rose-600'
-  if (c === 'amber') return 'text-amber-600'
-  return 'text-emerald-600'
+  switch (color) {
+    case 'amber':
+      return {
+        heroBg: '#2c1802',        // Deep warm honey molasses / rich roasted amber
+        heroText: '#fff9ed',
+        accentBg: '#d97706',      // Vibrant golden amber CTA
+        accentHover: '#b45309',
+        cardBg: '#fffbf2',        // Warm honey-milk cream
+        borderAccent: '#fde68a',
+        badgeBg: 'bg-amber-500/20',
+        badgeText: 'text-amber-300',
+        badgeBorder: 'border-amber-400/40',
+        subtext: 'text-amber-100/90',
+        taglineText: 'text-amber-200/90',
+        navIconBg: 'bg-amber-950/60',
+        navIconBorder: 'border-amber-800/40',
+        navIconText: 'text-amber-300',
+        testimonialCardBg: '#3d2203',
+        testimonialBorder: '#543007',
+        btnBg: '#d97706',
+        btnText: '#ffffff'
+      }
+    case 'indigo':
+      return {
+        heroBg: '#0f172a',        // Deep sleek midnight navy
+        heroText: '#f8fafc',
+        accentBg: '#4f46e5',      // Royal tech indigo
+        accentHover: '#4338ca',
+        cardBg: '#f8fafc',
+        borderAccent: '#c7d2fe',
+        badgeBg: 'bg-indigo-500/20',
+        badgeText: 'text-indigo-300',
+        badgeBorder: 'border-indigo-400/40',
+        subtext: 'text-indigo-100/90',
+        taglineText: 'text-indigo-200/90',
+        navIconBg: 'bg-indigo-950/60',
+        navIconBorder: 'border-indigo-800/40',
+        navIconText: 'text-indigo-300',
+        testimonialCardBg: '#1e293b',
+        testimonialBorder: '#334155',
+        btnBg: '#4f46e5',
+        btnText: '#ffffff'
+      }
+    case 'rose':
+      return {
+        heroBg: '#270814',        // Deep luxury plum berry
+        heroText: '#fff1f2',
+        accentBg: '#e11d48',      // Vibrant rose coral
+        accentHover: '#be123c',
+        cardBg: '#fff1f2',
+        borderAccent: '#fecdd3',
+        badgeBg: 'bg-rose-500/20',
+        badgeText: 'text-rose-300',
+        badgeBorder: 'border-rose-400/40',
+        subtext: 'text-rose-100/90',
+        taglineText: 'text-rose-200/90',
+        navIconBg: 'bg-rose-950/60',
+        navIconBorder: 'border-rose-800/40',
+        navIconText: 'text-rose-300',
+        testimonialCardBg: '#3d0c1f',
+        testimonialBorder: '#5c132f',
+        btnBg: '#e11d48',
+        btnText: '#ffffff'
+      }
+    case 'slate':
+      return {
+        heroBg: '#18181b',        // Matte graphite black
+        heroText: '#fafafa',
+        accentBg: '#ea580c',      // Precision safety industrial orange
+        accentHover: '#c2410c',
+        cardBg: '#f4f4f5',
+        borderAccent: '#fed7aa',
+        badgeBg: 'bg-orange-500/20',
+        badgeText: 'text-orange-300',
+        badgeBorder: 'border-orange-400/40',
+        subtext: 'text-zinc-300',
+        taglineText: 'text-zinc-400',
+        navIconBg: 'bg-zinc-800',
+        navIconBorder: 'border-zinc-700',
+        navIconText: 'text-orange-400',
+        testimonialCardBg: '#27272a',
+        testimonialBorder: '#3f3f46',
+        btnBg: '#ea580c',
+        btnText: '#ffffff'
+      }
+    case 'emerald':
+    default:
+      return {
+        heroBg: '#12372a',        // Deep forest botanical green
+        heroText: '#fff6e0',
+        accentBg: '#e8a020',      // Warm saffron gold
+        accentHover: '#c97a0c',
+        cardBg: '#fff6e0',
+        borderAccent: '#fed7aa',
+        badgeBg: 'bg-amber-500/20',
+        badgeText: 'text-amber-300',
+        badgeBorder: 'border-amber-400/40',
+        subtext: 'text-emerald-100/90',
+        taglineText: 'text-emerald-200/90',
+        navIconBg: 'bg-emerald-950/60',
+        navIconBorder: 'border-emerald-800/40',
+        navIconText: 'text-amber-300',
+        testimonialCardBg: '#1f5a42',
+        testimonialBorder: '#065f46',
+        btnBg: '#e8a020',
+        btnText: '#16251d'
+      }
+  }
 })
 
 const pixelId = computed(() => store.value?.config?.pixel_id)

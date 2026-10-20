@@ -46,6 +46,7 @@ Current Store Data:
 - Price: ${currentStore.price}
 - Regular Price: ${currentStore.regular_price}
 - Stock: ${currentStore.stock ?? 20}
+- Current Theme Color: "${currentStore.theme_color || 'emerald'}" (Themes: amber, emerald, indigo, rose, slate)
 - Show Urgency Top Bar: ${currentStore.config?.show_urgency_bar ?? true}
 - Show Verified Badge: ${currentStore.config?.show_verified_badge ?? true}
 - Show Video Reel: ${currentStore.config?.show_video_reel ?? true}
@@ -90,7 +91,7 @@ RETURN STRICT JSON ONLY:
   "show_verified_badge": boolean,
   "show_testimonials": boolean,
   "show_faqs": boolean,
-  "theme_color": "emerald" | "indigo" | "rose" | "amber",
+  "theme_color": "amber" | "emerald" | "indigo" | "rose" | "slate",
   "delivery_fee_inside": number,
   "delivery_fee_outside": number,
   "video_reel_url": "string",

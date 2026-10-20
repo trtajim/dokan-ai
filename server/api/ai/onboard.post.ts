@@ -44,7 +44,8 @@ export default defineEventHandler(async (event) => {
     delivery_fee_inside: currentState?.delivery_fee_inside != null ? Number(currentState.delivery_fee_inside) : 70,
     delivery_fee_outside: currentState?.delivery_fee_outside != null ? Number(currentState.delivery_fee_outside) : 130,
     video_reel_url: currentState?.video_reel_url || null,
-    variants: Array.isArray(currentState?.variants) ? currentState.variants : []
+    variants: Array.isArray(currentState?.variants) ? currentState.variants : [],
+    theme_color: currentState?.theme_color || 'emerald'
   }
 
   // PASS 1: Natural Conversational Response
@@ -104,6 +105,12 @@ INSTRUCTIONS:
    - "delivery_fee_outside": updated number (e.g. if user says "bahire 90 taka", set to 90)
    - "video_reel_url": URL if provided, otherwise preserve baseline
    - "variants": array of [{"name": string, "price": number}]
+   - "theme_color": pick the most aesthetic matching theme for this product category from:
+     * 'amber' (honey, organic food, bakery, leather, oil, tea, spices)
+     * 'emerald' (herbal, green products, watches, luxury, plants, agriculture)
+     * 'indigo' (tech, smart electronics, gadgets, modern apparel, footwear)
+     * 'rose' (cosmetics, skincare, jewelry, perfume, feminine fashion)
+     * 'slate' (automotive, tools, industrial, minimalist hardware)
 3. Retain existing baseline values if the user did NOT request to change them.
 4. "readyToGenerate" condition:
    - Must be true ONLY AFTER:
@@ -124,6 +131,7 @@ OUTPUT STRICT JSON ONLY:
   "delivery_fee_outside": number,
   "video_reel_url": string or null,
   "variants": [{"name": string, "price": number}],
+  "theme_color": "amber" | "emerald" | "indigo" | "rose" | "slate",
   "readyToGenerate": boolean
 }`
 
@@ -167,6 +175,9 @@ OUTPUT STRICT JSON ONLY:
         }
         if (Array.isArray(parsed.variants)) {
           workingState.variants = parsed.variants
+        }
+        if (parsed.theme_color && ['amber', 'emerald', 'indigo', 'rose', 'slate'].includes(parsed.theme_color)) {
+          workingState.theme_color = parsed.theme_color
         }
         if (parsed.readyToGenerate !== undefined) {
           readyToGenerate = Boolean(parsed.readyToGenerate)

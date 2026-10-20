@@ -63,7 +63,15 @@ Delivery Charges: Inside Dhaka ৳${insideFee}, Outside Dhaka ৳${outsideFee} (
 Variants Info: ${JSON.stringify(variants || [])}
 Reel / Video URL: "${video_reel_url || ''}"
 Notes: ${description || '100% genuine with warranty'}
-Theme: ${theme_color || 'emerald'}
+Selected Theme: ${theme_color || 'auto'}
+
+AESTHETIC THEME COLOR SELECTION:
+Pick the most aesthetic, high-converting color theme for this product in "theme_color":
+- "amber" -> for honey, ghee, organic food, bakery, mustard oil, dry fruits, spices, tea
+- "emerald" -> for nature/herbal, watches, luxury gadgets, plants, agricultural items, electronics
+- "indigo" -> for tech devices, smart gadgets, footwear, denim, modern electronics, accessories
+- "rose" -> for cosmetics, skincare, perfumes, jewelry, women fashion
+- "slate" -> for industrial tools, hardware, automotive parts, minimalist dark items
 
 CRITICAL HEADLINE RULES:
 1. "headline" MUST BE COMPACT & PUNCHY: Maximum 10-14 words (1 to 2 lines max). Do NOT write a whole paragraph or huge run-on sentence as the headline!
@@ -79,6 +87,7 @@ Respond ONLY with a strictly valid JSON matching this schema:
         "seller_tagline": "A relevant, authentic short Bengali line directly specific to this product",
         "urgency_text": "🔥 অফারটি সীমিত সময়ের জন্য! ক্যাশ অন ডেলিভারিতে অর্ডার করুন!",
         "video_reel_url": "${video_reel_url || ''}",
+        "theme_color": "amber" | "emerald" | "indigo" | "rose" | "slate",
         "features": [
           { "title": "Feature 1 Bengali title", "desc": "Detailed emotional benefit description" },
           { "title": "Feature 2 Bengali title", "desc": "Detailed emotional benefit description" },
@@ -157,6 +166,8 @@ Respond ONLY with a strictly valid JSON matching this schema:
     }
   }
 
+  const finalThemeColor = generatedConfig?.theme_color || theme_color || 'emerald'
+  generatedConfig.theme_color = finalThemeColor
   generatedConfig.delivery_fee_inside = insideFee
   generatedConfig.delivery_fee_outside = outsideFee
   generatedConfig.images = allImages
@@ -181,7 +192,7 @@ Respond ONLY with a strictly valid JSON matching this schema:
     images: allImages,
     delivery_fee_inside: insideFee,
     delivery_fee_outside: outsideFee,
-    theme_color: theme_color || 'emerald',
+    theme_color: finalThemeColor,
     config: generatedConfig,
     created_at: new Date().toISOString()
   }
