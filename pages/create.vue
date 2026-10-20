@@ -58,23 +58,63 @@
 
               <!-- IN-CHAT DYNAMIC ACTION CARD -->
               <div v-if="msg.readyToGenerate" class="mt-3 pt-2.5 border-t border-slate-200/60 animate-in fade-in zoom-in-95 duration-200">
-                <div class="p-3 bg-white rounded-xl sm:rounded-2xl border border-emerald-200 shadow-sm space-y-2 text-slate-800">
-                  <div class="flex items-center gap-1.5 text-emerald-700 font-bold text-xs">
-                    <CheckCircle2 class="w-4 h-4 text-emerald-600" />
-                    <span>সব তথ্য সংগ্রহ সম্পন্ন হয়েছে!</span>
+                <div class="p-3 bg-white rounded-xl sm:rounded-2xl border border-emerald-200 shadow-sm space-y-2.5 text-slate-800">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1.5 text-emerald-700 font-bold text-xs">
+                      <CheckCircle2 class="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>সংগৃহীত সকল তথ্য রিভিউ</span>
+                    </div>
+                    <span class="text-[10px] bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded-full border border-emerald-200">
+                      রেডি টু বিল্ড
+                    </span>
                   </div>
+
+                  <p class="text-[11px] text-slate-500 leading-normal">
+                    একবার রিভিউ করে দেখুন, কিছু পরিবর্তন করার থাকলে নিচে লিখে জানান অথবা সরাসরি দোকানটি তৈরি করুন:
+                  </p>
                   
-                  <div class="text-[10px] sm:text-[11px] text-slate-600 font-medium space-y-0.5 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                    <div>📦 প্রোডাক্ট: <strong>{{ extractedData.product_title || 'এক্সক্লুসিভ কালেকশন' }}</strong></div>
-                    <div>💰 অফার মূল্য: <strong class="text-emerald-600">৳{{ extractedData.price || 1200 }}</strong></div>
-                    <div>🚚 ডেলিভারি: <strong>ভেতরে ৳{{ extractedData.delivery_fee_inside }} | বাইরে ৳{{ extractedData.delivery_fee_outside }}</strong></div>
-                    <div>🖼️ ছবি: <strong>{{ allUploadedImages.length }} টি যুক্ত আছে</strong></div>
+                  <div class="text-[10px] sm:text-[11px] text-slate-700 font-medium space-y-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-200/80">
+                    <div class="flex items-start justify-between border-b border-slate-200/60 pb-1">
+                      <span class="text-slate-500">📦 প্রোডাক্ট:</span>
+                      <strong class="text-right text-slate-900">{{ extractedData.product_title || 'এক্সক্লুসিভ কালেকশন' }}</strong>
+                    </div>
+
+                    <div class="flex items-center justify-between border-b border-slate-200/60 pb-1">
+                      <span class="text-slate-500">💰 অফার মূল্য:</span>
+                      <strong class="text-emerald-700 font-bold">৳{{ extractedData.price || 1200 }}</strong>
+                    </div>
+
+                    <div v-if="extractedData.variants && extractedData.variants.length > 0" class="flex items-start justify-between border-b border-slate-200/60 pb-1">
+                      <span class="text-slate-500">🏷️ ভ্যারিয়েন্ট:</span>
+                      <strong class="text-right text-slate-800">
+                        {{ extractedData.variants.map(v => typeof v === 'object' ? `${v.name}${v.price ? ' (৳' + v.price + ')' : ''}` : v).join(', ') }}
+                      </strong>
+                    </div>
+
+                    <div class="flex items-center justify-between border-b border-slate-200/60 pb-1">
+                      <span class="text-slate-500">🖼️ ছবি:</span>
+                      <strong class="text-slate-800">{{ allUploadedImages.length }} টি যুক্ত আছে</strong>
+                    </div>
+
+                    <div class="flex items-center justify-between border-b border-slate-200/60 pb-1">
+                      <span class="text-slate-500">🎥 রিল / ভিডিও:</span>
+                      <strong class="text-slate-800">
+                        {{ extractedData.video_reel_url ? 'লিঙ্ক সংযুক্ত আছে' : 'সংযুক্ত নেই' }}
+                      </strong>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-0.5">
+                      <span class="text-slate-500">🚚 ডেলিভারি চার্জ:</span>
+                      <span class="text-slate-800 font-semibold">
+                        ভেতরে ৳{{ extractedData.delivery_fee_inside }} | বাইরে ৳{{ extractedData.delivery_fee_outside }}
+                      </span>
+                    </div>
                   </div>
 
                   <button 
                     @click="generateFullStore" 
                     :disabled="isGeneratingStore"
-                    class="w-full py-3 px-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-xs sm:text-sm"
+                    class="w-full py-3 px-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer"
                   >
                     <Loader2 v-if="isGeneratingStore" class="w-4 h-4 animate-spin" />
                     <Sparkles v-else class="w-4 h-4" />
