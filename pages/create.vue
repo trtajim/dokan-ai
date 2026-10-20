@@ -1,21 +1,21 @@
 <template>
-  <div class="min-h-screen bg-slate-50 flex flex-col">
+  <div class="h-screen h-[100dvh] bg-slate-50 flex flex-col overflow-hidden">
     <Navbar />
 
-    <main class="flex-1 max-w-3xl w-full mx-auto p-2.5 sm:p-6 lg:p-8 flex flex-col justify-between">
+    <main class="flex-1 max-w-3xl w-full mx-auto p-2 sm:p-6 lg:p-8 flex flex-col min-h-0 overflow-hidden">
       
-      <!-- Top Title (Compact on mobile) -->
-      <div class="mb-2 sm:mb-4 text-center px-2">
-        <h1 class="text-xl sm:text-3xl font-black text-slate-900 leading-tight">
+      <!-- Top Title (Hidden on mobile to maximize chat viewport, visible on desktop) -->
+      <div class="hidden sm:block mb-3 text-center px-2 shrink-0">
+        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
           AI সহকারীর সাথে কথা বলে দোকান তৈরি করুন
         </h1>
-        <p class="text-[11px] sm:text-sm text-slate-500 mt-0.5 sm:mt-1 max-w-md mx-auto hidden sm:block">
+        <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
           AI আপনাকে প্রশ্ন করবে এবং আইডিয়া সাজেস্ট করবে।
         </p>
       </div>
 
-      <!-- Pure Chat Container (Full height responsive on mobile screens) -->
-      <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-lg sm:shadow-xl overflow-hidden flex flex-col flex-1 h-[78vh] sm:h-[640px]">
+      <!-- Pure Chat Container (Locked to viewport without outer scroll) -->
+      <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-md sm:shadow-xl overflow-hidden flex flex-col flex-1 min-h-0">
         
         <!-- Chat Header Bar -->
         <div class="px-3 py-2.5 sm:p-4 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
