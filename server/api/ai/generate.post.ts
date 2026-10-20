@@ -1,5 +1,5 @@
 /**
- * AI Store Configuration Generator & Updater
+ * AI Store Configuration Generator with Variant Support
  */
 import { GoogleGenAI } from '@google/genai'
 import { memoryStore } from '../../utils/memoryStore'
@@ -12,6 +12,8 @@ export default defineEventHandler(async (event) => {
     product_title, 
     price, 
     regular_price, 
+    variants,
+    stock,
     delivery_fee_inside,
     delivery_fee_outside,
     description, 
@@ -33,6 +35,7 @@ export default defineEventHandler(async (event) => {
   const outsideFee = Number(delivery_fee_outside) || 130
   const productPrice = Number(price) || 999
   const oldPrice = Number(regular_price) || Math.round(productPrice * 1.4)
+  const initialStock = Number(stock) || 20
 
   const allImages = Array.isArray(images) && images.length > 0 
     ? images 
@@ -49,6 +52,7 @@ Generate high-converting sales landing page content in persuasive Bengali for th
 Product: ${product_title}
 Offer Price: ${productPrice} BDT (Regular: ${oldPrice} BDT)
 Delivery: Inside Dhaka ${insideFee} BDT, Outside Dhaka ${outsideFee} BDT (Cash on Delivery)
+Variants Info: ${JSON.stringify(variants || [])}
 Notes / Highlights: ${description || '100% genuine with warranty'}
 Theme: ${theme_color || 'emerald'}
 
@@ -56,14 +60,13 @@ Respond ONLY with a strictly valid JSON matching this schema:
 {
   "headline": "Persuasive attention-grabbing headline in Bengali",
   "subheadline": "Benefit-driven 2-sentence description in Bengali",
-  "urgency_text": "🔥 অফারটি আর মাত্র ১২ জনের জন্য প্রযোজ্য!",
+  "urgency_text": "🔥 অফারটি সীমিত সময়ের জন্য! ক্যাশ অন ডেলিভারিতে অর্ডার করুন!",
   "trust_badges": [
     "ক্যাশ অন ডেলিভারি (পণ্য চেক করে মূল্য পরিশোধ)",
     "৭ দিনের সহজ রিপ্লেসমেন্ট পলিসি",
     "১০০% অরিজিনাল ও প্রিমিয়াম কোয়ালিটি"
   ],
   "features": [
-    { "title": "Feature title in Bengali", "desc": "Detailed benefit description in Bengali" },
     { "title": "Feature title in Bengali", "desc": "Detailed benefit description in Bengali" },
     { "title": "Feature title in Bengali", "desc": "Detailed benefit description in Bengali" },
     { "title": "Feature title in Bengali", "desc": "Detailed benefit description in Bengali" }
@@ -74,8 +77,7 @@ Respond ONLY with a strictly valid JSON matching this schema:
     { "q": "কোন সমস্যা হলে রিপ্লেসমেন্ট পাব?", "a": "আমাদের রয়েছে ৭ দিনের সহজ ফ্রি রিপ্লেসমেন্ট পলিসি।" }
   ],
   "testimonials": [
-    { "name": "কাস্টমারের নাম", "location": "ঢাকা / চট্টগ্রাম / সিলেট", "comment": "স্বাভাবিক ও বাস্তবসম্মত প্রশংসা রিভিউ" },
-    { "name": "কাস্টমারের নাম", "location": "রাজশাহী / খুলনা / বরিশাল", "comment": "পণ্য ও সার্ভিসের সন্তুষ্টি রিভিউ" }
+    { "name": "কাস্টমারের নাম", "location": "ঢাকা / চট্টগ্রাম / সিলেট", "comment": "স্বাভাবিক ও বাস্তবসম্মত প্রশংসা রিভিউ" }
   ]
 }`
 
@@ -97,7 +99,7 @@ Respond ONLY with a strictly valid JSON matching this schema:
     generatedConfig = {
       headline: `প্রিমিয়াম কোয়ালিটির ${product_title} - আপনার প্রতিদিনের বিশ্বস্ত সঙ্গী`,
       subheadline: `সেরা কোয়ালিটি, আকর্ষণীয় ডিজাইন এবং দীর্ঘস্থায়ী পারফরম্যান্সের নিশ্চয়তা। এখনই অর্ডার করুন এবং উপভোগ করুন স্পেশাল ক্যাশ অন ডেলিভারি ডিসকাউন্ট!`,
-      urgency_text: `🔥 স্টক সীমিত! আজকের স্পেশাল ডিসকাউন্টে আর মাত্র ১১ টি বাকি আছে!`,
+      urgency_text: `🔥 অফারটি সীমিত সময়ের জন্য! ক্যাশ অন ডেলিভারিতে অর্ডার করুন!`,
       trust_badges: [
         'ক্যাশ অন ডেলিভারি (পণ্য দেখে মূল্য পরিশোধ)',
         '৭ দিনের ফ্রি রিপ্লেসমেন্ট সুবিধা',
@@ -110,15 +112,7 @@ Respond ONLY with a strictly valid JSON matching this schema:
         },
         {
           title: 'সহজ ও আরামদায়ক ব্যবহার',
-          desc: 'প্রতিদিনের জীবনযাত্রাকে আরও সহজ ও স্বাচ্ছন্দ্যময় করে তোলার জন্য বিশেষভাবে ডিজাইন করা।'
-        },
-        {
-          title: '১০০% পরীক্ষিত ও নিরাপদ',
-          desc: 'গুণগত মান যাচাইয়ের প্রতিটি ধাপে উত্তীর্ণ, তাই নিশ্চিন্তে ব্যবহার করতে পারেন।'
-        },
-        {
-          title: 'সেরা ভ্যালু ফর মানি',
-          desc: 'বাজারে বিদ্যমান সমমানের অন্যান্য পণ্যের চেয়ে সাশ্রয়ী মূল্যে সেরা সুযোগ।'
+          desc: 'প্রতিদিনের জীবনযাত্রাকে আরও সহজ ও স্বাচ্ছন্দ্যময় করে তোলার জন্য ডিজাইন করা।'
         }
       ],
       faqs: [
@@ -129,10 +123,6 @@ Respond ONLY with a strictly valid JSON matching this schema:
         {
           q: 'ডেলিভারি চার্জ কত এবং কতদিনে পাব?',
           a: `ঢাকার ভেতরে ডেলিভারি চার্জ মাত্র ৳${insideFee} এবং ঢাকার বাইরে ৳${outsideFee}।`
-        },
-        {
-          q: 'পছন্দ না হলে বা ত্রুটি থাকলে কি করব?',
-          a: 'আমাদের রয়েছে ৭ দিনের সহজ রিপ্লেসমেন্ট পলিসি। যেকোনো সমস্যায় যোগাযোগ করলেই ব্যবস্থা নেওয়া হবে।'
         }
       ],
       testimonials: [
@@ -140,20 +130,18 @@ Respond ONLY with a strictly valid JSON matching this schema:
           name: 'তানভীর আহমেদ',
           location: 'ধানমন্ডি, ঢাকা',
           comment: 'যেমন চেয়েছিলাম ঠিক তেমনই পেয়েছি। প্যাকেজিং খুব ভালো ছিল এবং ডেলিভারি খুব দ্রুত হয়েছে।'
-        },
-        {
-          name: 'মোঃ সাইদুর রহমান',
-          location: 'আগ্রাবাদ, চট্টগ্রাম',
-          comment: 'ক্যাশ অন ডেলিভারিতে চেক করে নিতে পেরে খুব ভালো লাগল। সেলারের রেসপন্সও খুব আন্তরিক ছিল।'
         }
       ]
     }
   }
 
-  // Store custom delivery fee inside config as well to ensure full forward-compatibility
+  const normalizedVariants = Array.isArray(variants) && variants.length > 0 ? variants : []
+
   generatedConfig.delivery_fee_inside = insideFee
   generatedConfig.delivery_fee_outside = outsideFee
   generatedConfig.images = allImages
+  generatedConfig.stock = initialStock
+  generatedConfig.variants = normalizedVariants
   generatedConfig.user_id = user_id || 'guest_merchant_demo'
 
   const storeData = {
@@ -163,6 +151,8 @@ Respond ONLY with a strictly valid JSON matching this schema:
     product_title: product_title || 'এক্সক্লুসিভ প্রোডাক্ট',
     price: productPrice,
     regular_price: oldPrice,
+    stock: initialStock,
+    variants: normalizedVariants,
     image_url: allImages[0],
     images: allImages,
     delivery_fee_inside: insideFee,
@@ -172,7 +162,6 @@ Respond ONLY with a strictly valid JSON matching this schema:
     created_at: new Date().toISOString()
   }
 
-  // Save to Supabase (only existing schema columns)
   const supabase = getSupabaseClient()
   if (supabase) {
     try {

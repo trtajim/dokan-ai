@@ -1,5 +1,5 @@
 /**
- * Store update, fetch, and live stock API
+ * Store update, fetch, and live stock/variant API
  */
 import { memoryStore } from '../../utils/memoryStore'
 import { getSupabaseClient } from '../../utils/supabase'
@@ -16,13 +16,9 @@ export default defineEventHandler(async (event) => {
         try {
           const { data } = await supabase.from('stores').select('*').eq('slug', slug).single()
           if (data) {
-            // Merge in-memory stock if available
             const mem = memoryStore.getStore(slug)
-            if (mem && typeof mem.stock === 'number') {
-              data.stock = mem.stock
-            } else {
-              data.stock = typeof data.config?.stock === 'number' ? data.config.stock : 25
-            }
+            data.stock = mem?.stock ?? data.config?.stock ?? 25
+            data.variants = mem?.variants ?? data.config?.variants ?? []
             return { success: true, store: data }
           }
         } catch (err) {
@@ -46,6 +42,7 @@ export default defineEventHandler(async (event) => {
           data.forEach((s: any) => {
             const mem = memoryStore.getStore(s.slug)
             s.stock = mem?.stock ?? s.config?.stock ?? 25
+            s.variants = mem?.variants ?? s.config?.variants ?? []
           })
           return { success: true, stores: data }
         }
@@ -89,10 +86,10 @@ export default defineEventHandler(async (event) => {
     return { success: true, stock: updatedStock }
   }
 
-  // PUT: Full store edit
+  // PUT: Full store edit (including variants)
   if (method === 'PUT') {
     const body = await readBody(event)
-    const { slug, product_title, price, regular_price, stock, theme_color, image_url, config } = body
+    const { slug, product_title, price, regular_price, stock, variants, theme_color, image_url, config } = body
 
     if (!slug) {
       throw createError({ statusCode: 400, message: 'Store slug is required' })
@@ -102,6 +99,9 @@ export default defineEventHandler(async (event) => {
     if (typeof stock === 'number') {
       updatedConfig.stock = stock
       memoryStore.updateStock(slug, stock)
+    }
+    if (Array.isArray(variants)) {
+      updatedConfig.variants = variants
     }
 
     const updatedData = {
@@ -126,6 +126,7 @@ export default defineEventHandler(async (event) => {
     if (existing) {
       Object.assign(existing, updatedData)
       if (typeof stock === 'number') existing.stock = stock
+      if (Array.isArray(variants)) existing.variants = variants
       memoryStore.setStore(slug, existing)
       return { success: true, store: existing }
     }

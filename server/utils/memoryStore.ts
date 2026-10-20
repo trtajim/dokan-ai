@@ -1,6 +1,12 @@
 /**
- * Shared memory fallback store with live dynamic stock tracking
+ * Shared memory fallback store with live dynamic stock and variant support
  */
+
+export interface ProductVariant {
+  name: string // e.g. "1 কেজি", "2 কেজি" or "L (Large)", "XL (Extra Large)"
+  price?: number // override price if different, or null to use base
+  stock?: number
+}
 
 export interface StoreRecord {
   id: string
@@ -11,6 +17,7 @@ export interface StoreRecord {
   regular_price: number
   image_url: string
   images?: string[]
+  variants?: ProductVariant[]
   stock: number
   delivery_fee_inside?: number
   delivery_fee_outside?: number
@@ -29,6 +36,7 @@ export interface OrderRecord {
   delivery_fee: number
   total_price: number
   quantity: number
+  selected_variant?: string
   status: 'pending' | 'confirmed' | 'shipped' | 'cancelled'
   created_at: string
 }
@@ -53,6 +61,11 @@ if (!globalThis.__dokan_stores) {
       'https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80'
     ],
+    variants: [
+      { name: 'Black (কালো স্ট্র্যাপ)', price: 1350 },
+      { name: 'Orange (কমলা স্ট্র্যাপ)', price: 1350 },
+      { name: 'Silver (সিলভার মেটাল)', price: 1450 }
+    ],
     delivery_fee_inside: 70,
     delivery_fee_outside: 130,
     theme_color: 'emerald',
@@ -60,6 +73,11 @@ if (!globalThis.__dokan_stores) {
       headline: 'প্রিমিয়াম ব্লুটুথ কলিং ও ফুল ওয়াটারপ্রুফ স্মার্টওয়াচ',
       subheadline: '২.০৯ ইঞ্চি ফুল এইচডি ডিসপ্লে, ২ দিনের ব্যাটারি লাইফ এবং প্রিমিয়াম মেটালিক ডিজাইন সহ প্রিমিয়াম কোয়ালিটি ওয়াচ। সাথে থাকছে ২টি ফ্রি স্ট্র্যাপ!',
       urgency_text: '🔥 অফারটি সীমিত সময়ের জন্য! ক্যাশ অন ডেলিভারিতে অর্ডার করুন!',
+      variants: [
+        { name: 'Black (কালো স্ট্র্যাপ)', price: 1350 },
+        { name: 'Orange (কমলা স্ট্র্যাপ)', price: 1350 },
+        { name: 'Silver (সিলভার মেটাল)', price: 1450 }
+      ],
       trust_badges: [
         'ক্যাশ অন ডেলিভারি (পণ্য দেখে মূল্য পরিশোধ)',
         '৭ দিনের রিপ্লেসমেন্ট গ্যারান্টি',
@@ -75,10 +93,6 @@ if (!globalThis.__dokan_stores) {
           desc: 'ক্রিস্টাল ক্লিয়ার সুপার ব্রাইট বেজেল-লেস ডিসপ্লে যা সরাসরি রোদের আলোতেও পরিষ্কার দেখা যায়।'
         },
         {
-          title: 'অল-ডে হেলথ ট্র্যাকার',
-          desc: 'হার্ট রেট, ব্লাড প্রেশার, স্লিপ মনিটর ও মাল্টি-স্পোর্টস ট্র্যাকিং ফিচার।'
-        },
-        {
           title: 'লং লাস্টিং ব্যাটারি ব্যাকআপ',
           desc: 'একবার ফুল চার্জে টানা ২ থেকে ৩ দিন অনায়াসে ব্যবহার করা যায়।'
         }
@@ -91,22 +105,13 @@ if (!globalThis.__dokan_stores) {
         {
           q: 'ডেলিভারি পেতে কতদিন সময় লাগবে?',
           a: 'ঢাকার ভেতরে ২৪ থেকে ৪৮ ঘণ্টার মধ্যে এবং ঢাকার বাইরে ২ থেকে ৩ দিনের মধ্যে ডেলিভারি সম্পন্ন হয়।'
-        },
-        {
-          q: 'কোন সমস্যা হলে রিপ্লেসমেন্ট পাব?',
-          a: 'প্রোডাক্টে কোন প্রকার ম্যানুফ্যাকচারিং ডিফেক্ট থাকলে ৭ দিনের মধ্যে সম্পূর্ণ ফ্রিতে রিপ্লেসমেন্ট দেওয়া হবে।'
         }
       ],
       testimonials: [
         {
           name: 'তানভীর আহমেদ',
           location: 'মিরপুর, ঢাকা',
-          comment: 'কালকে অর্ডার করেছিলাম আজকেই ডেলিভারি পেলাম! ওয়াচটির ডিসপ্লে আর কলিং কোয়ালিটি সত্যি দারুণ। ১০০% রেকমেন্ডেড।'
-        },
-        {
-          name: 'মোঃ সাইদুল ইসলাম',
-          location: 'সিলেট সদর',
-          comment: 'দাম অনুযায়ী এই ওয়াচটি অনেক প্রিমিয়াম। প্যাকেজিং চমৎকার ছিল এবং ডেলিভারি ম্যান খুব অমায়িক ছিল।'
+          comment: 'কালকে অর্ডার করেছিলাম আজকেই ডেলিভারি পেলাম! ওয়াচটির ডিসপ্লে আর কলিং কোয়ালিটি সত্যি দারুণ।'
         }
       ]
     },

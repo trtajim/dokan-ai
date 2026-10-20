@@ -19,6 +19,7 @@
         ধন্যবাদ <strong>{{ form.customer_name }}</strong>। আমাদের প্রতিনিধি খুব শীঘ্রই আপনার নম্বরে ({{ form.customer_phone }}) ফোন করে অর্ডার নিশ্চিত করবেন।
       </p>
       <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 max-w-sm mx-auto text-left text-xs space-y-1.5">
+        <div v-if="selectedVariantName" class="flex justify-between"><span>সিলেক্টেড ভ্যারিয়েন্ট:</span> <strong class="text-slate-800">{{ selectedVariantName }}</strong></div>
         <div class="flex justify-between"><span>মোট বিল:</span> <strong class="text-emerald-700 font-bold">৳{{ totalBill }}</strong></div>
         <div class="flex justify-between"><span>পেমেন্ট মাধ্যম:</span> <span>ক্যাশ অন ডেলিভারি</span></div>
         <div class="flex justify-between"><span>ডেলিভারি ঠিকানা:</span> <span class="truncate max-w-[180px]">{{ form.customer_address }}</span></div>
@@ -34,6 +35,24 @@
     <!-- The Active Checkout Form -->
     <form v-else @submit.prevent="submitOrder" class="space-y-4 text-xs sm:text-sm">
       
+      <!-- VARIANT SELECTOR (E.g. 1kg vs 2kg or M vs L vs XL) -->
+      <div v-if="availableVariants.length > 0" class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-2">
+        <label class="block font-bold text-slate-800">পণ্য নির্বাচন করুন (সাইজ/ওজন/প্যাক): <span class="text-red-500">*</span></label>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <button 
+            v-for="(v, vIdx) in availableVariants" 
+            :key="vIdx"
+            type="button"
+            @click="selectedVariant = v"
+            class="p-2.5 rounded-xl border-2 text-center transition-all flex flex-col items-center justify-center gap-0.5"
+            :class="selectedVariant?.name === v.name ? borderActiveDeliveryClass : 'border-slate-200 bg-white hover:border-slate-300'"
+          >
+            <span class="font-bold text-xs truncate max-w-full">{{ v.name }}</span>
+            <span class="text-[11px] font-black text-slate-900">৳{{ v.price || store.price }}</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Customer Name -->
       <div>
         <label class="block font-bold text-slate-800 mb-1.5">আপনার নাম: <span class="text-red-500">*</span></label>
@@ -96,7 +115,7 @@
         </div>
       </div>
 
-      <!-- Delivery Zone Selection with Custom Store Fees -->
+      <!-- Delivery Zone Selection -->
       <div>
         <label class="block font-bold text-slate-800 mb-2">ডেলিভারি এরিয়া নির্বাচন করুন:</label>
         <div class="grid grid-cols-2 gap-3">
@@ -128,7 +147,7 @@
       <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-2 mt-4">
         <div class="flex justify-between text-slate-600">
           <span>প্রোডাক্ট মূল্য:</span>
-          <span>৳{{ store.price }} × {{ form.quantity }} = <strong>৳{{ store.price * form.quantity }}</strong></span>
+          <span>৳{{ unitItemPrice }} × {{ form.quantity }} = <strong>৳{{ unitItemPrice * form.quantity }}</strong></span>
         </div>
         <div class="flex justify-between text-slate-600">
           <span>ডেলিভারি চার্জ:</span>
@@ -160,7 +179,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, watch } from 'vue'
 import { ShieldCheck, ShoppingBag, CheckCircle2, Loader2 } from 'lucide-vue-next'
 import confetti from 'canvas-confetti'
 
@@ -174,6 +193,27 @@ const props = defineProps({
 const submitting = ref(false)
 const orderSubmitted = ref(false)
 const phoneError = ref(false)
+
+const availableVariants = computed(() => {
+  return props.store.variants || props.store.config?.variants || []
+})
+
+const selectedVariant = ref(null)
+
+watch(availableVariants, (vars) => {
+  if (vars && vars.length > 0 && !selectedVariant.value) {
+    selectedVariant.value = vars[0]
+  }
+}, { immediate: true })
+
+const selectedVariantName = computed(() => selectedVariant.value?.name || '')
+
+const unitItemPrice = computed(() => {
+  if (selectedVariant.value && typeof selectedVariant.value.price === 'number') {
+    return selectedVariant.value.price
+  }
+  return props.store.price || 0
+})
 
 const form = reactive({
   customer_name: '',
@@ -192,7 +232,7 @@ const feeOutside = computed(() => {
 })
 
 const deliveryFee = computed(() => form.delivery_zone === 'outside_dhaka' ? feeOutside.value : feeInside.value)
-const totalBill = computed(() => (props.store.price * form.quantity) + deliveryFee.value)
+const totalBill = computed(() => (unitItemPrice.value * form.quantity) + deliveryFee.value)
 
 const decrementQty = () => {
   if (form.quantity > 1) form.quantity--
@@ -216,10 +256,10 @@ const badgeClass = computed(() => {
 
 const borderActiveDeliveryClass = computed(() => {
   const c = props.store.theme_color
-  if (c === 'indigo') return 'border-indigo-600 bg-indigo-50/40 text-indigo-900'
-  if (c === 'rose') return 'border-rose-600 bg-rose-50/40 text-rose-900'
-  if (c === 'amber') return 'border-amber-600 bg-amber-50/40 text-amber-900'
-  return 'border-emerald-600 bg-emerald-50/40 text-emerald-900'
+  if (c === 'indigo') return 'border-indigo-600 bg-indigo-50/60 text-indigo-900 font-bold'
+  if (c === 'rose') return 'border-rose-600 bg-rose-50/60 text-rose-900 font-bold'
+  if (c === 'amber') return 'border-amber-600 bg-amber-50/60 text-amber-900 font-bold'
+  return 'border-emerald-600 bg-emerald-50/60 text-emerald-900 font-bold'
 })
 
 const totalPriceTextClass = computed(() => {
@@ -258,7 +298,8 @@ const submitOrder = async () => {
         customer_address: form.customer_address,
         delivery_zone: form.delivery_zone,
         quantity: form.quantity,
-        unit_price: props.store.price
+        unit_price: unitItemPrice.value,
+        selected_variant: selectedVariantName.value
       }
     })
 
