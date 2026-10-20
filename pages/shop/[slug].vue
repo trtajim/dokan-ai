@@ -368,7 +368,7 @@
             <div class="bg-slate-900 text-white p-2.5 sm:p-3 rounded-2xl rounded-br-none ml-auto max-w-[85%] text-xs shadow-xs">
               {{ log.prompt }}
             </div>
-            <div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-bl-none mr-auto max-w-[90%] text-xs text-slate-800 space-y-2 shadow-xs">
+            <div v-if="log.response" class="bg-white border border-slate-200 p-3 rounded-2xl rounded-bl-none mr-auto max-w-[90%] text-xs text-slate-800 space-y-2 shadow-xs">
               <div class="flex items-start gap-2">
                 <CheckCircle2 class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                 <span class="font-medium leading-relaxed">{{ log.response }}</span>
@@ -545,6 +545,20 @@ const submitAiEdit = async () => {
   if (!instruction) return
 
   aiInstruction.value = ''
+  
+  // Optimistically append the user message immediately before waiting for response
+  const activeLogIndex = editLogs.value.length
+  editLogs.value.push({
+    prompt: instruction,
+    response: '',
+    suggestions: []
+  })
+
+  await nextTick()
+  if (editorScroll.value) {
+    editorScroll.value.scrollTop = editorScroll.value.scrollHeight
+  }
+
   isAiEditing.value = true
 
   try {
@@ -560,11 +574,12 @@ const submitAiEdit = async () => {
       if (res.store && data.value) {
         data.value.store = { ...data.value.store, ...res.store }
       }
-      editLogs.value.push({
-        prompt: instruction,
-        response: res.reply,
-        suggestions: res.suggestions || []
-      })
+      
+      // Update the active log item with the response
+      if (editLogs.value[activeLogIndex]) {
+        editLogs.value[activeLogIndex].response = res.reply
+        editLogs.value[activeLogIndex].suggestions = res.suggestions || []
+      }
 
       // Persist in tab session so refresh doesn't wipe chat history
       if (import.meta.client) {
@@ -583,6 +598,9 @@ const submitAiEdit = async () => {
       }
     }
   } catch (err) {
+    if (editLogs.value[activeLogIndex]) {
+      editLogs.value[activeLogIndex].response = 'AI এডিট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।'
+    }
     toast.error('AI এডিট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।')
   } finally {
     isAiEditing.value = false
