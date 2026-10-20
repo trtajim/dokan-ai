@@ -67,12 +67,18 @@ Reel / Video URL: "${video_reel_url || ''}"
 Notes: ${description || '100% genuine with warranty'}
 Theme: ${theme_color || 'emerald'}
 
+CRITICAL HEADLINE RULES:
+1. "headline" MUST BE COMPACT & PUNCHY: Maximum 10-14 words (1 to 2 lines max). Do NOT write a whole paragraph or huge run-on sentence as the headline!
+2. Put the full detailed explanation and benefits inside "subheadline" (2 concise sentences).
+3. "badge_text": A clean 2-4 word Bengali highlight tag directly relevant to this product.
+4. "seller_tagline": A relevant, authentic short Bengali line directly specific to this product (e.g. for honey: pure wild honey assurance, for watch: original imported guarantee).
+
 Respond ONLY with a strictly valid JSON matching this schema:
 {
-        "headline": "Emotional, curiosity-driven Bengali headline solving customer problem",
+        "headline": "Short, punchy, high-converting Bengali headline (max 10-14 words)",
         "subheadline": "2-sentence transformation explanation highlighting benefits and why order now",
-        "badge_text": "A punchy, relevant 2-4 word Bengali highlight tag directly relevant to this product (e.g. for organic items: origin/purity highlight, for tech: feature highlight)",
-        "seller_tagline": "A relevant, authentic short Bengali line directly specific to this product without any generic words (e.g. for honey: pure wild honey assurance, for watch: original imported guarantee)",
+        "badge_text": "A punchy, relevant 2-4 word Bengali highlight tag directly relevant to this product",
+        "seller_tagline": "A relevant, authentic short Bengali line directly specific to this product",
         "urgency_text": "🔥 অফারটি সীমিত সময়ের জন্য! ক্যাশ অন ডেলিভারিতে অর্ডার করুন!",
         "video_reel_url": "${video_reel_url || ''}",
         "features": [

@@ -56,7 +56,7 @@ Current Store Data:
 - Badge Text: "${currentStore.config?.badge_text ?? 'অরিজিনাল কোয়ালিটি নিশ্চয়তা'}"
 - Seller Tagline: "${currentStore.config?.seller_tagline ?? '১০০% খাঁটি ও গুণগত মান সম্পন্ন'}"
 - CTA Button Text: "${currentStore.config?.cta_button_text ?? 'এখনই অর্ডার করুন (ক্যাশ অন ডেলিভারি)'}"
-- Headline: "${currentStore.config?.headline ?? ''}"
+- Headline: "${currentStore.config?.headline ?? ''}" (Must be punchy & compact, max 10-14 words, not a long paragraph)
 - Subheadline: "${currentStore.config?.subheadline ?? ''}"
 - Features: ${JSON.stringify(currentStore.config?.features ?? [])}
 - FAQs: ${JSON.stringify(currentStore.config?.faqs ?? [])}
