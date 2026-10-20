@@ -87,10 +87,10 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // PATCH: Quick stock or pixel update from dashboard
+  // PATCH: Quick stock, pixel, or telegram update from dashboard
   if (method === 'PATCH') {
     const body = await readBody(event)
-    const { slug, stock, pixel_id, meta_access_token } = body
+    const { slug, stock, pixel_id, meta_access_token, telegram_chat_id } = body
 
     if (!slug) {
       throw createError({ statusCode: 400, message: 'slug is required' })
@@ -108,6 +108,7 @@ export default defineEventHandler(async (event) => {
       if (typeof stock === 'number') currentStore.config.stock = updatedStock
       if (pixel_id !== undefined) currentStore.config.pixel_id = pixel_id ? String(pixel_id).trim() : null
       if (meta_access_token !== undefined) currentStore.config.meta_access_token = meta_access_token ? String(meta_access_token).trim() : null
+      if (telegram_chat_id !== undefined) currentStore.config.telegram_chat_id = telegram_chat_id ? String(telegram_chat_id).trim() : null
       memoryStore.setStore(slug, currentStore)
     }
 
@@ -120,6 +121,7 @@ export default defineEventHandler(async (event) => {
           if (typeof stock === 'number') cfg.stock = updatedStock
           if (pixel_id !== undefined) cfg.pixel_id = pixel_id ? String(pixel_id).trim() : null
           if (meta_access_token !== undefined) cfg.meta_access_token = meta_access_token ? String(meta_access_token).trim() : null
+          if (telegram_chat_id !== undefined) cfg.telegram_chat_id = telegram_chat_id ? String(telegram_chat_id).trim() : null
           await supabase.from('stores').update({ config: cfg }).eq('slug', slug)
         }
       } catch (e) {
@@ -131,7 +133,8 @@ export default defineEventHandler(async (event) => {
       success: true, 
       stock: updatedStock,
       pixel_id: pixel_id !== undefined ? (pixel_id ? String(pixel_id).trim() : null) : undefined,
-      meta_access_token: meta_access_token !== undefined ? (meta_access_token ? String(meta_access_token).trim() : null) : undefined
+      meta_access_token: meta_access_token !== undefined ? (meta_access_token ? String(meta_access_token).trim() : null) : undefined,
+      telegram_chat_id: telegram_chat_id !== undefined ? (telegram_chat_id ? String(telegram_chat_id).trim() : null) : undefined
     }
   }
 

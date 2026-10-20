@@ -4,6 +4,7 @@
 import { memoryStore, type OrderRecord } from '../../utils/memoryStore'
 import { getSupabaseClient } from '../../utils/supabase'
 import { sendMetaPurchaseEvent } from '../../utils/metaCapi'
+import { sendTelegramMessage, formatOrderTelegramMessage } from '../../utils/telegram'
 
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
@@ -123,6 +124,50 @@ export default defineEventHandler(async (event) => {
     }
 
     memoryStore.addOrder(newOrder)
+
+    // Send Telegram Notification to Merchant if chat_id is configured
+    try {
+      let storeConfig: any = null
+      let storeTitle: string = store_slug
+
+      if (supabase) {
+        const { data: storeData } = await supabase.from('stores').select('product_title, config').eq('slug', store_slug).single()
+        if (storeData) {
+          storeConfig = storeData.config
+          storeTitle = storeData.product_title || store_slug
+        }
+      }
+      if (!storeConfig) {
+        const mem = memoryStore.getStore(store_slug)
+        if (mem) {
+          storeConfig = mem.config
+          storeTitle = mem.product_title || store_slug
+        }
+      }
+
+      const telegramChatId = storeConfig?.telegram_chat_id
+      if (telegramChatId) {
+        const msgText = formatOrderTelegramMessage({
+          store_title: storeTitle,
+          store_slug,
+          customer_name: newOrder.customer_name,
+          customer_phone: newOrder.customer_phone,
+          customer_address: newOrder.customer_address,
+          selected_variant: newOrder.selected_variant,
+          quantity: newOrder.quantity,
+          total_price: newOrder.total_price,
+          delivery_zone: newOrder.delivery_zone,
+          delivery_fee: newOrder.delivery_fee
+        })
+
+        await sendTelegramMessage({
+          chatId: telegramChatId,
+          text: msgText
+        })
+      }
+    } catch (telegramErr) {
+      console.warn('Telegram new order notification error:', telegramErr)
+    }
 
     return {
       success: true,
