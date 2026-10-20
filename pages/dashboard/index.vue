@@ -495,10 +495,21 @@
 
         <!-- If bot username configured in env -->
         <div v-if="telegramBotUsername" class="space-y-3 text-xs">
-          <div class="p-3 bg-sky-50/70 border border-sky-100 rounded-2xl space-y-2">
+          <!-- Active Status Banner if already connected -->
+          <div v-if="telegramModal.store?.config?.telegram_chat_id" class="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-2.5 text-emerald-800">
+            <div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0">
+              <CheckCircle2 class="w-4 h-4" />
+            </div>
+            <div>
+              <span class="font-bold text-xs block">টেলিগ্রাম সফলভাবে কানেক্টেড!</span>
+              <span class="text-[10px] text-emerald-700">Chat ID: {{ telegramModal.store?.config?.telegram_chat_id }}</span>
+            </div>
+          </div>
+
+          <div v-else class="p-3 bg-sky-50/70 border border-sky-100 rounded-2xl space-y-2">
             <span class="font-bold text-sky-900 block">⚡ ১-ক্লিক অটোমেটিক কানেক্ট:</span>
             <p class="text-slate-600 leading-relaxed text-[11px]">
-              নিচের বাটনে ক্লিক করে টেলিগ্রাম বটে প্রবেশ করুন এবং <strong>START</strong> চাপুন। স্বয়ংক্রিয়ভাবে নোটিফিকেশন যুক্ত হয়ে যাবে!
+              নিচের বাটনে ক্লিক করে টেলিগ্রাম বটে প্রবেশ করুন এবং <strong>START</strong> চাপুন। সাথে সাথে এখানে কানেক্টেড স্ট্যাটাস চলে আসবে!
             </p>
             <a 
               :href="`https://t.me/${telegramBotUsername}?start=store_${telegramModal.store?.slug}`"
@@ -897,10 +908,37 @@ const openPixelModal = (st) => {
   pixelModal.isOpen = true
 }
 
+let telegramPollingTimer = null
+
 const openTelegramModal = (st) => {
   telegramModal.store = st
   telegramModal.chatId = st.config?.telegram_chat_id || ''
   telegramModal.isOpen = true
+
+  // Auto-poll store status every 2.5s while modal is open to detect when user taps START in Telegram
+  if (telegramPollingTimer) clearInterval(telegramPollingTimer)
+  telegramPollingTimer = setInterval(async () => {
+    if (!telegramModal.isOpen || !telegramModal.store) {
+      clearInterval(telegramPollingTimer)
+      return
+    }
+    try {
+      const res = await $fetch(`/api/stores?slug=${telegramModal.store.slug}`)
+      if (res && res.store?.config?.telegram_chat_id) {
+        const foundId = res.store.config.telegram_chat_id
+        if (foundId !== telegramModal.store.config?.telegram_chat_id) {
+          telegramModal.store.config.telegram_chat_id = foundId
+          telegramModal.chatId = foundId
+          const match = stores.value.find(s => s.slug === telegramModal.store.slug)
+          if (match) {
+            if (!match.config) match.config = {}
+            match.config.telegram_chat_id = foundId
+          }
+          toast.success('টেলিগ্রাম কানেকশন সফল হয়েছে!')
+        }
+      }
+    } catch (e) {}
+  }, 2500)
 }
 
 const confirmTelegramUpdate = async () => {
