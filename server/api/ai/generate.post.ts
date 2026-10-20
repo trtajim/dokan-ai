@@ -44,12 +44,12 @@ export default defineEventHandler(async (event) => {
 
   const allImages = Array.isArray(images) && images.length > 0 
     ? images 
-    : [image_url || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80']
+    : (image_url ? [image_url] : [])
 
   // Intelligent Image Placement: Hero image, Secondary image, and Trust image
-  const heroImage = allImages[0]
-  const secondaryImage = allImages.length > 1 ? allImages[1] : allImages[0]
-  const featureImage = allImages.length > 2 ? allImages[2] : (allImages.length > 1 ? allImages[1] : allImages[0])
+  const heroImage = allImages[0] || null
+  const secondaryImage = allImages.length > 1 ? allImages[1] : null
+  const featureImage = allImages.length > 2 ? allImages[2] : (allImages.length > 1 ? allImages[1] : null)
 
   let generatedConfig: any = null
 

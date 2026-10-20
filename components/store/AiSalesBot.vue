@@ -1,16 +1,13 @@
 <template>
-  <div class="fixed bottom-16 sm:bottom-6 right-3 sm:right-6 z-40">
+  <div class="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-40">
     <!-- Chat Trigger Bubble -->
     <button 
       v-if="!isOpen"
       @click="isOpen = true"
-      class="flex items-center gap-2 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full text-white shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 font-bold text-xs sm:text-sm"
+      class="flex items-center gap-2 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full text-white shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 font-bold text-xs sm:text-sm cursor-pointer"
       :class="primaryBgClass"
     >
-      <div class="relative">
-        <Bot class="w-4 h-4 sm:w-5 sm:h-5" />
-        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-300 rounded-full animate-ping"></span>
-      </div>
+      <Bot class="w-4 h-4 sm:w-5 sm:h-5" />
       <span>AI সহায়ক</span>
     </button>
 
@@ -35,13 +32,13 @@
         </button>
       </div>
 
-      <!-- Quick Question Chips -->
-      <div class="px-2.5 py-1.5 bg-slate-50 border-b border-slate-100 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+      <!-- Quick Suggestion Buttons (Grid layout, no horizontal scroll) -->
+      <div class="p-2.5 bg-slate-50 border-b border-slate-100 grid grid-cols-2 gap-1.5">
         <button 
           v-for="(chip, cIdx) in quickChips" 
           :key="cIdx"
           @click="askQuickChip(chip)"
-          class="whitespace-nowrap px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-semibold bg-white border border-slate-200 text-slate-700 hover:border-slate-400 transition-colors"
+          class="px-2 py-1.5 rounded-xl text-[11px] font-bold bg-white border border-slate-200/90 text-slate-800 hover:border-slate-400 hover:bg-slate-100 active:scale-95 transition-all text-center truncate cursor-pointer shadow-2xs"
         >
           {{ chip }}
         </button>

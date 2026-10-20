@@ -94,13 +94,13 @@
       
       <!-- HERO CARD: PRODUCT PRESENTATION & TRUST BADGES -->
       <section class="bg-white rounded-3xl p-4 sm:p-8 border border-slate-200/90 shadow-xl shadow-slate-200/40 relative overflow-hidden">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10 items-center">
+        <div class="grid grid-cols-1 gap-6 sm:gap-10 items-center" :class="productImages.length > 0 ? 'md:grid-cols-2' : 'max-w-2xl mx-auto text-center'">
           
-          <!-- Image Gallery with Thumbnails & Zoom Hover -->
-          <div class="space-y-3">
+          <!-- Image Gallery with Thumbnails (Only rendered if store actually has uploaded photos) -->
+          <div v-if="productImages.length > 0" class="space-y-3">
             <div class="aspect-square rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-100 border border-slate-200/80 relative group flex items-center justify-center shadow-inner">
               <img 
-                :src="activeHeroImage || store.config?.hero_image || store.image_url" 
+                :src="activeHeroImage || store.config?.hero_image || store.image_url || productImages[0]" 
                 :alt="store.product_title" 
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
               />
@@ -391,8 +391,8 @@
           </div>
         </div>
 
-        <!-- Editor Prompt Input Bar (Pinned at bottom) -->
-        <div class="p-3 border-t border-slate-100 bg-white shrink-0 shadow-lg">
+        <!-- Editor Prompt Input Bar (Pinned at bottom, accounting for mobile safe area) -->
+        <div class="p-3 pb-6 sm:pb-3 border-t border-slate-100 bg-white shrink-0 shadow-lg z-20">
           <form @submit.prevent="submitAiEdit" class="flex items-center gap-2">
             <input 
               v-model="aiInstruction" 
