@@ -202,7 +202,7 @@
           <div v-if="finalDisplayOrders.length === 0" class="py-10 text-center text-slate-400 font-semibold text-xs">
             কোনো অর্ডার খুঁজে পাওয়া যায়নি।
           </div>
-          <div v-for="order in finalDisplayOrders" :key="'mob_' + order.id" class="p-4 space-y-2.5">
+          <div v-for="order in finalDisplayOrders" :key="'mob_' + order.id" class="p-3.5 space-y-2">
             <div class="flex items-start justify-between gap-2">
               <div>
                 <h4 class="font-bold text-slate-900 text-sm">{{ order.customer_name }}</h4>
@@ -217,35 +217,34 @@
                 @change="changeStatus(order.id, $event.target.value)"
                 class="px-2 py-1 text-[11px] font-bold rounded-lg border border-slate-200 bg-white text-slate-700 focus:outline-none focus:border-emerald-500"
               >
-                <option value="pending">পেন্ডিং (Pending)</option>
-                <option value="confirmed">কনফার্মড (Confirmed)</option>
-                <option value="under_courier">কুরিয়ারে আছে (Under Courier)</option>
-                <option value="delivered">ডেলিভার্ড (Delivered)</option>
-                <option value="cancelled">বাতিল (Cancelled)</option>
+                <option value="pending">পেন্ডিং</option>
+                <option value="confirmed">কনফার্মড</option>
+                <option value="under_courier">কুরিয়ারে আছে</option>
+                <option value="delivered">ডেলিভার্ড</option>
+                <option value="cancelled">বাতিল</option>
               </select>
             </div>
 
-            <div class="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200/70 space-y-1">
-              <div class="flex justify-between text-[11px]">
-                <span class="text-slate-400">স্টোর / ভ্যারিয়েন্ট:</span>
-                <span class="font-bold text-slate-800">/s/{{ order.store_slug }} {{ order.selected_variant ? `(${order.selected_variant})` : '' }}</span>
-              </div>
-              <div class="flex justify-between text-[11px]">
-                <span class="text-slate-400">বিল (পরিমাণ):</span>
-                <span class="font-black text-slate-900">৳{{ order.total_price }} ({{ order.quantity }}টি)</span>
-              </div>
-              <div class="text-[11px] text-slate-500 pt-1 border-t border-slate-200/50 truncate">
-                📍 {{ order.customer_address }}
-              </div>
+            <!-- Essential Info Row: Dokan & Poriman -->
+            <div class="flex items-center justify-between text-xs bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200/60">
+              <span class="text-slate-600 font-bold truncate max-w-[140px]">/s/{{ order.store_slug }}</span>
+              <span class="font-black text-slate-900">৳{{ order.total_price }} ({{ order.quantity }}টি)</span>
             </div>
 
-            <!-- Mobile Footer Row -->
+            <!-- Mobile Footer: Details Button & Delete -->
             <div class="flex items-center justify-between pt-1">
-              <span class="text-[10px] text-slate-400">{{ formatTime(order.created_at) }}</span>
+              <button 
+                @click="viewOrderDetails(order)"
+                class="px-2.5 py-1 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
+              >
+                <Eye class="w-3.5 h-3.5" />
+                <span>বিস্তারিত দেখুন</span>
+              </button>
+
               <button 
                 v-if="order.status !== 'cancelled'"
                 @click="changeStatus(order.id, 'cancelled')"
-                class="text-xs text-slate-400 hover:text-red-600 flex items-center gap-1"
+                class="text-xs text-slate-400 hover:text-red-600 flex items-center gap-1 p-1"
                 title="অর্ডার বাতিল"
               >
                 <Trash2 class="w-3 h-3" />
@@ -262,10 +261,10 @@
               <tr>
                 <th class="py-3 px-4">কাস্টমার</th>
                 <th class="py-3 px-4">ফোন নম্বর</th>
-                <th class="py-3 px-4">দোকান ও ভ্যারিয়েন্ট</th>
-                <th class="py-3 px-4">ঠিকানা ও এরিয়া</th>
-                <th class="py-3 px-4">পরিমাণ ও মোট বিল</th>
-                <th class="py-3 px-4">অর্ডার স্ট্যাটাস</th>
+                <th class="py-3 px-4">দোকান</th>
+                <th class="py-3 px-4">পরিমাণ ও বিল</th>
+                <th class="py-3 px-4">স্ট্যাটাস</th>
+                <th class="py-3 px-4 text-center">বিস্তারিত</th>
                 <th class="py-3 px-4 text-right">ডিলিট</th>
               </tr>
             </thead>
@@ -276,13 +275,12 @@
                 </td>
               </tr>
               <tr v-for="order in finalDisplayOrders" :key="order.id" class="hover:bg-slate-50/60 transition-colors">
-                <!-- Customer Name -->
-                <td class="py-3.5 px-4">
-                  <div class="font-bold text-slate-900">{{ order.customer_name }}</div>
-                  <span class="text-[11px] text-slate-400 block">{{ formatTime(order.created_at) }}</span>
+                <!-- Name -->
+                <td class="py-3.5 px-4 font-bold text-slate-900">
+                  {{ order.customer_name }}
                 </td>
 
-                <!-- Phone (with 1-click Call) -->
+                <!-- Number -->
                 <td class="py-3.5 px-4 font-mono font-semibold">
                   <a :href="`tel:${order.customer_phone}`" class="inline-flex items-center gap-1.5 text-emerald-700 hover:underline">
                     <PhoneCall class="w-3.5 h-3.5 text-emerald-600" />
@@ -290,29 +288,18 @@
                   </a>
                 </td>
 
-                <!-- Store & Variant -->
+                <!-- Dokan -->
                 <td class="py-3.5 px-4">
-                  <div class="text-xs font-bold text-slate-800">/s/{{ order.store_slug }}</div>
-                  <span v-if="order.selected_variant" class="text-[11px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold">
-                    {{ order.selected_variant }}
-                  </span>
+                  <span class="font-bold text-slate-800">/s/{{ order.store_slug }}</span>
                 </td>
 
-                <!-- Address -->
-                <td class="py-3.5 px-4 max-w-xs">
-                  <div class="truncate text-xs">{{ order.customer_address }}</div>
-                  <span class="text-[10px] px-2 py-0.5 rounded font-bold" :class="order.delivery_zone === 'outside_dhaka' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'">
-                    {{ order.delivery_zone === 'outside_dhaka' ? 'ঢাকার বাইরে' : 'ঢাকার ভিতরে' }}
-                  </span>
-                </td>
-
-                <!-- Quantity and Bill -->
+                <!-- Poriman -->
                 <td class="py-3.5 px-4">
-                  <div class="font-bold text-slate-900">৳{{ order.total_price }}</div>
-                  <span class="text-[11px] text-slate-400">{{ order.quantity }} টি আইটেম</span>
+                  <span class="font-black text-slate-900">৳{{ order.total_price }}</span>
+                  <span class="text-xs text-slate-400 ml-1">({{ order.quantity }} টি)</span>
                 </td>
 
-                <!-- Status Select Dropdown (Interactive update) -->
+                <!-- Status Select Dropdown -->
                 <td class="py-3.5 px-4">
                   <select 
                     :value="order.status"
@@ -334,7 +321,18 @@
                   </select>
                 </td>
 
-                <!-- Delete / Cancel Button -->
+                <!-- Details Button -->
+                <td class="py-3.5 px-4 text-center">
+                  <button 
+                    @click="viewOrderDetails(order)"
+                    class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-colors cursor-pointer"
+                  >
+                    <Eye class="w-3.5 h-3.5" />
+                    <span>বিস্তারিত</span>
+                  </button>
+                </td>
+
+                <!-- Delete Button -->
                 <td class="py-3.5 px-4 text-right">
                   <button 
                     v-if="order.status !== 'cancelled'"
@@ -420,12 +418,106 @@
       </div>
     </div>
 
+    <!-- Custom Modal: Order Full Details -->
+    <div v-if="orderModal.isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+      <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-5 animate-in fade-in zoom-in-95 duration-200">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="text-base font-black text-slate-900">অর্ডার বিস্তারিত বিবরণ</h3>
+            <span class="text-xs text-slate-400 font-mono">{{ formatTime(orderModal.order?.created_at) }}</span>
+          </div>
+          <button 
+            @click="orderModal.isOpen = false"
+            class="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            <X class="w-5 h-5" />
+          </button>
+        </div>
+
+        <div v-if="orderModal.order" class="space-y-3.5 text-xs sm:text-sm">
+          <!-- Customer Info -->
+          <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/70 space-y-1.5">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">গ্রাহক তথ্য</div>
+            <div class="font-bold text-slate-900 text-sm sm:text-base">{{ orderModal.order.customer_name }}</div>
+            <div class="flex items-center gap-2 pt-0.5">
+              <a :href="`tel:${orderModal.order.customer_phone}`" class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg font-mono font-bold">
+                <PhoneCall class="w-3.5 h-3.5" />
+                <span>{{ orderModal.order.customer_phone }}</span>
+              </a>
+              <span class="text-slate-400 text-xs">(কল দিতে ট্যাপ করুন)</span>
+            </div>
+          </div>
+
+          <!-- Delivery Address -->
+          <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/70 space-y-1.5">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">ডেলিভারি ঠিকানা ও জোন</div>
+            <div class="text-slate-800 font-medium leading-relaxed">
+              📍 {{ orderModal.order.customer_address }}
+            </div>
+            <div class="pt-1">
+              <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold" :class="orderModal.order.delivery_zone === 'outside_dhaka' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'">
+                {{ orderModal.order.delivery_zone === 'outside_dhaka' ? 'ঢাকার বাইরে' : 'ঢাকার ভিতরে' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Product & Order Specs -->
+          <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/70 space-y-2">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">অর্ডার সারসংক্ষেপ</div>
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-500">দোকান লিংক:</span>
+              <NuxtLink :to="`/s/${orderModal.order.store_slug}`" target="_blank" class="font-bold text-emerald-600 hover:underline">
+                /s/{{ orderModal.order.store_slug }}
+              </NuxtLink>
+            </div>
+            <div v-if="orderModal.order.selected_variant" class="flex justify-between items-center text-xs">
+              <span class="text-slate-500">সিলেক্টেড ভ্যারিয়েন্ট:</span>
+              <span class="font-bold text-slate-800 bg-white px-2 py-0.5 rounded border border-slate-200">{{ orderModal.order.selected_variant }}</span>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-500">পণ্যের পরিমাণ:</span>
+              <span class="font-bold text-slate-800">{{ orderModal.order.quantity }} টি</span>
+            </div>
+            <div class="flex justify-between items-center text-sm pt-2 border-t border-slate-200 font-black">
+              <span class="text-slate-900">সর্বমোট ক্যাশ অন ডেলিভারি বিল:</span>
+              <span class="text-emerald-700 text-base">৳{{ orderModal.order.total_price }}</span>
+            </div>
+          </div>
+
+          <!-- Status Editor in Modal -->
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-xs font-bold text-slate-600">অর্ডার স্ট্যাটাস পরিবর্তন:</span>
+            <select 
+              :value="orderModal.order.status"
+              @change="changeStatus(orderModal.order.id, $event.target.value); orderModal.order.status = $event.target.value"
+              class="px-3 py-1.5 text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:border-emerald-500"
+            >
+              <option value="pending">পেন্ডিং (Pending)</option>
+              <option value="confirmed">কনফার্মড (Confirmed)</option>
+              <option value="under_courier">কুরিয়ারে আছে (Under Courier)</option>
+              <option value="delivered">ডেলিভার্ড (Delivered)</option>
+              <option value="cancelled">বাতিল (Cancelled)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button
+            @click="orderModal.isOpen = false"
+            class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer"
+          >
+            বন্ধ করুন
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
-import { RefreshCw, Plus, Banknote, ShoppingBag, Clock, Store, Boxes, Copy, ExternalLink, PhoneCall, Trash2 } from 'lucide-vue-next'
+import { RefreshCw, Plus, Banknote, ShoppingBag, Clock, Store, Boxes, Copy, ExternalLink, PhoneCall, Trash2, Eye, X } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 import { useAppToast } from '~/composables/useAppToast'
 
@@ -454,6 +546,16 @@ const deleteModal = reactive({
   store: null,
   isSubmitting: false
 })
+
+const orderModal = reactive({
+  isOpen: false,
+  order: null
+})
+
+const viewOrderDetails = (order) => {
+  orderModal.order = order
+  orderModal.isOpen = true
+}
 
 onMounted(async () => {
   await initAuth()
