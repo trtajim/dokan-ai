@@ -50,8 +50,9 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <!-- AI Editor Trigger Button -->
+          <!-- AI Editor Trigger Button: ONLY VISIBLE TO LOGGED IN OWNER -->
           <button 
+            v-if="isStoreOwner"
             @click="isEditingStore = true"
             class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
           >
@@ -387,15 +388,29 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, onMounted } from 'vue'
 import { Flame, ShoppingBag, ArrowDown, Check, Sparkles, Star, HelpCircle, X, Video, ShieldCheck, CheckCircle2, Loader2, Send } from 'lucide-vue-next'
+import { useAuth } from '~/composables/useAuth'
 
+const { currentUser, initAuth } = useAuth()
 const route = useRoute()
 const slug = route.params.slug
+
+onMounted(() => {
+  initAuth()
+})
 
 const { data, pending, refresh } = await useFetch(`/api/stores?slug=${slug}`)
 
 const store = computed(() => data.value?.store)
+
+// Owner Check: Only the creator or the demo judge can see the "AI Edit" button
+const isStoreOwner = computed(() => {
+  if (!currentUser.value) return false
+  if (currentUser.value.isGuest) return true
+  const storeUserId = store.value?.user_id || store.value?.config?.user_id
+  return storeUserId === currentUser.value.id || currentUser.value.id === 'demo_judge_account_id'
+})
 
 const showUrgencyBar = computed(() => {
   return store.value?.config?.show_urgency_bar !== false
