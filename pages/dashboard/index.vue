@@ -7,12 +7,7 @@
       <!-- Top Title -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">মার্চেন্ট ড্যাশবোর্ড</h1>
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
-              {{ currentUser?.displayName }}
-            </span>
-          </div>
+          <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">মার্চেন্ট ড্যাশবোর্ড</h1>
           <p class="text-xs sm:text-sm text-slate-500 mt-1">আপনার সকল সক্রিয় দোকান, লাইভ স্টক ও কাস্টমারদের ক্যাশ অন ডেলিভারি অর্ডার তালিকা</p>
         </div>
       </div>
@@ -25,7 +20,8 @@
             <span class="text-xs font-bold uppercase tracking-wider text-slate-500">মোট বিক্রয় (অর্ডার ভ্যালু)</span>
             <Banknote class="w-5 h-5 text-emerald-600" />
           </div>
-          <div class="text-2xl sm:text-3xl font-black text-slate-900">৳{{ totalRevenue.toLocaleString() }}</div>
+          <div v-if="isLoading" class="h-9 w-28 bg-slate-200 animate-pulse rounded-lg my-1"></div>
+          <div v-else class="text-2xl sm:text-3xl font-black text-slate-900">৳{{ totalRevenue.toLocaleString() }}</div>
           <span class="text-[11px] text-emerald-600 font-semibold mt-1 block">ক্যাশ অন ডেলিভারি ভ্যালু</span>
         </div>
 
@@ -35,7 +31,8 @@
             <span class="text-xs font-bold uppercase tracking-wider text-slate-500">মোট অর্ডার</span>
             <ShoppingBag class="w-5 h-5 text-indigo-600" />
           </div>
-          <div class="text-2xl sm:text-3xl font-black text-slate-900">{{ filteredOrdersByStore.length }}</div>
+          <div v-if="isLoading" class="h-9 w-16 bg-slate-200 animate-pulse rounded-lg my-1"></div>
+          <div v-else class="text-2xl sm:text-3xl font-black text-slate-900">{{ filteredOrdersByStore.length }}</div>
           <span class="text-[11px] text-slate-500 font-semibold mt-1 block">সর্বমোট প্রাপ্ত অর্ডার</span>
         </div>
 
@@ -45,7 +42,8 @@
             <span class="text-xs font-bold uppercase tracking-wider text-slate-500">পেন্ডিং অর্ডার (কল প্রয়োজন)</span>
             <Clock class="w-5 h-5 text-amber-500" />
           </div>
-          <div class="text-2xl sm:text-3xl font-black text-amber-600">{{ pendingCount }}</div>
+          <div v-if="isLoading" class="h-9 w-16 bg-slate-200 animate-pulse rounded-lg my-1"></div>
+          <div v-else class="text-2xl sm:text-3xl font-black text-amber-600">{{ pendingCount }}</div>
           <span class="text-[11px] text-amber-600 font-semibold mt-1 block">ভেরিফাই করে কনফার্ম করুন</span>
         </div>
 
@@ -55,7 +53,8 @@
             <span class="text-xs font-bold uppercase tracking-wider text-slate-500">আপনার সক্রিয় দোকান</span>
             <Store class="w-5 h-5 text-teal-600" />
           </div>
-          <div class="text-2xl sm:text-3xl font-black text-slate-900">{{ userStores.length }}</div>
+          <div v-if="isLoading" class="h-9 w-16 bg-slate-200 animate-pulse rounded-lg my-1"></div>
+          <div v-else class="text-2xl sm:text-3xl font-black text-slate-900">{{ userStores.length }}</div>
           <span class="text-[11px] text-teal-600 font-semibold mt-1 block">একাধিক ওয়েবসাইট ম্যানেজ করুন</span>
         </div>
       </div>
@@ -66,13 +65,13 @@
           <div>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
               <Boxes class="w-4 h-4 text-emerald-600" />
-              <span>আপনার পরিচালিত দোকানসমূহ ({{ userStores.length }} টি স্টোর)</span>
+              <span>আপনার পরিচালিত দোকানসমূহ <span v-if="!isLoading">({{ userStores.length }} টি স্টোর)</span></span>
             </h2>
             <p class="text-xs text-slate-400 mt-0.5">যে কোনো স্টোরে ক্লিক করে নির্দিষ্ট অর্ডার তালিকা ফিল্টার করুন</p>
           </div>
 
           <!-- Store Switcher Filter -->
-          <div class="flex items-center gap-1.5 overflow-x-auto text-xs">
+          <div v-if="!isLoading" class="flex items-center gap-1.5 overflow-x-auto text-xs">
             <button 
               @click="selectedStoreFilter = 'all'"
               class="px-3 py-1.5 rounded-lg font-bold transition-colors"
@@ -92,8 +91,16 @@
           </div>
         </div>
 
+        <!-- Skeleton loading state for stores -->
+        <div v-if="isLoading" class="space-y-3">
+          <div v-for="i in 3" :key="i" class="h-16 bg-slate-100 animate-pulse rounded-xl"></div>
+        </div>
+
         <!-- Stores Row List -->
-        <div class="divide-y divide-slate-100 border border-slate-200/80 rounded-2xl overflow-hidden bg-white">
+        <div v-else class="divide-y divide-slate-100 border border-slate-200/80 rounded-2xl overflow-hidden bg-white">
+          <div v-if="userStores.length === 0" class="p-8 text-center text-slate-400 text-sm">
+            কোনো সক্রিয় দোকান পাওয়া যায়নি।
+          </div>
           <div 
             v-for="st in userStores" 
             :key="st.id" 
@@ -191,7 +198,13 @@
           </div>
         </div>
 
+        <!-- Loading Skeleton for Orders -->
+        <div v-if="isLoading" class="p-6 space-y-4">
+          <div v-for="i in 4" :key="i" class="h-12 bg-slate-100 animate-pulse rounded-xl"></div>
+        </div>
+
         <!-- Orders: Responsive Card View on Mobile, Table on Desktop -->
+        <template v-else>
         <!-- Mobile Orders List (< md) -->
         <div class="md:hidden divide-y divide-slate-100">
           <div v-if="finalDisplayOrders.length === 0" class="py-10 text-center text-slate-400 font-semibold text-xs">
@@ -344,26 +357,111 @@
             </tbody>
           </table>
         </div>
+        </template>
       </div>
 
     </main>
+
+    <!-- Custom Modal: Edit Stock -->
+    <div v-if="stockModal.isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+      <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">স্টক আপডেট করুন</h3>
+          <p class="text-xs text-slate-500 mt-1 truncate font-medium">দোকান: {{ stockModal.store?.product_title }}</p>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">নতুন স্টক সংখ্যা</label>
+          <input
+            v-model.number="stockModal.value"
+            type="number"
+            min="0"
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+            placeholder="0"
+            @keyup.enter="confirmStockUpdate"
+          />
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button
+            @click="stockModal.isOpen = false"
+            class="px-3.5 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+          >
+            বাতিল
+          </button>
+          <button
+            @click="confirmStockUpdate"
+            :disabled="stockModal.isSubmitting"
+            class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-95 rounded-xl transition-all shadow-sm cursor-pointer disabled:opacity-50"
+          >
+            {{ stockModal.isSubmitting ? 'আপডেট হচ্ছে...' : 'সংরক্ষণ করুন' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom Modal: Confirm Delete Store -->
+    <div v-if="deleteModal.isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+      <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+        <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center">
+          <Trash2 class="w-5 h-5" />
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-slate-900">দোকান ডিলিট করবেন?</h3>
+          <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+            আপনি কি নিশ্চিতভাবে <span class="font-bold text-slate-800">"{{ deleteModal.store?.product_title }}"</span> দোকানটি ডিলিট করতে চান? এই একশনটি ফিরিয়ে আনা যাবে না।
+          </p>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button
+            @click="deleteModal.isOpen = false"
+            class="px-3.5 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+          >
+            না, রাখুন
+          </button>
+          <button
+            @click="confirmDeleteStore"
+            :disabled="deleteModal.isSubmitting"
+            class="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 active:scale-95 rounded-xl transition-all shadow-sm cursor-pointer disabled:opacity-50"
+          >
+            {{ deleteModal.isSubmitting ? 'ডিলিট হচ্ছে...' : 'হ্যাঁ, ডিলিট করুন' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { RefreshCw, Plus, Banknote, ShoppingBag, Clock, Store, Boxes, Copy, ExternalLink, PhoneCall, Trash2 } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
+import { useAppToast } from '~/composables/useAppToast'
 
 const { currentUser, initAuth } = useAuth()
 const router = useRouter()
+const toast = useAppToast()
 
+const isLoading = ref(true)
 const isRefreshing = ref(false)
 const activeStatusFilter = ref('all')
 const selectedStoreFilter = ref('all')
 
 const stores = ref([])
 const orders = ref([])
+
+// Custom Modals State
+const stockModal = reactive({
+  isOpen: false,
+  store: null,
+  value: 0,
+  isSubmitting: false
+})
+
+const deleteModal = reactive({
+  isOpen: false,
+  store: null,
+  isSubmitting: false
+})
 
 onMounted(async () => {
   await initAuth()
@@ -372,7 +470,8 @@ onMounted(async () => {
     router.replace('/login?redirect=/dashboard')
     return
   }
-  refreshData()
+  await refreshData()
+  isLoading.value = false
   const interval = setInterval(refreshData, 15000)
   onUnmounted(() => clearInterval(interval))
 })
@@ -390,6 +489,7 @@ const refreshData = async () => {
     console.error('Failed to load dashboard data:', err)
   } finally {
     isRefreshing.value = false
+    isLoading.value = false
   }
 }
 
@@ -436,8 +536,9 @@ const quickAdjustStock = async (slug, newStock) => {
       st.stock = stockVal
       if (st.config) st.config.stock = stockVal
     }
+    toast.success('স্টক সফলভাবে আপডেট করা হয়েছে!')
   } catch (e) {
-    alert('স্টক আপডেট করা সম্ভব হয়নি।')
+    toast.error('স্টক আপডেট করা সম্ভব হয়নি।')
   }
 }
 
@@ -464,21 +565,37 @@ const statusFilterOptions = [
   { value: 'cancelled', label: 'বাতিল (Cancelled)' }
 ]
 
-const openStockPrompt = async (st) => {
-  const current = getStoreStock(st)
-  const input = prompt(`"${st.product_title}"-এর নতুন স্টক সংখ্যা কত দিতে চান?`, current.toString())
-  if (input === null) return
-  const num = parseInt(input.trim(), 10)
-  if (isNaN(num) || num < 0) {
-    alert('দয়া করে সঠিক সংখ্যা প্রদান করুন।')
-    return
-  }
-  await quickAdjustStock(st.slug, num)
+const openStockPrompt = (st) => {
+  stockModal.store = st
+  stockModal.value = getStoreStock(st)
+  stockModal.isOpen = true
 }
 
-const deleteStore = async (st) => {
-  const confirmDelete = confirm(`আপনি কি নিশ্চিতভাবে "${st.product_title}" দোকানটি ডিলিট করতে চান?`)
-  if (!confirmDelete) return
+const confirmStockUpdate = async () => {
+  if (!stockModal.store) return
+  const num = parseInt(stockModal.value, 10)
+  if (isNaN(num) || num < 0) {
+    toast.warning('দয়া করে সঠিক স্টক সংখ্যা প্রদান করুন।')
+    return
+  }
+  stockModal.isSubmitting = true
+  try {
+    await quickAdjustStock(stockModal.store.slug, num)
+    stockModal.isOpen = false
+  } finally {
+    stockModal.isSubmitting = false
+  }
+}
+
+const deleteStore = (st) => {
+  deleteModal.store = st
+  deleteModal.isOpen = true
+}
+
+const confirmDeleteStore = async () => {
+  if (!deleteModal.store) return
+  deleteModal.isSubmitting = true
+  const st = deleteModal.store
 
   try {
     await $fetch('/api/stores', {
@@ -489,15 +606,19 @@ const deleteStore = async (st) => {
     if (selectedStoreFilter.value === st.slug) {
       selectedStoreFilter.value = 'all'
     }
+    deleteModal.isOpen = false
+    toast.success(`"${st.product_title}" দোকানটি ডিলিট করা হয়েছে।`)
   } catch (err) {
-    alert('দোকান ডিলিট করতে সমস্যা হয়েছে।')
+    toast.error('দোকান ডিলিট করতে সমস্যা হয়েছে।')
+  } finally {
+    deleteModal.isSubmitting = false
   }
 }
 
 const copyStoreLink = (slug) => {
   const url = `${window.location.origin}/s/${slug}`
   navigator.clipboard.writeText(url)
-  alert(`স্টোর লিংক কপি হয়েছে:\n${url}`)
+  toast.success(`স্টোর লিংক কপি হয়েছে:\n${url}`)
 }
 
 const changeStatus = async (orderId, newStatus) => {
@@ -507,8 +628,9 @@ const changeStatus = async (orderId, newStatus) => {
       body: { order_id: orderId, status: newStatus }
     })
     await refreshData()
+    toast.success('অর্ডার স্ট্যাটাস সফলভাবে আপডেট করা হয়েছে!')
   } catch (e) {
-    alert('স্ট্যাটাস পরিবর্তন করা সম্ভব হয়নি।')
+    toast.error('স্ট্যাটাস পরিবর্তন করা সম্ভব হয়নি।')
   }
 }
 </script>

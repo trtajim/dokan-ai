@@ -193,6 +193,7 @@ const props = defineProps({
 const submitting = ref(false)
 const orderSubmitted = ref(false)
 const phoneError = ref(false)
+const toast = useAppToast()
 
 const availableVariants = computed(() => {
   return props.store.variants || props.store.config?.variants || []
@@ -315,7 +316,7 @@ const submitOrder = async () => {
     }
   } catch (err) {
     console.error('Order submission failed:', err)
-    alert('অর্ডার সাবমিট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।')
+    toast.error('অর্ডার সাবমিট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।')
   } finally {
     submitting.value = false
   }

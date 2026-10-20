@@ -495,6 +495,7 @@ const aiInstruction = ref('')
 const editLogs = ref([])
 const activeHeroImage = ref('')
 const editorScroll = ref(null)
+const toast = useAppToast()
 
 const productImages = computed(() => {
   if (store.value?.config?.images && Array.isArray(store.value.config.images) && store.value.config.images.length > 0) {
@@ -589,7 +590,7 @@ const submitAiEdit = async () => {
       }
     }
   } catch (err) {
-    alert('AI এডিট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।')
+    toast.error('AI এডিট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।')
   } finally {
     isAiEditing.value = false
   }

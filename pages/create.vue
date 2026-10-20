@@ -154,9 +154,11 @@
 import { ref, reactive, nextTick, onMounted } from 'vue'
 import { Sparkles, Bot, Send, Loader2, CheckCircle2, Paperclip, X } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
+import { useAppToast } from '~/composables/useAppToast'
 
 const router = useRouter()
 const { currentUser, initAuth } = useAuth()
+const toast = useAppToast()
 
 const chatScrollContainer = ref(null)
 const isAiTyping = ref(false)
@@ -310,7 +312,7 @@ const generateFullStore = async () => {
     }
   } catch (err) {
     console.error('Store generation failed:', err)
-    alert('দোকান তৈরি করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।')
+    toast.error('দোকান তৈরি করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।')
   } finally {
     isGeneratingStore.value = false
   }

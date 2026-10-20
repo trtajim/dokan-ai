@@ -24,9 +24,9 @@ export const useAuth = () => {
       if (saved) {
         try {
           const parsed = JSON.parse(saved)
-          // Ensure legacy sessions with 'Judge / Demo Merchant' are cleanly sanitized to 'Verified Merchant'
-          if (parsed.displayName?.includes('Judge')) {
-            parsed.displayName = 'Verified Merchant'
+          // Ensure legacy sessions are cleanly sanitized
+          if (parsed.displayName?.includes('Judge') || parsed.displayName === 'Verified Merchant') {
+            parsed.displayName = 'মার্চেন্ট'
             localStorage.setItem('dokan_auth_session', JSON.stringify(parsed))
           }
           currentUser.value = parsed
@@ -45,7 +45,7 @@ export const useAuth = () => {
       id: 'demo_judge_account_id',
       email: demoEmail,
       isGuest: true,
-      displayName: 'Verified Merchant'
+      displayName: 'মার্চেন্ট'
     }
 
     currentUser.value = userSession
