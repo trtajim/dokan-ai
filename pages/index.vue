@@ -10,7 +10,7 @@
         <!-- Live Pill -->
         <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-8 shadow-sm">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-          <span>Bangladesh’s 1st Autonomous COD Store Generator</span>
+          <span>Bangladesh's Top Autonomous COD Store Generator</span>
         </div>
 
         <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.15]">
@@ -28,7 +28,7 @@
         <!-- CTA Buttons -->
         <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
           <NuxtLink to="/create" class="w-full sm:w-auto px-8 py-4 text-base font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-95 rounded-2xl shadow-xl shadow-emerald-600/30 transition-all flex items-center justify-center gap-2.5">
-            <Sparkles class="w-5 h-5" />
+            <Rocket class="w-5 h-5" />
             <span>AI দিয়ে ফ্রি স্টোর তৈরি করুন</span>
             <ArrowRight class="w-5 h-5" />
           </NuxtLink>
@@ -51,7 +51,7 @@
           </div>
           <div>
             <div class="text-2xl sm:text-3xl font-black text-slate-900">COD Form</div>
-            <div class="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">১১ ডিজিট ফোন ভেরিফাইড</div>
+            <div class="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">সহজ ও দ্রুত অর্ডার</div>
           </div>
           <div>
             <div class="text-2xl sm:text-3xl font-black text-emerald-600">AI Sales Bot</div>
@@ -77,7 +77,7 @@
             </div>
             <h3 class="text-lg font-bold text-slate-900 mb-2">প্রোডাক্টের বিবরণ দিন</h3>
             <p class="text-sm text-slate-600 leading-relaxed">
-              আপনার প্রোডাক্টের নাম, দাম এবং ৩টি মূল সুবিধা লিখুন। DokanAI অনবোর্ডিং এজেন্ট বাকি সব নিজে সাজিয়ে নিবে।
+              আপনার প্রোডাক্টের নাম, দাম এবং অন্যান্য তথ্য লিখুন। DokanAI অনবোর্ডিং এজেন্ট বাকি সব নিজে সাজিয়ে নিবে।
             </p>
           </div>
 
@@ -115,7 +115,7 @@
           কোন ক্রেডিট কার্ড বা ফি ছাড়াই শুরু করুন। আপনার ব্যবসার বিক্রি বাড়ান ডাবল গতিতে।
         </p>
         <NuxtLink to="/create" class="inline-flex items-center gap-2 px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
-          <Sparkles class="w-4 h-4" />
+          <Rocket class="w-4 h-4" />
           <span>এখনই শুরু করুন</span>
         </NuxtLink>
       </div>
@@ -124,5 +124,5 @@
 </template>
 
 <script setup>
-import { Sparkles, ArrowRight, ExternalLink } from 'lucide-vue-next'
+import { Rocket, ArrowRight, ExternalLink } from 'lucide-vue-next'
 </script>

@@ -520,9 +520,11 @@
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { RefreshCw, Plus, Banknote, ShoppingBag, Clock, Store, Boxes, Copy, ExternalLink, PhoneCall, Trash2, Eye, X } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
+import { useAuthModal } from '~/composables/useAuthModal'
 import { useAppToast } from '~/composables/useAppToast'
 
 const { currentUser, initAuth } = useAuth()
+const { openLogin } = useAuthModal()
 const router = useRouter()
 const toast = useAppToast()
 
@@ -560,9 +562,10 @@ const viewOrderDetails = (order) => {
 
 onMounted(async () => {
   await initAuth()
-  // Strict Login Check: If not logged in, redirect to login page immediately
+  // Strict Login Check: If not logged in, show login alert dialog immediately
   if (!currentUser.value) {
-    router.replace('/login?redirect=/dashboard')
+    openLogin('/dashboard')
+    isLoading.value = false
     return
   }
   await refreshData()
