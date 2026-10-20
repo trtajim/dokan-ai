@@ -263,43 +263,48 @@ const decrementQty = () => {
 }
 
 const borderAccentClass = computed(() => {
-  const c = props.store.theme_color
+  const c = props.store?.theme_color || props.store?.config?.theme_color
   if (c === 'indigo') return 'border-indigo-100'
   if (c === 'rose') return 'border-rose-100'
-  if (c === 'amber') return 'border-amber-100'
+  if (c === 'amber') return 'border-amber-200'
+  if (c === 'slate') return 'border-zinc-200'
   return 'border-emerald-100'
 })
 
 const badgeClass = computed(() => {
-  const c = props.store.theme_color
+  const c = props.store?.theme_color || props.store?.config?.theme_color
   if (c === 'indigo') return 'bg-indigo-50 text-indigo-700'
   if (c === 'rose') return 'bg-rose-50 text-rose-700'
-  if (c === 'amber') return 'bg-amber-50 text-amber-700'
+  if (c === 'amber') return 'bg-amber-100 text-amber-800'
+  if (c === 'slate') return 'bg-zinc-100 text-zinc-800'
   return 'bg-emerald-50 text-emerald-700'
 })
 
 const borderActiveDeliveryClass = computed(() => {
-  const c = props.store.theme_color
+  const c = props.store?.theme_color || props.store?.config?.theme_color
   if (c === 'indigo') return 'border-indigo-600 bg-indigo-50/60 text-indigo-900 font-bold'
   if (c === 'rose') return 'border-rose-600 bg-rose-50/60 text-rose-900 font-bold'
-  if (c === 'amber') return 'border-amber-600 bg-amber-50/60 text-amber-900 font-bold'
+  if (c === 'amber') return 'border-amber-600 bg-amber-50/60 text-amber-950 font-bold'
+  if (c === 'slate') return 'border-orange-600 bg-orange-50/60 text-zinc-900 font-bold'
   return 'border-emerald-600 bg-emerald-50/60 text-emerald-900 font-bold'
 })
 
 const totalPriceTextClass = computed(() => {
-  const c = props.store.theme_color
+  const c = props.store?.theme_color || props.store?.config?.theme_color
   if (c === 'indigo') return 'text-indigo-600'
   if (c === 'rose') return 'text-rose-600'
-  if (c === 'amber') return 'text-amber-600'
-  return 'text-emerald-600'
+  if (c === 'amber') return 'text-amber-700'
+  if (c === 'slate') return 'text-orange-600'
+  return 'text-emerald-700'
 })
 
 const primaryButtonClass = computed(() => {
-  const c = props.store.theme_color
+  const c = props.store?.theme_color || props.store?.config?.theme_color
   if (c === 'indigo') return 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-600/30'
   if (c === 'rose') return 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/30'
   if (c === 'amber') return 'bg-amber-600 hover:bg-amber-700 shadow-amber-600/30'
-  return 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/30'
+  if (c === 'slate') return 'bg-orange-600 hover:bg-orange-700 shadow-orange-600/30'
+  return 'bg-[#c97a0c] hover:bg-[#b06a08] shadow-amber-600/30'
 })
 
 const submitOrder = async () => {
