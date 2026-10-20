@@ -130,8 +130,9 @@
               <textarea 
                 v-model="inputMessage" 
                 @keydown.enter.exact.prevent="sendMessage"
+                @paste="handlePaste"
                 rows="1"
-                placeholder="উত্তর লিখুন বা ছবি দিন..." 
+                placeholder="উত্তর লিখুন বা ছবি পেস্ট (Ctrl+V) / আপলোড করুন..." 
                 class="flex-1 max-h-24 min-h-[36px] py-2 px-1 text-xs sm:text-sm bg-transparent border-0 focus:outline-none resize-none placeholder:text-slate-400 text-slate-800 font-medium"
                 :disabled="isAiTyping || isGeneratingStore"
               ></textarea>
@@ -225,14 +226,43 @@ const scrollToBottom = async () => {
 const handleFileUpload = (e) => {
   const files = e.target.files
   if (!files || files.length === 0) return
-  for (let i = 0; i < files.length; i++) {
-    const reader = new FileReader()
-    reader.onload = (uploadEvent) => {
-      if (uploadEvent.target?.result) {
-        pendingImages.value.push(uploadEvent.target.result)
+  processFiles(files)
+}
+
+const handlePaste = (e) => {
+  const clipboardData = e.clipboardData || window.clipboardData
+  if (!clipboardData) return
+  const items = clipboardData.items
+  if (!items) return
+
+  const imageFiles = []
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].type && items[i].type.startsWith('image/')) {
+      const file = items[i].getAsFile()
+      if (file) {
+        imageFiles.push(file)
       }
     }
-    reader.readAsDataURL(files[i])
+  }
+
+  if (imageFiles.length > 0) {
+    processFiles(imageFiles)
+    toast.success(`${imageFiles.length}টি ছবি পেস্ট করা হয়েছে!`)
+  }
+}
+
+const processFiles = (files) => {
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i]
+    if (file && file.type && file.type.startsWith('image/')) {
+      const reader = new FileReader()
+      reader.onload = (uploadEvent) => {
+        if (uploadEvent.target?.result) {
+          pendingImages.value.push(uploadEvent.target.result)
+        }
+      }
+      reader.readAsDataURL(file)
+    }
   }
 }
 
