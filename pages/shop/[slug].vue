@@ -117,7 +117,7 @@
           <div class="space-y-3.5 sm:space-y-5">
             <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] sm:text-xs font-bold uppercase tracking-wider">
               <Sparkles class="w-3 h-3 text-emerald-600" />
-              <span>প্রিমিয়াম কোয়ালিটি গ্যারান্টিড</span>
+              <span>{{ store.config?.badge_text || 'প্রিমিয়াম কোয়ালিটি গ্যারান্টিড' }}</span>
             </div>
 
             <h1 class="text-xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-[1.25] tracking-tight">
@@ -178,7 +178,7 @@
                 :class="primaryBgClass"
               >
                 <ShoppingBag class="w-5 h-5" />
-                <span>এখনই অর্ডার করুন (ক্যাশ অন ডেলিভারি)</span>
+                <span>{{ store.config?.cta_button_text || 'এখনই অর্ডার করুন (ক্যাশ অন ডেলিভারি)' }}</span>
               </button>
               <div v-else class="w-full py-3.5 sm:py-4 bg-slate-200 text-slate-500 font-black text-center rounded-2xl cursor-not-allowed text-sm">
                 পণ্যটির স্টক সাময়িকভাবে শেষ

@@ -53,6 +53,8 @@ Current Store Data:
 - Show FAQs: ${currentStore.config?.show_faqs ?? true}
 - Delivery Fee Inside Dhaka: ${currentStore.config?.delivery_fee_inside ?? 70}
 - Delivery Fee Outside Dhaka: ${currentStore.config?.delivery_fee_outside ?? 130}
+- Badge Text: "${currentStore.config?.badge_text ?? 'প্রিমিয়াম কোয়ালিটি গ্যারান্টিড'}"
+- CTA Button Text: "${currentStore.config?.cta_button_text ?? 'এখনই অর্ডার করুন (ক্যাশ অন ডেলিভারি)'}"
 - Headline: "${currentStore.config?.headline ?? ''}"
 - Subheadline: "${currentStore.config?.subheadline ?? ''}"
 - Features: ${JSON.stringify(currentStore.config?.features ?? [])}
@@ -61,9 +63,13 @@ Current Store Data:
 - Testimonials: ${JSON.stringify(currentStore.config?.testimonials ?? [])}
 
 BEHAVIOR AND INTERMEDIARY CONFIRMATION RULES:
-1. Apply requested changes accurately.
-2. In "reply", confirm the modification clearly in friendly Bengali AND offer an intelligent follow-up suggestion or question (e.g. asking if they want to adjust stock, discount percentage, delivery fee, or review texts accordingly).
-3. Provide 2 to 3 quick clickable follow-up suggestion chips in Bengali in "suggestions" array (e.g. ["ডেলিভারি চার্জ পরিবর্তন", "অফার ব্যানার বন্ধ করুন", "আরেকটি রিভিউ যোগ করুন"]).
+1. Apply requested changes accurately. You can customize EVERY SINGLE PIECE of text and setting:
+   - Badge text above headline (e.g. "প্রিমিয়াম কোয়ালিটি গ্যারান্টিড" -> anything the user wants)
+   - CTA button text (e.g. "অর্ডার করুন", "এখনই কিনুন", etc.)
+   - Headline, subheadline, price, regular price, stock, color theme
+   - Features, trust badges, FAQs, reviews/testimonials
+2. In "reply", confirm the modification clearly in friendly Bengali AND offer an intelligent follow-up suggestion or question.
+3. Provide 2 to 3 quick clickable follow-up suggestion chips in Bengali in "suggestions" array.
 4. SECTION VISIBILITY:
    - If asked to hide/remove urgency bar, set "show_urgency_bar": false.
    - If asked to hide/remove verified badge, set "show_verified_badge": false.
@@ -77,6 +83,8 @@ RETURN STRICT JSON ONLY:
   "price": number,
   "regular_price": number,
   "stock": number,
+  "badge_text": "string (e.g. প্রিমিয়াম কোয়ালিটি গ্যারান্টিড or custom)",
+  "cta_button_text": "string (e.g. এখনই অর্ডার করুন (ক্যাশ অন ডেলিভারি) or custom)",
   "show_urgency_bar": boolean,
   "show_verified_badge": boolean,
   "show_testimonials": boolean,
@@ -112,6 +120,8 @@ RETURN STRICT JSON ONLY:
         subheadline: parsed.subheadline || currentStore.config?.subheadline,
         delivery_fee_inside: parsed.delivery_fee_inside ?? currentStore.config?.delivery_fee_inside,
         delivery_fee_outside: parsed.delivery_fee_outside ?? currentStore.config?.delivery_fee_outside,
+        badge_text: parsed.badge_text !== undefined ? parsed.badge_text : currentStore.config?.badge_text,
+        cta_button_text: parsed.cta_button_text !== undefined ? parsed.cta_button_text : currentStore.config?.cta_button_text,
         video_reel_url: parsed.video_reel_url !== undefined ? parsed.video_reel_url : currentStore.config?.video_reel_url,
         features: parsed.features || currentStore.config?.features,
         trust_badges: parsed.trust_badges || currentStore.config?.trust_badges,
