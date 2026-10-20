@@ -154,10 +154,12 @@
 import { ref, reactive, nextTick, onMounted } from 'vue'
 import { Sparkles, Bot, Send, Loader2, CheckCircle2, Paperclip, X } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
+import { useAuthModal } from '~/composables/useAuthModal'
 import { useAppToast } from '~/composables/useAppToast'
 
 const router = useRouter()
 const { currentUser, initAuth } = useAuth()
+const { openLogin } = useAuthModal()
 const toast = useAppToast()
 
 const chatScrollContainer = ref(null)
@@ -335,7 +337,7 @@ const resetChat = () => {
 onMounted(async () => {
   await initAuth()
   if (!currentUser.value) {
-    router.replace('/login?redirect=/create')
+    openLogin('/create')
     return
   }
   scrollToBottom()

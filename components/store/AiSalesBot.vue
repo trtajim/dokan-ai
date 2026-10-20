@@ -32,18 +32,6 @@
         </button>
       </div>
 
-      <!-- Quick Suggestion Buttons (Grid layout, no horizontal scroll) -->
-      <div class="p-2.5 bg-slate-50 border-b border-slate-100 grid grid-cols-2 gap-1.5">
-        <button 
-          v-for="(chip, cIdx) in quickChips" 
-          :key="cIdx"
-          @click="askQuickChip(chip)"
-          class="px-2 py-1.5 rounded-xl text-[11px] font-bold bg-white border border-slate-200/90 text-slate-800 hover:border-slate-400 hover:bg-slate-100 active:scale-95 transition-all text-center truncate cursor-pointer shadow-2xs"
-        >
-          {{ chip }}
-        </button>
-      </div>
-
       <!-- Message History -->
       <div ref="chatScroll" class="flex-1 p-3 overflow-y-auto space-y-2.5">
         <div 
@@ -60,9 +48,26 @@
           >
             <p class="whitespace-pre-line">{{ msg.text }}</p>
 
+            <!-- Suggested Question Buttons inside Initial Bot Message (Facebook page style) -->
+            <div 
+              v-if="mIdx === 0 && messages.length === 1" 
+              class="mt-3 pt-2.5 border-t border-slate-200/70 space-y-1.5"
+            >
+              <button 
+                v-for="(chip, cIdx) in quickChips" 
+                :key="cIdx"
+                type="button"
+                @click="askQuickChip(chip)"
+                class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:text-emerald-700 hover:border-emerald-300 hover:bg-emerald-50/50 active:scale-[0.98] transition-all flex items-center justify-between shadow-2xs group cursor-pointer"
+              >
+                <span>{{ chip }}</span>
+                <span class="text-slate-400 group-hover:text-emerald-600 font-bold">›</span>
+              </button>
+            </div>
+
             <!-- 1-Click Order Form Shortcut inside AI Bot -->
             <button
-              v-if="msg.role === 'model'"
+              v-if="msg.role === 'model' && (mIdx > 0 || messages.length > 1)"
               @click="closeAndScrollToOrder"
               class="mt-2 w-full py-1.5 px-2.5 text-[11px] font-bold text-white rounded-xl shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
               :class="primaryBgClass"
