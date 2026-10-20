@@ -12,8 +12,27 @@ export default defineEventHandler(async (event) => {
   if (method === 'GET') {
     const query = getQuery(event)
     const storeSlug = query.slug as string | undefined
+    const orderId = query.id as string | undefined
 
     const supabase = getSupabaseClient()
+
+    // Query single order by ID
+    if (orderId) {
+      if (supabase) {
+        try {
+          const { data } = await supabase.from('orders').select('*').eq('id', orderId).single()
+          if (data) {
+            return { success: true, order: data }
+          }
+        } catch (err) {}
+      }
+      const memOrder = memoryStore.getOrder(orderId)
+      if (memOrder) {
+        return { success: true, order: memOrder }
+      }
+      throw createError({ statusCode: 404, message: 'Order not found' })
+    }
+
     if (supabase) {
       try {
         let req = supabase.from('orders').select('*').order('created_at', { ascending: false })
@@ -37,7 +56,7 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'POST') {
     const body = await readBody(event)
-    const { store_slug, customer_name, customer_phone, customer_address, delivery_zone, quantity, unit_price } = body
+    const { store_slug, customer_name, customer_phone, customer_address, delivery_zone, quantity, unit_price, selected_variant } = body
 
     if (!store_slug || !customer_name || !customer_phone || !customer_address) {
       throw createError({ statusCode: 400, message: 'Missing required customer order fields' })
@@ -78,8 +97,9 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, message: `স্টকে সর্বোচ্চ ${availableStock}টি আইটেম অবশিষ্ট আছে।` })
     }
 
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000)
     const newOrder: OrderRecord = {
-      id: 'ord-' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5),
+      id: `ORD-${Date.now().toString().slice(-6)}${randomSuffix}`,
       store_slug,
       customer_name: customer_name.trim(),
       customer_phone: cleanPhone,
@@ -88,6 +108,7 @@ export default defineEventHandler(async (event) => {
       delivery_fee: deliveryFee,
       total_price: totalPrice,
       quantity: qty,
+      selected_variant: selected_variant || null,
       status: 'pending',
       created_at: new Date().toISOString()
     }
@@ -107,6 +128,7 @@ export default defineEventHandler(async (event) => {
           delivery_fee: newOrder.delivery_fee,
           total_price: newOrder.total_price,
           quantity: newOrder.quantity,
+          selected_variant: newOrder.selected_variant,
           status: newOrder.status
         })
 

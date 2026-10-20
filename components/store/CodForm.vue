@@ -333,9 +333,7 @@ const submitOrder = async () => {
       }
     })
 
-    if (res && res.success) {
-      orderSubmitted.value = true
-      
+    if (res && res.success && res.order) {
       // Fire Meta Pixel Lead event for COD order confirmation
       if (pixelId.value) {
         trackLead({
@@ -345,13 +343,9 @@ const submitOrder = async () => {
         })
       }
 
-      try {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
-        })
-      } catch (e) {}
+      // Redirect immediately to standalone Order Success Page with full Tracking ID
+      navigateTo(`/order/success/${res.order.id}`)
+      return
     }
   } catch (err) {
     console.error('Order submission failed:', err)
