@@ -553,6 +553,13 @@ const submitAiEdit = async () => {
         response: res.reply,
         suggestions: res.suggestions || []
       })
+
+      // If store properties actually changed (not just consultative chat/clarification),
+      // perform a clean background refresh to re-sync any server dependencies
+      if (res.hasChanged) {
+        refresh()
+      }
+
       await nextTick()
       if (editorScroll.value) {
         editorScroll.value.scrollTop = editorScroll.value.scrollHeight

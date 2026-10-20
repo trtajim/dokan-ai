@@ -121,6 +121,15 @@ RETURN STRICT JSON ONLY:
         stock: parsed.stock ?? currentStore.stock
       }
 
+      const prevSnapshot = JSON.stringify({
+        title: currentStore.product_title,
+        price: currentStore.price,
+        regular_price: currentStore.regular_price,
+        theme_color: currentStore.theme_color,
+        stock: currentStore.stock,
+        config: currentStore.config
+      })
+
       currentStore.product_title = parsed.product_title || currentStore.product_title
       currentStore.price = parsed.price || currentStore.price
       currentStore.regular_price = parsed.regular_price || currentStore.regular_price
@@ -128,6 +137,17 @@ RETURN STRICT JSON ONLY:
       currentStore.stock = parsed.stock ?? currentStore.stock
       currentStore.variants = parsed.variants || currentStore.variants
       currentStore.config = updatedConfig
+
+      const newSnapshot = JSON.stringify({
+        title: currentStore.product_title,
+        price: currentStore.price,
+        regular_price: currentStore.regular_price,
+        theme_color: currentStore.theme_color,
+        stock: currentStore.stock,
+        config: currentStore.config
+      })
+
+      const hasChanged = prevSnapshot !== newSnapshot
 
       if (supabase) {
         try {
@@ -149,6 +169,7 @@ RETURN STRICT JSON ONLY:
         success: true,
         reply: parsed.reply || 'আপনার নির্দেশনা অনুযায়ী সেকশনটি আপডেট করা হয়েছে!',
         suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
+        hasChanged,
         store: currentStore
       }
     } catch (err: any) {
