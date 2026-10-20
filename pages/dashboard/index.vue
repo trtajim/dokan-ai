@@ -238,7 +238,10 @@
           <div v-for="order in finalDisplayOrders" :key="'mob_' + order.id" class="p-3.5 space-y-2">
             <div class="flex items-start justify-between gap-2">
               <div>
-                <h4 class="font-bold text-slate-900 text-sm">{{ order.customer_name }}</h4>
+                <div class="flex items-center gap-1.5">
+                  <span class="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">#{{ order.id }}</span>
+                  <h4 class="font-bold text-slate-900 text-sm">{{ order.customer_name }}</h4>
+                </div>
                 <a :href="`tel:${order.customer_phone}`" class="inline-flex items-center gap-1 text-emerald-700 text-xs font-mono font-bold mt-0.5">
                   <PhoneCall class="w-3 h-3 text-emerald-600" />
                   <span>{{ order.customer_phone }}</span>
@@ -292,6 +295,7 @@
           <table class="w-full text-left text-xs sm:text-sm">
             <thead class="bg-slate-50/80 text-slate-500 font-bold border-b border-slate-200/70 text-[11px] uppercase tracking-wider">
               <tr>
+                <th class="py-3 px-4">অর্ডার আইডি</th>
                 <th class="py-3 px-4">কাস্টমার</th>
                 <th class="py-3 px-4">ফোন নম্বর</th>
                 <th class="py-3 px-4">দোকান</th>
@@ -303,11 +307,18 @@
             </thead>
             <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
               <tr v-if="finalDisplayOrders.length === 0">
-                <td colspan="7" class="py-12 text-center text-slate-400 font-semibold">
+                <td colspan="8" class="py-12 text-center text-slate-400 font-semibold">
                   কোনো অর্ডার খুঁজে পাওয়া যায়নি।
                 </td>
               </tr>
               <tr v-for="order in finalDisplayOrders" :key="order.id" class="hover:bg-slate-50/60 transition-colors">
+                <!-- Order ID -->
+                <td class="py-3.5 px-4 font-mono font-bold text-slate-600 text-xs">
+                  <span class="bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-md text-slate-800 transition-colors">
+                    #{{ order.id }}
+                  </span>
+                </td>
+
                 <!-- Name -->
                 <td class="py-3.5 px-4 font-bold text-slate-900">
                   {{ order.customer_name }}
