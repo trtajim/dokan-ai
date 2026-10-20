@@ -122,6 +122,17 @@
                 <span>{{ st.config?.pixel_id ? 'পিক্সেল অন' : 'পিক্সেল' }}</span>
               </button>
 
+              <!-- Telegram Order Alert Button -->
+              <button 
+                @click="openTelegramModal(st)"
+                class="px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                :class="st.config?.telegram_chat_id ? 'bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'"
+                :title="st.config?.telegram_chat_id ? 'টেলিগ্রাম নোটিফিকেশন চালু আছে' : 'টেলিগ্রাম এলার্ট সেটআপ করুন'"
+              >
+                <Send class="w-3.5 h-3.5" :class="st.config?.telegram_chat_id ? 'text-sky-600' : 'text-slate-400'" />
+                <span>{{ st.config?.telegram_chat_id ? 'টেলিগ্রাম অন' : 'টেলিগ্রাম' }}</span>
+              </button>
+
               <NuxtLink 
                 :to="`/s/${st.slug}`" 
                 target="_blank" 
@@ -463,6 +474,98 @@
       </div>
     </div>
 
+    <!-- Custom Modal: Telegram 1-Click Setup -->
+    <div v-if="telegramModal.isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+      <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+        <div class="flex items-center justify-between">
+          <div class="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center">
+            <Send class="w-5 h-5" />
+          </div>
+          <button @click="telegramModal.isOpen = false" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+            <X class="w-5 h-5" />
+          </button>
+        </div>
+        
+        <div>
+          <h3 class="text-base font-black text-slate-900">টেলিগ্রাম অর্ডার নোটিফিকেশন</h3>
+          <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+            দোকান: <span class="font-bold text-slate-800">{{ telegramModal.store?.product_title }}</span>
+          </p>
+        </div>
+
+        <!-- If bot username configured in env -->
+        <div v-if="telegramBotUsername" class="space-y-3 text-xs">
+          <div class="p-3 bg-sky-50/70 border border-sky-100 rounded-2xl space-y-2">
+            <span class="font-bold text-sky-900 block">⚡ ১-ক্লিক অটোমেটিক কানেক্ট:</span>
+            <p class="text-slate-600 leading-relaxed text-[11px]">
+              নিচের বাটনে ক্লিক করে টেলিগ্রাম বটে প্রবেশ করুন এবং <strong>START</strong> চাপুন। স্বয়ংক্রিয়ভাবে নোটিফিকেশন যুক্ত হয়ে যাবে!
+            </p>
+            <a 
+              :href="`https://t.me/${telegramBotUsername}?start=store_${telegramModal.store?.slug}`"
+              target="_blank"
+              class="w-full py-2.5 px-3 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95 text-center text-xs"
+            >
+              <Send class="w-4 h-4" />
+              <span>টেলিগ্রামে কানেক্ট করুন</span>
+            </a>
+          </div>
+
+          <div class="pt-1">
+            <label class="block font-bold text-slate-700 mb-1">অথবা ম্যানুয়ালি Chat ID দিন:</label>
+            <input 
+              type="text"
+              v-model="telegramModal.chatId"
+              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono text-slate-900 focus:outline-none focus:border-sky-500 bg-slate-50"
+              placeholder="যেমন: 123456789"
+            />
+          </div>
+        </div>
+
+        <!-- Fallback if bot username not in env yet -->
+        <div v-else class="space-y-3 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Telegram Chat ID:</label>
+            <input 
+              type="text"
+              v-model="telegramModal.chatId"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-mono font-bold text-slate-900 focus:outline-none focus:border-sky-500 bg-slate-50"
+              placeholder="যেমন: 123456789"
+            />
+            <p class="text-[11px] text-slate-400 leading-normal mt-1">
+              💡 আপনার টেলিগ্রাম চ্যাট আইডি জানতে টেলিগ্রামে <strong>@userinfobot</strong> সার্চ করে স্টার্ট দিন।
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+          <button
+            v-if="telegramModal.store?.config?.telegram_chat_id"
+            @click="disconnectTelegram"
+            class="text-[11px] font-bold text-rose-600 hover:underline cursor-pointer"
+          >
+            ডিসকানেক্ট
+          </button>
+          <div v-else></div>
+
+          <div class="flex items-center gap-2">
+            <button
+              @click="telegramModal.isOpen = false"
+              class="px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+            >
+              বন্ধ করুন
+            </button>
+            <button
+              @click="confirmTelegramUpdate"
+              :disabled="telegramModal.isSubmitting"
+              class="px-4 py-1.5 text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 active:scale-95 rounded-xl transition-all shadow-sm cursor-pointer disabled:opacity-50"
+            >
+              {{ telegramModal.isSubmitting ? 'সেভ হচ্ছে...' : 'সেভ করুন' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Custom Modal: Confirm Delete Store -->
     <div v-if="deleteModal.isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
       <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in-95 duration-200">
@@ -600,7 +703,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
-import { RefreshCw, Plus, Banknote, ShoppingBag, Clock, Store, Boxes, Copy, ExternalLink, PhoneCall, Trash2, Eye, X, Activity } from 'lucide-vue-next'
+import { RefreshCw, Plus, Banknote, ShoppingBag, Clock, Store, Boxes, Copy, ExternalLink, PhoneCall, Trash2, Eye, X, Activity, Send } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 import { useAuthModal } from '~/composables/useAuthModal'
 import { useAppToast } from '~/composables/useAppToast'
@@ -644,6 +747,16 @@ const pixelModal = reactive({
   accessToken: '',
   isSubmitting: false
 })
+
+const telegramModal = reactive({
+  isOpen: false,
+  store: null,
+  chatId: '',
+  isSubmitting: false
+})
+
+const runtimeConfig = useRuntimeConfig()
+const telegramBotUsername = computed(() => runtimeConfig.public?.telegramBotUsername || '')
 
 const viewOrderDetails = (order) => {
   orderModal.order = order
@@ -782,6 +895,50 @@ const openPixelModal = (st) => {
   pixelModal.value = st.config?.pixel_id || ''
   pixelModal.accessToken = st.config?.meta_access_token || ''
   pixelModal.isOpen = true
+}
+
+const openTelegramModal = (st) => {
+  telegramModal.store = st
+  telegramModal.chatId = st.config?.telegram_chat_id || ''
+  telegramModal.isOpen = true
+}
+
+const confirmTelegramUpdate = async () => {
+  if (!telegramModal.store) return
+  const cleanChatId = telegramModal.chatId.trim()
+  telegramModal.isSubmitting = true
+  try {
+    await $fetch('/api/stores', {
+      method: 'PATCH',
+      body: {
+        slug: telegramModal.store.slug,
+        telegram_chat_id: cleanChatId || null
+      }
+    })
+
+    const match = stores.value.find(s => s.slug === telegramModal.store.slug)
+    if (match) {
+      if (!match.config) match.config = {}
+      match.config.telegram_chat_id = cleanChatId || null
+    }
+
+    telegramModal.isOpen = false
+    if (cleanChatId) {
+      toast.success('টেলিগ্রাম চ্যাট আইডি সফলভাবে সেভ করা হয়েছে!')
+    } else {
+      toast.success('টেলিগ্রাম এলার্ট বন্ধ করা হয়েছে।')
+    }
+  } catch (e) {
+    toast.error('টেলিগ্রাম সেটিংস আপডেট করা সম্ভব হয়নি।')
+  } finally {
+    telegramModal.isSubmitting = false
+  }
+}
+
+const disconnectTelegram = async () => {
+  if (!telegramModal.store) return
+  telegramModal.chatId = ''
+  await confirmTelegramUpdate()
 }
 
 const confirmPixelUpdate = async () => {

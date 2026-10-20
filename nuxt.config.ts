@@ -9,9 +9,11 @@ export default defineNuxtConfig({
     aiProvider: process.env.AI_PROVIDER || 'gemini',
     supabaseUrl: process.env.SUPABASE_URL || '',
     supabaseKey: process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY || '',
+    telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || '',
     public: {
       supabaseUrl: process.env.SUPABASE_URL || '',
-      supabaseAnonKey: process.env.SUPABASE_ANON_KEY || ''
+      supabaseAnonKey: process.env.SUPABASE_ANON_KEY || '',
+      telegramBotUsername: process.env.TELEGRAM_BOT_USERNAME || ''
     }
   }
 })
