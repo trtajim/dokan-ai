@@ -6,15 +6,11 @@
       
       <!-- Top Title (Compact on mobile) -->
       <div class="mb-2 sm:mb-4 text-center px-2">
-        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 sm:mb-2">
-          <Sparkles class="w-3 h-3 text-emerald-600" />
-          <span>Multimodal Conversational AI</span>
-        </div>
         <h1 class="text-xl sm:text-3xl font-black text-slate-900 leading-tight">
           AI সহকারীর সাথে কথা বলে দোকান তৈরি করুন
         </h1>
         <p class="text-[11px] sm:text-sm text-slate-500 mt-0.5 sm:mt-1 max-w-md mx-auto hidden sm:block">
-          AI আপনাকে একটি একটি করে প্রশ্ন করবে এবং আইডিয়া সাজেস্ট করবে।
+          AI আপনাকে প্রশ্ন করবে এবং আইডিয়া সাজেস্ট করবে।
         </p>
       </div>
 
@@ -30,7 +26,7 @@
             <div>
               <h3 class="text-xs sm:text-sm font-bold text-slate-900">DokanAI সহকারী</h3>
               <span class="inline-flex items-center gap-1 text-[10px] text-emerald-600 font-semibold">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> ১টি করে প্রশ্ন মোড
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> অনলাইন
               </span>
             </div>
           </div>
