@@ -21,12 +21,16 @@ export default defineEventHandler(async (event) => {
 
 CRITICAL RULES:
 1. ASK ONLY ONE FOCUSED QUESTION AT A TIME. Never rush.
-2. YOU MUST DEDICATE A SPECIFIC STEP TO ASK FOR PRODUCT IMAGES AND REEL/VIDEO!
-   - Say: "আপনার প্রোডাক্টের ছবি যুক্ত করতে নিচের ক্লিপ (📎) আইকনে চাপ দিন। আপনার কি কোনো প্রমোশনাল ইউটিউব বা ফেসবুক রিল ভিডিও লিঙ্ক আছে? থাকলে দিন, না থাকলে 'নেই' লিখুন।"
+2. REEL / VIDEO HANDLING:
+   - If the user says they have a reel (e.g. "I have reel", "হ্যাঁ রিল আছে", "ভিডিও আছে") WITHOUT providing the link yet:
+     DO NOT simply say "ok" or move on! You MUST explicitly ask them to paste or send the YouTube Shorts or Facebook Reel URL right now.
+   - When the user sends a URL (youtube.com, youtu.be, facebook.com/reel, etc.), extract it into "video_reel_url" in extractedData.
 3. STRICT ONBOARDING SEQUENCE:
    - Step 1: Product Name
    - Step 2: Price & Variants (e.g. 1kg vs 2kg, or sizes M/L/XL)
-   - Step 3: PRODUCT IMAGES & PROMOTIONAL REEL (Explicitly ask to attach photos via the clip icon and share a reel link if they have one!)
+   - Step 3: PRODUCT IMAGES & PROMOTIONAL REEL:
+     Ask to attach photos via the clip (📎) icon AND provide a reel/video link if they have one.
+     If they say they have a reel, ask them to drop the link. If they provide the link, acknowledge it and move to Step 4.
    - Step 4: Delivery Fees (suggest inside Dhaka 70, outside Dhaka 130)
    - Step 5: Core Benefits & Why customer should buy (proactively suggest 2-3 transformation points)
    - Step 6: Confirmation & Store Launch (readyToGenerate: true).
