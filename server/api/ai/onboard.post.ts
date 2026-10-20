@@ -56,14 +56,18 @@ RETURN STRICT JSON ONLY (No markdown codeblocks, just valid JSON):
 }`
 
     const chatHistory: any[] = (messages || []).map((m: any) => ({
-      role: m.role === 'user' ? 'user' : 'model',
+      role: m.role === 'user' ? 'user' : 'assistant',
       content: m.content || ''
     }))
 
-    chatHistory.push({
-      role: 'user',
-      content: userMessage || ''
-    })
+    // Avoid duplicate user message if already present in messages array
+    const lastMsg = chatHistory[chatHistory.length - 1]
+    if (!lastMsg || lastMsg.role !== 'user' || lastMsg.content !== userMessage) {
+      chatHistory.push({
+        role: 'user',
+        content: userMessage || ''
+      })
+    }
 
     const rawResponse = await generateAiChat({
       systemPrompt,
@@ -100,12 +104,21 @@ RETURN STRICT JSON ONLY (No markdown codeblocks, just valid JSON):
 })
 
 function handleFallbackAgent(messages: any[], userMessage: string) {
-  const historyLen = (messages || []).length
+  const lowerMsg = (userMessage || '').trim().toLowerCase()
   const priceMatch = userMessage.match(/(\d{3,5})/g)
   let extractedPrice = priceMatch ? parseInt(priceMatch[0], 10) : 1200
-  const lowerMsg = (userMessage || '').toLowerCase()
 
-  // Did the user mention reel / video?
+  // 1. If user says 'ki?', 'kiser chobi?', 'bujhlam na' or asks a question about pictures:
+  if (lowerMsg === 'ki?' || lowerMsg === 'ki' || lowerMsg.includes('কিসের') || lowerMsg.includes('বুঝলাম না') || lowerMsg.includes('bujhlam na')) {
+    return {
+      success: true,
+      reply: `আপনার প্রোডাক্টটির বাস্তব কয়েকটি ছবি যুক্ত করতে হবে (যেমন: প্যাকেট বা পণ্যের ছবি)। নিচে ক্লিপ (📎) আইকনে চাপ দিয়ে আপনার মোবাইল বা কম্পিউটার থেকে ছবি সিলেক্ট করুন, অথবা ছবি পেস্ট (Ctrl+V) করুন।`,
+      readyToGenerate: false,
+      extractedData: {}
+    }
+  }
+
+  // 2. Did the user mention reel / video?
   if (lowerMsg.includes('reel') || lowerMsg.includes('video') || lowerMsg.includes('রিল') || lowerMsg.includes('ভিডিও')) {
     const hasReelUrl = userMessage.match(/https?:\/\/[^\s]+/)
     if (hasReelUrl) {
@@ -129,94 +142,43 @@ function handleFallbackAgent(messages: any[], userMessage: string) {
         success: true,
         reply: `আপনার রিল বা ভিডিওর লিঙ্কটি (Facebook Reel বা YouTube Shorts) দয়া করে এখানে মেসেজে পেস্ট করে দিন।`,
         readyToGenerate: false,
-        extractedData: {
-          product_title: null,
-          price: extractedPrice,
-          regular_price: Math.round(extractedPrice * 1.4),
-          delivery_fee_inside: 70,
-          delivery_fee_outside: 130,
-          theme_color: 'emerald',
-          highlights: []
-        }
+        extractedData: {}
       }
     }
   }
 
-  // Turn 1 -> Ask Price & Variants
-  if (historyLen <= 1) {
+  // 3. Inspect conversation context rather than blind history length:
+  const allText = (messages || []).map(m => m.content || '').join(' ').toLowerCase()
+  const hasImages = (messages || []).some(m => m.images && m.images.length > 0) || lowerMsg.includes('ছবি যুক্ত') || lowerMsg.includes('ছবি দিয়েছি')
+
+  if (!hasImages) {
+    // Photos not yet provided! Keep asking for photos, never jump ahead
     return {
       success: true,
-      reply: `চমৎকার চয়েস! "${userMessage.slice(0, 30)}"-এর বর্তমান বাজারে দারুণ চাহিদা রয়েছে।\n\nএবার জানান এর অফার মূল্য (Price) কত রাখবেন? এবং কোনো ভ্যারিয়েন্ট বা সাইজ/ওজন আছে কি? (যেমন: ১ কেজি ৳১২০০ অথবা M, L সাইজ)`,
+      reply: `আপনার ল্যান্ডিং পেজে দেখানোর জন্য প্রোডাক্টটির কয়েকটি ভালো ছবি প্রয়োজন। নিচে ক্লিপ (📎) আইকন ব্যবহার করে ছবি আপলোড করুন অথবা সরাসরি পেস্ট করুন।`,
       readyToGenerate: false,
       extractedData: {
-        product_title: userMessage.slice(0, 40),
-        price: extractedPrice,
-        regular_price: Math.round(extractedPrice * 1.4),
-        delivery_fee_inside: 70,
-        delivery_fee_outside: 130,
-        theme_color: 'emerald',
-        highlights: []
+        price: extractedPrice
       }
     }
   }
 
-  // Turn 2 -> Ask for Product Pictures (Required)
-  if (historyLen <= 3) {
-    return {
-      success: true,
-      reply: `প্রাইস ও ভ্যারিয়েন্ট তথ্য সংরক্ষিত হয়েছে!\n\nএবার প্রোডাক্টটির আকর্ষণীয় কয়েকটি ভালো ছবি (Pictures) যুক্ত করুন। নিচে ক্লিপ (📎) আইকনে চাপ দিয়ে ছবি সিলেক্ট করুন অথবা সরাসরি পেস্ট (Ctrl+V) করুন। কয়েকটি সুন্দর ছবি থাকলে কাস্টমারদের অর্ডার করার সম্ভাবনা অনেক বেড়ে যায়!`,
-      readyToGenerate: false,
-      extractedData: {
-        product_title: null,
-        price: extractedPrice,
-        regular_price: Math.round(extractedPrice * 1.4),
-        delivery_fee_inside: 70,
-        delivery_fee_outside: 130,
-        theme_color: 'emerald',
-        highlights: []
-      }
-    }
-  }
+  // 4. Photos exist, check if reel has been addressed:
+  const hasReelUrl = userMessage.match(/https?:\/\/[^\s]+/)
+  const hasReelMention = allText.includes('রিল') || allText.includes('reel') || allText.includes('video')
 
-  // Turn 3 -> Separately Ask for Reel / Video Link
-  if (historyLen <= 5) {
-    const hasReelUrl = userMessage.match(/https?:\/\/[^\s]+/)
-    if (hasReelUrl) {
-      return {
-        success: true,
-        reply: `ভিডিও লিঙ্ক যুক্ত হয়েছে! নিচে সংগৃহীত সকল তথ্য রয়েছে। একবার রিভিউ করে দেখুন, কিছু পরিবর্তন করার থাকলে জানান অথবা নিচের বাটনে চাপ দিয়ে সরাসরি আপনার আকর্ষণীয় ল্যান্ডিং পেজ তৈরি করে ফেলুন!`,
-        readyToGenerate: true,
-        extractedData: {
-          product_title: null,
-          price: extractedPrice,
-          regular_price: Math.round(extractedPrice * 1.4),
-          video_reel_url: hasReelUrl[0],
-          delivery_fee_inside: 70,
-          delivery_fee_outside: 130,
-          theme_color: 'emerald',
-          highlights: ['১০০% অরিজিনাল কোয়ালিটি', 'ক্যাশ অন ডেলিভারি সুবিধা', 'দ্রুততম হোম ডেলিভারি']
-        }
-      }
-    }
-
+  if (!hasReelMention && !hasReelUrl) {
     return {
       success: true,
       reply: `আপনার কি এই প্রোডাক্টটির কোনো রিল বা ভিডিও আছে? (Facebook Reel অথবা YouTube Shorts এর লিঙ্ক থাকলে শেয়ার করুন, না থাকলে 'না' বা 'নেই' লিখে জানান)।`,
       readyToGenerate: false,
       extractedData: {
-        product_title: null,
-        price: extractedPrice,
-        regular_price: Math.round(extractedPrice * 1.4),
-        delivery_fee_inside: 70,
-        delivery_fee_outside: 130,
-        theme_color: 'emerald',
-        highlights: []
+        price: extractedPrice
       }
     }
   }
 
-  // Ready to generate!
-  const hasReelUrl = userMessage.match(/https?:\/\/[^\s]+/)
+  // 5. All core info gathered -> Review card!
   return {
     success: true,
     reply: `সব তথ্য সুন্দরভাবে সংগ্রহ করা হয়েছে! নিচে একবার রিভিউ করে দেখুন, কিছু পরিবর্তন করার থাকলে জানান অথবা নিচের বাটনে চাপ দিয়ে দোকানটি তৈরি করে নিন।`,
