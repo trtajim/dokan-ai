@@ -2,126 +2,127 @@
   <div class="min-h-screen bg-slate-50 flex flex-col">
     <Navbar />
 
-    <main class="flex-1 max-w-3xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col">
-      <!-- Top Title -->
-      <div class="mb-4 text-center">
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
-          <Sparkles class="w-3.5 h-3.5 text-emerald-600" />
-          <span>Step-by-Step AI Store Consultant</span>
+    <main class="flex-1 max-w-3xl w-full mx-auto p-2.5 sm:p-6 lg:p-8 flex flex-col justify-between">
+      
+      <!-- Top Title (Compact on mobile) -->
+      <div class="mb-2 sm:mb-4 text-center px-2">
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 sm:mb-2">
+          <Sparkles class="w-3 h-3 text-emerald-600" />
+          <span>Multimodal Conversational AI</span>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-black text-slate-900">
+        <h1 class="text-xl sm:text-3xl font-black text-slate-900 leading-tight">
           AI সহকারীর সাথে কথা বলে দোকান তৈরি করুন
         </h1>
-        <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-md mx-auto">
-          AI আপনাকে একটি একটি করে প্রশ্ন করবে এবং আইডিয়া সাজেস্ট করবে। চ্যাট শেষেই পেয়ে যাবেন লাইভ সিঙ্গেল প্রোডাক্ট স্টোর।
+        <p class="text-[11px] sm:text-sm text-slate-500 mt-0.5 sm:mt-1 max-w-md mx-auto hidden sm:block">
+          AI আপনাকে একটি একটি করে প্রশ্ন করবে এবং আইডিয়া সাজেস্ট করবে।
         </p>
       </div>
 
-      <!-- Pure Chat Container -->
-      <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden flex flex-col flex-1 h-[640px]">
+      <!-- Pure Chat Container (Full height responsive on mobile screens) -->
+      <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-lg sm:shadow-xl overflow-hidden flex flex-col flex-1 h-[78vh] sm:h-[640px]">
         
         <!-- Chat Header Bar -->
-        <div class="p-4 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-500/20">
-              <Bot class="w-5 h-5" />
+        <div class="px-3 py-2.5 sm:p-4 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-bold shadow-sm">
+              <Bot class="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div>
-              <h3 class="text-sm font-bold text-slate-900">DokanAI সহকারী</h3>
-              <span class="inline-flex items-center gap-1.5 text-[11px] text-emerald-600 font-semibold">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> অনলাইন (১টি করে প্রশ্ন ও পরামর্শ মোড)
+              <h3 class="text-xs sm:text-sm font-bold text-slate-900">DokanAI সহকারী</h3>
+              <span class="inline-flex items-center gap-1 text-[10px] text-emerald-600 font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> ১টি করে প্রশ্ন মোড
               </span>
             </div>
           </div>
 
-          <button @click="resetChat" class="text-xs text-slate-400 hover:text-slate-600 p-1">
+          <button @click="resetChat" class="text-xs text-slate-400 hover:text-slate-600 px-2 py-1">
             রিসেট
           </button>
         </div>
 
         <!-- Scrollable Messages Feed -->
-        <div ref="chatScrollContainer" class="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4">
+        <div ref="chatScrollContainer" class="flex-1 p-3 sm:p-6 overflow-y-auto space-y-3 sm:space-y-4">
           
           <div v-for="(msg, idx) in messages" :key="idx" class="flex flex-col" :class="msg.role === 'user' ? 'items-end' : 'items-start'">
             
             <div 
-              class="max-w-[88%] sm:max-w-[78%] rounded-3xl px-4 sm:px-5 py-3 sm:py-3.5 text-xs sm:text-sm leading-relaxed"
+              class="max-w-[92%] sm:max-w-[78%] rounded-2xl sm:rounded-3xl px-3.5 sm:px-5 py-2.5 sm:py-3.5 text-xs sm:text-sm leading-relaxed"
               :class="msg.role === 'user' 
-                ? 'bg-emerald-600 text-white rounded-br-none shadow-md shadow-emerald-600/10' 
+                ? 'bg-emerald-600 text-white rounded-br-none shadow-sm' 
                 : 'bg-slate-100 text-slate-800 rounded-bl-none border border-slate-200/50'"
             >
               <!-- Render user-attached images inside message bubble -->
-              <div v-if="msg.images && msg.images.length > 0" class="flex flex-wrap gap-2 mb-2.5">
-                <div v-for="(img, imgIdx) in msg.images" :key="imgIdx" class="w-20 h-20 rounded-xl overflow-hidden border border-white/20 shadow-sm">
+              <div v-if="msg.images && msg.images.length > 0" class="flex flex-wrap gap-1.5 mb-2">
+                <div v-for="(img, imgIdx) in msg.images" :key="imgIdx" class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border border-white/30 shadow-sm">
                   <img :src="img" class="w-full h-full object-cover" />
                 </div>
               </div>
 
               <p class="whitespace-pre-line">{{ msg.content }}</p>
 
-              <!-- IN-CHAT DYNAMIC ACTION CARD (Appears in chat when all follow-ups are answered) -->
-              <div v-if="msg.readyToGenerate" class="mt-4 pt-3 border-t border-slate-200/60 animate-in fade-in zoom-in-95 duration-200">
-                <div class="p-3.5 bg-white rounded-2xl border border-emerald-200 shadow-sm space-y-2.5 text-slate-800">
-                  <div class="flex items-center gap-2 text-emerald-700 font-bold text-xs">
+              <!-- IN-CHAT DYNAMIC ACTION CARD -->
+              <div v-if="msg.readyToGenerate" class="mt-3 pt-2.5 border-t border-slate-200/60 animate-in fade-in zoom-in-95 duration-200">
+                <div class="p-3 bg-white rounded-xl sm:rounded-2xl border border-emerald-200 shadow-sm space-y-2 text-slate-800">
+                  <div class="flex items-center gap-1.5 text-emerald-700 font-bold text-xs">
                     <CheckCircle2 class="w-4 h-4 text-emerald-600" />
-                    <span>সব প্রয়োজনীয় তথ্য সংগ্রহ ও সাজানো সম্পন্ন হয়েছে!</span>
+                    <span>সব তথ্য সংগ্রহ সম্পন্ন হয়েছে!</span>
                   </div>
                   
-                  <div class="text-[11px] text-slate-600 font-medium space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <div class="text-[10px] sm:text-[11px] text-slate-600 font-medium space-y-0.5 bg-slate-50 p-2 rounded-lg border border-slate-100">
                     <div>📦 প্রোডাক্ট: <strong>{{ extractedData.product_title || 'এক্সক্লুসিভ কালেকশন' }}</strong></div>
-                    <div>💰 অফার মূল্য: <strong class="text-emerald-600">৳{{ extractedData.price || 1200 }}</strong> (আগে ছিল: <span class="line-through">৳{{ extractedData.regular_price || 1800 }}</span>)</div>
-                    <div>🚚 ডেলিভারি চার্জ: <strong>ঢাকার ভেতরে ৳{{ extractedData.delivery_fee_inside }} | বাইরে ৳{{ extractedData.delivery_fee_outside }}</strong></div>
-                    <div>🖼️ প্রোডাক্ট ফটো: <strong>{{ allUploadedImages.length }} টি ছবি যুক্ত আছে</strong></div>
+                    <div>💰 অফার মূল্য: <strong class="text-emerald-600">৳{{ extractedData.price || 1200 }}</strong></div>
+                    <div>🚚 ডেলিভারি: <strong>ভেতরে ৳{{ extractedData.delivery_fee_inside }} | বাইরে ৳{{ extractedData.delivery_fee_outside }}</strong></div>
+                    <div>🖼️ ছবি: <strong>{{ allUploadedImages.length }} টি যুক্ত আছে</strong></div>
                   </div>
 
                   <button 
                     @click="generateFullStore" 
                     :disabled="isGeneratingStore"
-                    class="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black rounded-xl shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 text-xs sm:text-sm"
+                    class="w-full py-3 px-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-xs sm:text-sm"
                   >
                     <Loader2 v-if="isGeneratingStore" class="w-4 h-4 animate-spin" />
                     <Sparkles v-else class="w-4 h-4" />
-                    <span>{{ isGeneratingStore ? 'দোকান তৈরি হচ্ছে...' : 'দোকানটি তৈরি করুন (Click to Launch Store)' }}</span>
+                    <span>{{ isGeneratingStore ? 'দোকান তৈরি হচ্ছে...' : 'দোকানটি তৈরি করুন' }}</span>
                   </button>
                 </div>
               </div>
             </div>
             
-            <span class="text-[10px] text-slate-400 mt-1 px-1">
+            <span class="text-[9px] text-slate-400 mt-0.5 px-1">
               {{ msg.role === 'user' ? 'আপনি' : 'DokanAI' }}
             </span>
           </div>
 
           <!-- Typing Indicator -->
-          <div v-if="isAiTyping" class="flex items-center gap-1.5 bg-slate-100 border border-slate-200/50 rounded-2xl rounded-bl-none px-4 py-3 w-fit">
-            <span class="w-2 h-2 rounded-full bg-slate-400 animate-bounce"></span>
-            <span class="w-2 h-2 rounded-full bg-slate-400 animate-bounce [animation-delay:0.2s]"></span>
-            <span class="w-2 h-2 rounded-full bg-slate-400 animate-bounce [animation-delay:0.4s]"></span>
+          <div v-if="isAiTyping" class="flex items-center gap-1.5 bg-slate-100 border border-slate-200/50 rounded-2xl rounded-bl-none px-3.5 py-2.5 w-fit">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.2s]"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.4s]"></span>
           </div>
         </div>
 
-        <!-- Chat Input Area (ChatGPT / Gemini Style) -->
-        <div class="p-3 sm:p-4 border-t border-slate-100 bg-white">
-          <form @submit.prevent="sendMessage" class="bg-slate-50 border border-slate-200 rounded-3xl p-2 sm:p-2.5 focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-all">
+        <!-- Mobile Optimized Chat Input Area -->
+        <div class="p-2 sm:p-3.5 border-t border-slate-100 bg-white">
+          <form @submit.prevent="sendMessage" class="bg-slate-50 border border-slate-200 rounded-2xl p-1.5 sm:p-2 focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-all">
             
             <!-- Pre-send attached image thumbnails -->
-            <div v-if="pendingImages.length > 0" class="flex items-center gap-2 px-2 pt-1 pb-2 overflow-x-auto">
-              <div v-for="(img, pIdx) in pendingImages" :key="pIdx" class="relative group w-14 h-14 rounded-xl overflow-hidden border border-slate-300 shrink-0">
+            <div v-if="pendingImages.length > 0" class="flex items-center gap-1.5 px-1.5 pt-1 pb-1.5 overflow-x-auto">
+              <div v-for="(img, pIdx) in pendingImages" :key="pIdx" class="relative group w-12 h-12 rounded-lg overflow-hidden border border-slate-300 shrink-0">
                 <img :src="img" class="w-full h-full object-cover" />
                 <button 
                   type="button"
                   @click="removePendingImage(pIdx)" 
-                  class="absolute top-1 right-1 bg-slate-900/80 hover:bg-red-600 text-white rounded-full p-0.5 transition-colors"
+                  class="absolute top-0.5 right-0.5 bg-slate-900/80 text-white rounded-full p-0.5"
                 >
-                  <X class="w-3 h-3" />
+                  <X class="w-2.5 h-2.5" />
                 </button>
               </div>
             </div>
 
             <!-- Input row: Clip button + Textarea + Send button -->
-            <div class="flex items-end gap-2">
+            <div class="flex items-end gap-1.5">
               <label 
-                class="cursor-pointer p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-slate-200/60 rounded-full transition-colors flex items-center justify-center shrink-0 mb-0.5" 
+                class="cursor-pointer p-2 text-slate-400 hover:text-emerald-600 rounded-full transition-colors flex items-center justify-center shrink-0 mb-0.5" 
                 title="ছবি আপলোড করুন"
               >
                 <Paperclip class="w-5 h-5" />
@@ -132,23 +133,20 @@
                 v-model="inputMessage" 
                 @keydown.enter.exact.prevent="sendMessage"
                 rows="1"
-                placeholder="উত্তর লিখুন বা প্রশ্ন করুন..." 
-                class="flex-1 max-h-32 min-h-[38px] py-2 px-1 text-xs sm:text-sm bg-transparent border-0 focus:outline-none resize-none placeholder:text-slate-400 text-slate-800 font-medium"
+                placeholder="উত্তর লিখুন বা ছবি দিন..." 
+                class="flex-1 max-h-24 min-h-[36px] py-2 px-1 text-xs sm:text-sm bg-transparent border-0 focus:outline-none resize-none placeholder:text-slate-400 text-slate-800 font-medium"
                 :disabled="isAiTyping || isGeneratingStore"
               ></textarea>
 
               <button 
                 type="submit" 
                 :disabled="(!inputMessage.trim() && pendingImages.length === 0) || isAiTyping || isGeneratingStore"
-                class="p-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white rounded-full font-bold transition-all flex items-center justify-center shadow-sm active:scale-95 shrink-0 mb-0.5"
+                class="p-2 sm:p-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white rounded-full font-bold transition-all flex items-center justify-center shadow-sm active:scale-95 shrink-0 mb-0.5"
               >
                 <Send class="w-4 h-4" />
               </button>
             </div>
           </form>
-          <div class="text-[11px] text-slate-400 text-center mt-2 font-medium">
-            Shift + Enter দিয়ে নতুন লাইন লিখুন। ছবি যুক্ত করতে ক্লিপ আইকনে চাপ দিন।
-          </div>
         </div>
 
       </div>
@@ -172,7 +170,6 @@ const inputMessage = ref('')
 const pendingImages = ref([])
 const allUploadedImages = ref([])
 
-// First message asks ONLY for the product name
 const messages = ref([
   {
     role: 'model',

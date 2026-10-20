@@ -1,52 +1,55 @@
 <template>
-  <nav class="border-b border-slate-200/80 bg-white/80 backdrop-blur-md sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <NuxtLink to="/" class="flex items-center gap-2.5 group">
-        <!-- Nuxt Emerald Mountain Logo Badge -->
-        <div class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center p-2 shadow-md group-hover:scale-105 transition-transform">
+  <nav class="border-b border-slate-200/80 bg-white/90 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <NuxtLink to="/" class="flex items-center gap-2 group shrink-0">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-900 flex items-center justify-center p-1.5 shadow-sm group-hover:scale-105 transition-transform">
           <NuxtLogo />
         </div>
         <div>
-          <span class="text-xl font-black tracking-tight text-slate-900">Dokan<span class="text-emerald-500">AI</span></span>
-          <span class="text-[10px] block font-semibold text-emerald-600 tracking-wide uppercase -mt-1">দোকান এআই</span>
+          <span class="text-lg sm:text-xl font-black tracking-tight text-slate-900">Dokan<span class="text-emerald-500">AI</span></span>
+          <span class="text-[9px] block font-bold text-emerald-600 tracking-wide uppercase -mt-1">দোকান এআই</span>
         </div>
       </NuxtLink>
 
-      <div class="flex items-center gap-3">
-        <!-- If logged in: Show user badge + Dashboard + Logout -->
+      <!-- Nav Items -->
+      <div class="flex items-center gap-1.5 sm:gap-3">
+        <!-- If logged in -->
         <template v-if="currentUser">
-          <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-semibold text-slate-700">
+          <!-- Mobile user pill -->
+          <div class="hidden md:flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 rounded-lg text-xs font-semibold text-slate-700">
             <User class="w-3.5 h-3.5 text-emerald-600" />
-            <span class="max-w-[130px] truncate">{{ currentUser.displayName }}</span>
+            <span class="max-w-[100px] truncate">{{ currentUser.displayName }}</span>
             <button @click="handleLogout" class="text-slate-400 hover:text-red-600 ml-1" title="লগআউট">
               <LogOut class="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <NuxtLink to="/dashboard" class="px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:text-emerald-600 hover:bg-slate-100 rounded-lg transition-colors flex items-center gap-1.5">
-            <LayoutDashboard class="w-4 h-4" />
-            <span>Dashboard</span>
+          <NuxtLink to="/dashboard" class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-slate-700 hover:text-emerald-600 hover:bg-slate-100 rounded-xl transition-colors flex items-center gap-1">
+            <LayoutDashboard class="w-4 h-4 text-emerald-600" />
+            <span>ড্যাশবোর্ড</span>
           </NuxtLink>
 
-          <NuxtLink to="/create" class="px-4 py-2 text-xs sm:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-95 shadow-md shadow-emerald-600/20 rounded-xl transition-all flex items-center gap-2">
+          <NuxtLink to="/create" class="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-black text-white bg-emerald-600 hover:bg-emerald-700 active:scale-95 shadow-md shadow-emerald-600/20 rounded-xl transition-all flex items-center gap-1.5">
             <Plus class="w-4 h-4" />
-            <span class="hidden sm:inline">নতুন দোকান বানান</span>
-            <span class="sm:hidden">দোকান</span>
+            <span>নতুন দোকান</span>
           </NuxtLink>
         </template>
 
-        <!-- If NOT logged in: Direct to Login page -->
+        <!-- If NOT logged in -->
         <template v-else>
-          <NuxtLink to="/login" class="px-3.5 py-2 text-xs sm:text-sm font-bold text-slate-700 hover:text-slate-950 rounded-lg">
+          <NuxtLink to="/login" class="px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-700 hover:text-slate-900 rounded-lg">
             লগইন
           </NuxtLink>
 
-          <NuxtLink to="/login" class="px-4 py-2 text-xs sm:text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all flex items-center gap-1.5 shadow-sm">
-            <span>গেস্ট ডেমো প্রবেশ</span>
+          <NuxtLink to="/login" class="px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all flex items-center gap-1 shadow-sm">
+            <span>গেস্ট ডেমো</span>
             <ArrowRight class="w-3.5 h-3.5 text-emerald-400" />
           </NuxtLink>
         </template>
       </div>
+
     </div>
   </nav>
 </template>

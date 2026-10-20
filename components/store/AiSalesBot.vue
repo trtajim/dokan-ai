@@ -1,32 +1,32 @@
 <template>
-  <div class="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-50">
+  <div class="fixed bottom-16 sm:bottom-6 right-3 sm:right-6 z-40">
     <!-- Chat Trigger Bubble -->
     <button 
       v-if="!isOpen"
       @click="isOpen = true"
-      class="flex items-center gap-2.5 px-4 py-3 rounded-full text-white shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 font-bold text-sm"
+      class="flex items-center gap-2 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full text-white shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 font-bold text-xs sm:text-sm"
       :class="primaryBgClass"
     >
       <div class="relative">
-        <Bot class="w-5 h-5" />
+        <Bot class="w-4 h-4 sm:w-5 sm:h-5" />
         <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-300 rounded-full animate-ping"></span>
       </div>
-      <span>প্রশ্ন করুন (AI Assistant)</span>
+      <span>প্রশ্ন করুন (AI Chat)</span>
     </button>
 
-    <!-- Chat Modal Window -->
+    <!-- Chat Modal Window (Mobile Fullscreen Sheet / Desktop floating) -->
     <div 
       v-else 
-      class="w-[92vw] sm:w-[380px] h-[480px] bg-white rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+      class="fixed sm:static inset-x-2 bottom-2 top-16 sm:inset-auto sm:w-[380px] sm:h-[480px] bg-white rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 z-50"
     >
       <!-- Chat Header -->
-      <div class="p-4 text-white flex items-center justify-between" :class="primaryBgClass">
+      <div class="p-3.5 sm:p-4 text-white flex items-center justify-between" :class="primaryBgClass">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-            <Bot class="w-5 h-5 text-white" />
+          <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/20 flex items-center justify-center">
+            <Bot class="w-4 h-4 text-white" />
           </div>
           <div>
-            <h4 class="text-sm font-black leading-tight">{{ store.product_title.slice(0, 24) }}</h4>
+            <h4 class="text-xs sm:text-sm font-black leading-tight">{{ store.product_title.slice(0, 22) }}</h4>
             <span class="text-[10px] text-white/80 font-medium">লাইভ সেলস সহকারী</span>
           </div>
         </div>
@@ -36,19 +36,19 @@
       </div>
 
       <!-- Quick Question Chips -->
-      <div class="px-3 py-2 bg-slate-50 border-b border-slate-100 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+      <div class="px-2.5 py-1.5 bg-slate-50 border-b border-slate-100 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
         <button 
           v-for="(chip, cIdx) in quickChips" 
           :key="cIdx"
           @click="askQuickChip(chip)"
-          class="whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white border border-slate-200 text-slate-700 hover:border-slate-400 transition-colors"
+          class="whitespace-nowrap px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-semibold bg-white border border-slate-200 text-slate-700 hover:border-slate-400 transition-colors"
         >
           {{ chip }}
         </button>
       </div>
 
       <!-- Message History -->
-      <div ref="chatScroll" class="flex-1 p-3.5 overflow-y-auto space-y-3">
+      <div ref="chatScroll" class="flex-1 p-3 overflow-y-auto space-y-2.5">
         <div 
           v-for="(msg, mIdx) in messages" 
           :key="mIdx" 
@@ -56,7 +56,7 @@
           :class="msg.role === 'user' ? 'items-end' : 'items-start'"
         >
           <div 
-            class="max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs sm:text-sm leading-relaxed"
+            class="max-w-[88%] rounded-2xl px-3.5 py-2 text-xs sm:text-sm leading-relaxed"
             :class="msg.role === 'user' 
               ? 'bg-slate-900 text-white rounded-br-none' 
               : 'bg-slate-100 text-slate-800 rounded-bl-none border border-slate-200/50'"
@@ -65,7 +65,7 @@
           </div>
         </div>
 
-        <div v-if="loading" class="flex items-center gap-1.5 bg-slate-100 rounded-2xl rounded-bl-none px-3.5 py-2.5 w-fit">
+        <div v-if="loading" class="flex items-center gap-1.5 bg-slate-100 rounded-2xl rounded-bl-none px-3.5 py-2 w-fit">
           <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce"></span>
           <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.2s]"></span>
           <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.4s]"></span>
@@ -73,12 +73,12 @@
       </div>
 
       <!-- Input Form -->
-      <form @submit.prevent="sendMessage" class="p-2.5 border-t border-slate-100 bg-white flex items-center gap-2">
+      <form @submit.prevent="sendMessage" class="p-2 border-t border-slate-100 bg-white flex items-center gap-1.5">
         <input 
           v-model="inputQuery" 
           type="text" 
           placeholder="আপনার প্রশ্ন লিখুন..." 
-          class="flex-1 px-3.5 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-slate-900"
+          class="flex-1 px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-slate-900"
           :disabled="loading"
         />
         <button 
@@ -120,7 +120,7 @@ const quickChips = [
 const messages = ref([
   {
     role: 'model',
-    text: `আসসালামু আলাইকুম! ${props.store.product_title} সম্পর্কে আপনার কোনো প্রশ্ন আছে? আমি সাহায্য করতে পারি!`
+    text: `আসসালামু আলাইকুম! ${props.store.product_title} সম্পর্কে কোনো প্রশ্ন থাকলে জানান!`
   }
 ])
 
