@@ -562,9 +562,9 @@ const viewOrderDetails = (order) => {
 
 onMounted(async () => {
   await initAuth()
-  // Strict Login Check: If not logged in, show login alert dialog immediately
+  // Strict Login Check: If not logged in, show login alert dialog immediately (mandatory)
   if (!currentUser.value) {
-    openLogin('/dashboard')
+    openLogin('/dashboard', false)
     isLoading.value = false
     return
   }

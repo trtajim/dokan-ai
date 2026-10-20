@@ -337,7 +337,7 @@ const resetChat = () => {
 onMounted(async () => {
   await initAuth()
   if (!currentUser.value) {
-    openLogin('/create')
+    openLogin('/create', false)
     return
   }
   scrollToBottom()
