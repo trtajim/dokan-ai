@@ -435,6 +435,14 @@ const slug = route.params.slug
 
 onMounted(() => {
   initAuth()
+  if (import.meta.client) {
+    const savedLogs = sessionStorage.getItem(`dokan_edit_logs_${slug}`)
+    if (savedLogs) {
+      try {
+        editLogs.value = JSON.parse(savedLogs)
+      } catch (e) {}
+    }
+  }
 })
 
 const { data, pending, refresh } = await useFetch(`/api/stores?slug=${slug}`)
@@ -553,6 +561,11 @@ const submitAiEdit = async () => {
         response: res.reply,
         suggestions: res.suggestions || []
       })
+
+      // Persist in tab session so refresh doesn't wipe chat history
+      if (import.meta.client) {
+        sessionStorage.setItem(`dokan_edit_logs_${slug}`, JSON.stringify(editLogs.value))
+      }
 
       // If store properties actually changed (not just consultative chat/clarification),
       // perform a clean background refresh to re-sync any server dependencies
