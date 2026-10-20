@@ -495,7 +495,7 @@ const isStoreOwner = computed(() => {
   if (!currentUser.value) return false
   if (currentUser.value.isGuest) return true
   const storeUserId = store.value?.user_id || store.value?.config?.user_id
-  return storeUserId === currentUser.value.id || currentUser.value.id === 'demo_judge_account_id'
+  return storeUserId === currentUser.value.id
 })
 
 const showUrgencyBar = computed(() => {
