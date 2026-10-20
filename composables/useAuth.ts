@@ -23,7 +23,13 @@ export const useAuth = () => {
       const saved = localStorage.getItem('dokan_auth_session')
       if (saved) {
         try {
-          currentUser.value = JSON.parse(saved)
+          const parsed = JSON.parse(saved)
+          // Ensure legacy sessions with 'Judge / Demo Merchant' are cleanly sanitized to 'Verified Merchant'
+          if (parsed.displayName?.includes('Judge')) {
+            parsed.displayName = 'Verified Merchant'
+            localStorage.setItem('dokan_auth_session', JSON.stringify(parsed))
+          }
+          currentUser.value = parsed
         } catch (e) {
           localStorage.removeItem('dokan_auth_session')
         }
