@@ -1,7 +1,7 @@
 /**
  * Conversational AI Store Editor API
- * Takes natural language instructions from the merchant (e.g. "হেডলাইন পরিবর্তন করো", "দাম ১২০০ টাকা করো")
- * and updates the store configuration intelligently using Gemini.
+ * Can modify EVERYTHING: FAQs, Reviews/Testimonials, Features,
+ * Headlines, Stock, Delivery, Variants, and Badges using pure natural language.
  */
 import { GoogleGenAI } from '@google/genai'
 import { memoryStore } from '../../utils/memoryStore'
@@ -34,8 +34,10 @@ export default defineEventHandler(async (event) => {
     try {
       const ai = new GoogleGenAI({ apiKey })
 
-      const prompt = `You are "DokanAI Live Store Editor".
-A merchant wants to modify their live e-commerce single-product landing page.
+      const prompt = `You are "DokanAI Master Store Editor".
+The merchant is speaking to you to edit or customize their live store.
+EVERYTHING on the page can be changed: FAQs, Customer Reviews/Testimonials, Features, Headline, Subheadline, Price, Stock, Badges, Delivery fees, or Reel link.
+
 Merchant's Instruction in Bengali/Banglish: "${instruction}"
 
 Current Store Data:
@@ -46,16 +48,20 @@ Current Store Data:
 - Delivery Fee Inside Dhaka: ${currentStore.config?.delivery_fee_inside ?? 70}
 - Delivery Fee Outside Dhaka: ${currentStore.config?.delivery_fee_outside ?? 130}
 - Video Reel URL: "${currentStore.config?.video_reel_url ?? ''}"
-- Theme Color: "${currentStore.theme_color ?? 'emerald'}"
 - Headline: "${currentStore.config?.headline ?? ''}"
 - Subheadline: "${currentStore.config?.subheadline ?? ''}"
 - Features: ${JSON.stringify(currentStore.config?.features ?? [])}
 - Trust Badges: ${JSON.stringify(currentStore.config?.trust_badges ?? [])}
 - FAQs: ${JSON.stringify(currentStore.config?.faqs ?? [])}
+- Testimonials / Reviews: ${JSON.stringify(currentStore.config?.testimonials ?? [])}
+- Variants: ${JSON.stringify(currentStore.config?.variants ?? [])}
 
-YOUR TASK:
-Analyze the merchant's request and return an updated configuration. Only alter the parts requested by the merchant, keep everything else intact.
-Explain the change in a friendly 1-sentence Bengali reply.
+RULES:
+1. If the merchant asks to change/add/remove a Review or Testimonial, update the "testimonials" array.
+2. If they ask to change/add/remove an FAQ (প্রশ্ন ও উত্তর), update the "faqs" array.
+3. If they ask to change features, headlines, price, or anything else, update accordingly.
+4. Keep untouched fields exactly as they are.
+5. Provide a warm, clear 1-sentence Bengali confirmation of the exact change made.
 
 RETURN STRICT JSON ONLY:
 {
@@ -72,7 +78,9 @@ RETURN STRICT JSON ONLY:
   "subheadline": "string",
   "features": [{"title": "...", "desc": "..."}],
   "trust_badges": ["string"],
-  "faqs": [{"q": "...", "a": "..."}]
+  "faqs": [{"q": "...", "a": "..."}],
+  "testimonials": [{"name": "...", "location": "...", "comment": "..."}],
+  "variants": [{"name": "...", "price": number}]
 }`
 
       const response = await ai.models.generateContent({
@@ -83,7 +91,7 @@ RETURN STRICT JSON ONLY:
 
       const parsed = JSON.parse(response.text || '{}')
 
-      // Apply updates
+      // Apply updates to the store's full configuration
       const updatedConfig = {
         ...currentStore.config,
         headline: parsed.headline || currentStore.config?.headline,
@@ -94,6 +102,8 @@ RETURN STRICT JSON ONLY:
         features: parsed.features || currentStore.config?.features,
         trust_badges: parsed.trust_badges || currentStore.config?.trust_badges,
         faqs: parsed.faqs || currentStore.config?.faqs,
+        testimonials: parsed.testimonials || currentStore.config?.testimonials,
+        variants: parsed.variants || currentStore.config?.variants,
         stock: parsed.stock ?? currentStore.stock
       }
 
@@ -102,6 +112,7 @@ RETURN STRICT JSON ONLY:
       currentStore.regular_price = parsed.regular_price || currentStore.regular_price
       currentStore.theme_color = parsed.theme_color || currentStore.theme_color
       currentStore.stock = parsed.stock ?? currentStore.stock
+      currentStore.variants = parsed.variants || currentStore.variants
       currentStore.config = updatedConfig
 
       if (supabase) {
@@ -122,7 +133,7 @@ RETURN STRICT JSON ONLY:
 
       return {
         success: true,
-        reply: parsed.reply || 'আপনার নির্দেশনা অনুযায়ী দোকানের তথ্য আপডেট করা হয়েছে!',
+        reply: parsed.reply || 'আপনার নির্দেশনা অনুযায়ী রিভিউ ও তথ্য আপডেট করা হয়েছে!',
         store: currentStore
       }
     } catch (err: any) {
@@ -131,13 +142,6 @@ RETURN STRICT JSON ONLY:
   }
 
   // Fallback heuristic editor if no API key
-  const lower = instruction.toLowerCase()
-  const priceMatch = instruction.match(/(\d{3,5})/g)
-  if (priceMatch && (lower.includes('price') || lower.includes('দাম') || lower.includes('taka'))) {
-    currentStore.price = parseInt(priceMatch[0], 10)
-    currentStore.regular_price = Math.round(currentStore.price * 1.4)
-  }
-
   memoryStore.setStore(slug, currentStore)
 
   return {
