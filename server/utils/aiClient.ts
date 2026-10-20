@@ -24,8 +24,10 @@ export interface AiChatOptions {
 
 export const getAiProvider = () => {
   const config = useRuntimeConfig()
-  const provider = (process.env.AI_PROVIDER || config.aiProvider || 'gemini').toLowerCase().trim()
-  return provider === 'groq' ? 'groq' : 'gemini'
+  const groqKey = process.env.GROQ_API_KEY || config.groqApiKey || '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'
+  if (groqKey) return 'groq'
+  const provider = (process.env.AI_PROVIDER || config.aiProvider || 'groq').toLowerCase().trim()
+  return provider === 'gemini' ? 'gemini' : 'groq'
 }
 
 export const generateAiContent = async (options: AiTextOptions): Promise<string> => {
@@ -33,7 +35,7 @@ export const generateAiContent = async (options: AiTextOptions): Promise<string>
   const config = useRuntimeConfig()
 
   if (provider === 'groq') {
-    const groqKey = process.env.GROQ_API_KEY || config.groqApiKey
+    const groqKey = process.env.GROQ_API_KEY || config.groqApiKey || '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'
     if (!groqKey) {
       throw new Error('GROQ_API_KEY is not set in environment')
     }
@@ -46,7 +48,7 @@ export const generateAiContent = async (options: AiTextOptions): Promise<string>
     messages.push({ role: 'user', content: options.prompt })
 
     const completion = await groq.chat.completions.create({
-      model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+      model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
       messages,
       response_format: options.jsonMode ? { type: 'json_object' } : undefined,
       temperature: 0.6
@@ -82,7 +84,7 @@ export const generateAiChat = async (options: AiChatOptions): Promise<string> =>
   const config = useRuntimeConfig()
 
   if (provider === 'groq') {
-    const groqKey = process.env.GROQ_API_KEY || config.groqApiKey
+    const groqKey = process.env.GROQ_API_KEY || config.groqApiKey || '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'
     if (!groqKey) {
       throw new Error('GROQ_API_KEY is not set in environment')
     }
@@ -100,7 +102,7 @@ export const generateAiChat = async (options: AiChatOptions): Promise<string> =>
     })
 
     const completion = await groq.chat.completions.create({
-      model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+      model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
       messages,
       response_format: options.jsonMode ? { type: 'json_object' } : undefined,
       temperature: 0.6
