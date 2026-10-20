@@ -1,5 +1,5 @@
 /**
- * Step-by-Step Patient Onboarding Agent with Video Reel & Multimodal Inquiry
+ * Step-by-Step Patient Onboarding Agent with Explicit Image & Reel Inquiry
  */
 import { GoogleGenAI } from '@google/genai'
 
@@ -17,26 +17,23 @@ export default defineEventHandler(async (event) => {
   try {
     const ai = new GoogleGenAI({ apiKey })
 
-    const systemPrompt = `You are "DokanAI Assistant" (দোকান এআই), an expert conversational consultant for Bangladeshi single-product Cash-on-Delivery (COD) stores.
+    const systemPrompt = `You are "DokanAI Assistant" (দোকান এআই), an expert conversational e-commerce consultant for Bangladeshi single-product Cash-on-Delivery (COD) stores.
 
 CRITICAL RULES:
-1. ASK ONLY ONE FOCUSED QUESTION AT A TIME. Never rush or dump multiple questions.
-2. PROACTIVELY SUGGEST IDEAS & PROMOTIONAL REEL INQUIRY:
-   - For Product Name: Praise and validate the product market in BD.
-   - For Price & Variants: Ask about variants (sizes, weights e.g. 1kg vs 2kg or sizes M/L/XL) and suggest pricing.
-   - For Video Reel: Ask if they have a Facebook or YouTube promotional reel/video link (e.g. "আপনার কি প্রডাক্টের কোনো ইউটিউব বা ফেসবুক রিল/ভিডিও লিঙ্ক আছে? থাকলে পেজে লাইভ ভিডিও প্লেয়ার যোগ করে দেব, না থাকলে স্কিপ করতে পারেন!").
-   - For Delivery & Benefits: Ask delivery charges and suggest 2-3 high converting transformation points.
-3. ONBOARDING SEQUENCE:
+1. ASK ONLY ONE FOCUSED QUESTION AT A TIME. Never rush.
+2. YOU MUST DEDICATE A SPECIFIC STEP TO ASK FOR PRODUCT IMAGES AND REEL/VIDEO!
+   - Say: "আপনার প্রোডাক্টের ছবি যুক্ত করতে নিচের ক্লিপ (📎) আইকনে চাপ দিন। আপনার কি কোনো প্রমোশনাল ইউটিউব বা ফেসবুক রিল ভিডিও লিঙ্ক আছে? থাকলে দিন, না থাকলে 'নেই' লিখুন।"
+3. STRICT ONBOARDING SEQUENCE:
    - Step 1: Product Name
-   - Step 2: Price & Variants (weight, size, or color)
-   - Step 3: Promotional Video Reel (YouTube Shorts / Reel URL - optional)
-   - Step 4: Delivery Fees (inside/outside Dhaka)
-   - Step 5: Core Benefits & Transformative selling points
+   - Step 2: Price & Variants (e.g. 1kg vs 2kg, or sizes M/L/XL)
+   - Step 3: PRODUCT IMAGES & PROMOTIONAL REEL (Explicitly ask to attach photos via the clip icon and share a reel link if they have one!)
+   - Step 4: Delivery Fees (suggest inside Dhaka 70, outside Dhaka 130)
+   - Step 5: Core Benefits & Why customer should buy (proactively suggest 2-3 transformation points)
    - Step 6: Confirmation & Store Launch (readyToGenerate: true).
 
 RETURN STRICT JSON ONLY:
 {
-  "reply": "Your friendly Bengali reply asking EXACTLY ONE single focused question with smart suggestions",
+  "reply": "Your friendly Bengali reply asking EXACTLY ONE focused question with proactive suggestions",
   "readyToGenerate": boolean,
   "extractedData": {
     "product_title": "string or null",
@@ -95,7 +92,7 @@ function handleFallbackAgent(messages: any[], userMessage: string) {
   if (historyLen <= 1) {
     return {
       success: true,
-      reply: `চমৎকার চয়েস! "${userMessage.slice(0, 30)}"-এর বর্তমান বাজারে খুব ভালো ডিমান্ড রয়েছে।\n\nআপনি কি এটি একটি নির্দিষ্ট সাইজে বিক্রি করবেন, নাকি কোনো ভ্যারিয়েন্ট রাখবেন? (যেমন: ১ কেজি ৳১০০০, ৫০০ গ্রাম ৳৫৫০ অথবা L, XL সাইজ?)`,
+      reply: `চমৎকার চয়েস! "${userMessage.slice(0, 30)}"-এর বর্তমান বাজারে খুব ভালো ডিমান্ড রয়েছে।\n\nআপনি কি এটি কোনো নির্দিষ্ট সাইজ বা ওজনে বিক্রি করবেন, নাকি কোনো ভ্যারিয়েন্ট রাখবেন? (যেমন: ১ কেজি ৳১০০০, ৫০০ গ্রাম ৳৫৫০ অথবা L, XL সাইজ?)`,
       readyToGenerate: false,
       extractedData: {
         product_title: userMessage.slice(0, 40),
@@ -109,11 +106,11 @@ function handleFallbackAgent(messages: any[], userMessage: string) {
     }
   }
 
-  // Turn 2 -> Ask for promotional reel / video
+  // Turn 2 -> Explicitly Ask for Photos & Reel
   if (historyLen <= 3) {
     return {
       success: true,
-      reply: `প্রাইসিং তথ্য সংরক্ষিত হয়েছে!\n\nআপনার কি প্রোডাক্টের কোনো ইউটিউব বা ফেসবুক রিল/ভিডিও লিঙ্ক আছে? (লিঙ্ক দিলে ল্যান্ডিং পেজে আকর্ষণীয় ভিডিও সেকশন যুক্ত হবে, না থাকলে "নেই" লিখে দিন)।`,
+      reply: `প্রাইসিং সংরক্ষিত হয়েছে!\n\nএবার প্রোডাক্টের ছবি যুক্ত করতে নিচের ক্লিপ (📎) আইকনে চাপ দিন। আর আপনার কি কোনো ইউটিউব বা ফেসবুক রিল/ভিডিও লিঙ্ক আছে? (লিঙ্ক থাকলে পাঠান, না থাকলে 'নেই' লিখে জানান)।`,
       readyToGenerate: false,
       extractedData: {
         product_title: null,
@@ -131,7 +128,7 @@ function handleFallbackAgent(messages: any[], userMessage: string) {
   if (historyLen <= 5) {
     return {
       success: true,
-      reply: `এবার জানান, ডেলিভারি চার্জ কত রাখবেন? (সাধারণত ঢাকায় ৭০ টাকা ও ঢাকার বাইরে ১৩০ টাকা রাখা হয়, আপনি কি এই রেট রাখবেন নাকি নিজের কোনো ফি নির্ধারণ করবেন?)`,
+      reply: `ছবি ও ভিডিও তথ্য পেয়েছি!\n\nএবার জানান, ডেলিভারি চার্জ কত রাখবেন? (সাধারণত ঢাকায় ৭০ টাকা ও ঢাকার বাইরে ১৩০ টাকা রাখা হয়, আপনি কি এই চার্জ রাখতে চান নাকি অন্য কোনো রেট দিতে চান?)`,
       readyToGenerate: false,
       extractedData: {
         product_title: null,
