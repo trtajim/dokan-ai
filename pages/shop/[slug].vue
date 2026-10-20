@@ -315,22 +315,6 @@
     <!-- IN-PAGE CUSTOMER AI SALES BOT -->
     <StoreAiSalesBot :store="store" />
 
-    <!-- STICKY MOBILE BOTTOM BAR -->
-    <div v-if="currentStock > 0" class="sm:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-2.5 z-40 flex items-center justify-between shadow-2xl">
-      <div class="pl-1">
-        <div class="text-[10px] text-slate-400 font-bold leading-none">অফার মূল্য:</div>
-        <div class="text-lg font-black leading-tight" :class="primaryTextClass">৳{{ store.price }}</div>
-      </div>
-      <button 
-        @click="scrollToForm" 
-        class="px-5 py-2.5 text-white font-black text-xs rounded-xl shadow-lg active:scale-95 transition-all flex items-center gap-1.5"
-        :class="primaryBgClass"
-      >
-        <ShoppingBag class="w-3.5 h-3.5" />
-        <span>এখনই অর্ডার করুন</span>
-      </button>
-    </div>
-
     <!-- CONVERSATIONAL AI STORE EDITOR SIDEBAR / DRAWER -->
     <!-- Backdrop overlay -->
     <Transition name="fade">
