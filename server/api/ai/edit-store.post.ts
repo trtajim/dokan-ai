@@ -45,26 +45,28 @@ Current Store Data:
 - Show Urgency Top Bar: ${currentStore.config?.show_urgency_bar ?? true}
 - Show Verified Badge: ${currentStore.config?.show_verified_badge ?? true}
 - Show Video Reel: ${currentStore.config?.show_video_reel ?? true}
+- Video Reel URL: "${currentStore.config?.video_reel_url || currentStore.video_reel_url || ''}"
 - Show Testimonials / Reviews: ${currentStore.config?.show_testimonials ?? true}
 - Show FAQs: ${currentStore.config?.show_faqs ?? true}
 - Delivery Fee Inside Dhaka: ${currentStore.config?.delivery_fee_inside ?? 70}
 - Delivery Fee Outside Dhaka: ${currentStore.config?.delivery_fee_outside ?? 130}
-- Badge Text: "${currentStore.config?.badge_text ?? 'অরিজিনাল কোয়ালিটি নিশ্চয়তা'}"
-- Seller Tagline: "${currentStore.config?.seller_tagline ?? '১০০% খাঁটি ও গুণগত মান সম্পন্ন'}"
-- CTA Button Text: "${currentStore.config?.cta_button_text ?? 'এখনই অর্ডার করুন (ক্যাশ অন ডেলিভারি)'}"
+- Badge Text: "${currentStore.config?.badge_text ?? ''}"
+- Seller Tagline: "${currentStore.config?.seller_tagline ?? ''}"
+- CTA Button Text: "${currentStore.config?.cta_button_text ?? 'এখনই অর্ডার করুন'}"
 - Headline: "${currentStore.config?.headline ?? ''}" (Must be punchy & compact, max 10-14 words, not a long paragraph)
 - Subheadline: "${currentStore.config?.subheadline ?? ''}"
 - Features: ${JSON.stringify(currentStore.config?.features ?? [])}
 - FAQs: ${JSON.stringify(currentStore.config?.faqs ?? [])}
 - Testimonials: ${JSON.stringify(currentStore.config?.testimonials ?? [])}
 
-BEHAVIOR AND INTERMEDIARY CONFIRMATION RULES:
-1. VAGUE OR AMBIGUOUS REQUESTS (CRITICAL):
-   - If the merchant's request is unclear, vague, or missing key details (e.g., "change it", "এটা পরিবর্তন করো", "দাম বদলাও", "কালার বদলাও", "কিছু একটা বাদ দাও"), DO NOT guess or make random destructive modifications.
-   - Set "is_clarification": true.
-   - Keep all store fields, prices, themes, and configs EXACTLY as their current values.
-   - In "reply", ask a polite, precise follow-up question in Bengali clarifying exactly what they want to change (e.g. "আপনি কি পণ্যের দাম, কালার থিম নাকি কোনো নির্দিষ্ট লেখা পরিবর্তন করতে চাচ্ছেন? বিস্তারিত জানালে সাথে সাথে করে দিচ্ছি।").
-   - In "suggestions", provide 3 distinct, specific clickable options (e.g. ["দাম পরিবর্তন করুন", "কালার থিম পরিবর্তন করুন", "হেডলাইন পরিবর্তন করুন"]).
+CRITICAL PRESERVATION & ISOLATION RULES (DO NOT INVENT UNREQUESTED CHANGES):
+1. PRESERVE UNTOUCHED FIELDS:
+   - When editing a specific item (for example, just the price, or just the CTA button text, or just the title), DO NOT change, reset, overwrite, or remove ANY other field.
+   - Specifically, NEVER remove or alter the Video Reel URL ("video_reel_url") or toggle "show_video_reel" unless the merchant EXPLICITLY asks to change/remove the video reel.
+   - Keep "video_reel_url" exactly as "${currentStore.config?.video_reel_url || currentStore.video_reel_url || ''}" unless explicitly asked to change or clear it.
+   - Keep "cta_button_text" exactly as "${currentStore.config?.cta_button_text || 'এখনই অর্ডার করুন'}" unless the user explicitly asks to change the order/CTA button text.
+   - Keep "badge_text" and "seller_tagline" exactly as their current values unless asked to edit them.
+   - Keep "features", "faqs", and "testimonials" arrays exactly as they are unless asked to add/edit/remove them.
 
 2. SPECIFIC INSTRUCTIONS:
    - Apply requested changes accurately. You can customize EVERY SINGLE PIECE of text and setting WITHOUT touching or wiping out other unrelated sections:
@@ -73,16 +75,23 @@ BEHAVIOR AND INTERMEDIARY CONFIRMATION RULES:
      - Headline, subheadline, price, regular price, stock, color theme ("amber", "emerald", "indigo", "rose", "slate")
      - Features, trust badges, FAQs, reviews/testimonials
      - Video Reel URL (add YouTube/Facebook reel or remove)
-   - Preserve all existing features, FAQs, and testimonials unless the merchant specifically asked to modify or remove them!
    - In "reply", confirm the exact modification clearly in natural, reassuring Bengali (e.g. "আপনার পণ্যের দাম ১০০০ থেকে কমিয়ে ৯৫০ টাকা করা হয়েছে!") AND ask a helpful follow-up question.
    - Provide 2 to 3 quick clickable next-step chips in "suggestions" array.
 
 3. SECTION VISIBILITY:
+   - Only toggle visibility when explicitly requested by the user:
    - If asked to hide/remove urgency bar, set "show_urgency_bar": false.
    - If asked to hide/remove verified badge, set "show_verified_badge": false.
    - If asked to hide/remove video/reel, set "show_video_reel": false.
    - If asked to hide/remove testimonials/reviews or FAQs, set "show_testimonials": false or "show_faqs": false.
    - If asked to show them back, set them to true.
+   - NEVER hide a section by accident.
+
+4. VAGUE OR AMBIGUOUS REQUESTS:
+   - If the merchant's request is completely unclear or missing key details (e.g., "change it", "এটা পরিবর্তন করো"), set "is_clarification": true.
+   - Keep all store fields, prices, themes, and configs EXACTLY as their current values.
+   - In "reply", ask a polite, precise follow-up question in Bengali clarifying exactly what they want to change.
+   - In "suggestions", provide 3 distinct, specific clickable options.
 
 RETURN STRICT JSON ONLY:
 {
@@ -94,8 +103,8 @@ RETURN STRICT JSON ONLY:
   "regular_price": number,
   "stock": number,
   "badge_text": "string (custom badge tag)",
-  "seller_tagline": "string (custom seller short highlight in black)",
-  "cta_button_text": "string (e.g. এখনই অর্ডার করুন (ক্যাশ অন ডেলিভারি) or custom)",
+  "seller_tagline": "string (custom seller short highlight)",
+  "cta_button_text": "string (e.g. এখনই অর্ডার করুন or custom)",
   "show_urgency_bar": boolean,
   "show_verified_badge": boolean,
   "show_video_reel": boolean,
@@ -121,27 +130,29 @@ RETURN STRICT JSON ONLY:
 
     const parsed = JSON.parse(rawResponse || '{}')
 
+    const currentReelUrl = currentStore.config?.video_reel_url || currentStore.video_reel_url || ''
+
     const updatedConfig = {
       ...currentStore.config,
-      show_urgency_bar: parsed.show_urgency_bar !== undefined ? parsed.show_urgency_bar : (currentStore.config?.show_urgency_bar ?? true),
-      show_verified_badge: parsed.show_verified_badge !== undefined ? parsed.show_verified_badge : (currentStore.config?.show_verified_badge ?? true),
-      show_video_reel: parsed.show_video_reel !== undefined ? parsed.show_video_reel : (currentStore.config?.show_video_reel ?? true),
-      show_testimonials: parsed.show_testimonials !== undefined ? parsed.show_testimonials : (currentStore.config?.show_testimonials ?? true),
-      show_faqs: parsed.show_faqs !== undefined ? parsed.show_faqs : (currentStore.config?.show_faqs ?? true),
+      show_urgency_bar: typeof parsed.show_urgency_bar === 'boolean' ? parsed.show_urgency_bar : (currentStore.config?.show_urgency_bar ?? true),
+      show_verified_badge: typeof parsed.show_verified_badge === 'boolean' ? parsed.show_verified_badge : (currentStore.config?.show_verified_badge ?? true),
+      show_video_reel: typeof parsed.show_video_reel === 'boolean' ? parsed.show_video_reel : (currentStore.config?.show_video_reel ?? true),
+      show_testimonials: typeof parsed.show_testimonials === 'boolean' ? parsed.show_testimonials : (currentStore.config?.show_testimonials ?? true),
+      show_faqs: typeof parsed.show_faqs === 'boolean' ? parsed.show_faqs : (currentStore.config?.show_faqs ?? true),
       headline: parsed.headline || currentStore.config?.headline,
       subheadline: parsed.subheadline || currentStore.config?.subheadline,
-      delivery_fee_inside: parsed.delivery_fee_inside ?? currentStore.config?.delivery_fee_inside,
-      delivery_fee_outside: parsed.delivery_fee_outside ?? currentStore.config?.delivery_fee_outside,
+      delivery_fee_inside: (parsed.delivery_fee_inside !== undefined && parsed.delivery_fee_inside !== null) ? Number(parsed.delivery_fee_inside) : currentStore.config?.delivery_fee_inside,
+      delivery_fee_outside: (parsed.delivery_fee_outside !== undefined && parsed.delivery_fee_outside !== null) ? Number(parsed.delivery_fee_outside) : currentStore.config?.delivery_fee_outside,
       badge_text: parsed.badge_text !== undefined ? parsed.badge_text : currentStore.config?.badge_text,
       seller_tagline: parsed.seller_tagline !== undefined ? parsed.seller_tagline : currentStore.config?.seller_tagline,
-      cta_button_text: parsed.cta_button_text !== undefined ? parsed.cta_button_text : currentStore.config?.cta_button_text,
-      video_reel_url: parsed.video_reel_url !== undefined ? parsed.video_reel_url : currentStore.config?.video_reel_url,
+      cta_button_text: parsed.cta_button_text || currentStore.config?.cta_button_text,
+      video_reel_url: (parsed.video_reel_url !== undefined && parsed.video_reel_url !== null) ? parsed.video_reel_url : currentReelUrl,
       features: (Array.isArray(parsed.features) && parsed.features.length > 0) ? parsed.features : currentStore.config?.features,
       trust_badges: (Array.isArray(parsed.trust_badges) && parsed.trust_badges.length > 0) ? parsed.trust_badges : currentStore.config?.trust_badges,
       faqs: (Array.isArray(parsed.faqs) && parsed.faqs.length > 0) ? parsed.faqs : currentStore.config?.faqs,
       testimonials: (Array.isArray(parsed.testimonials) && parsed.testimonials.length > 0) ? parsed.testimonials : currentStore.config?.testimonials,
       variants: parsed.variants || currentStore.config?.variants,
-      stock: parsed.stock ?? currentStore.stock,
+      stock: (parsed.stock !== undefined && parsed.stock !== null) ? Number(parsed.stock) : currentStore.stock,
       pixel_id: parsed.pixel_id !== undefined ? parsed.pixel_id : currentStore.config?.pixel_id
     }
 
