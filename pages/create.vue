@@ -334,10 +334,10 @@ const resetChat = () => {
   allUploadedImages.value = []
 }
 
-onMounted(() => {
-  initAuth()
+onMounted(async () => {
+  await initAuth()
   if (!currentUser.value) {
-    router.push('/login?redirect=/create')
+    router.replace('/login?redirect=/create')
     return
   }
   scrollToBottom()

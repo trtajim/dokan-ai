@@ -324,7 +324,7 @@ onMounted(async () => {
   await initAuth()
   // Strict Login Check: If not logged in, redirect to login page immediately
   if (!currentUser.value) {
-    router.push('/login?redirect=/dashboard')
+    router.replace('/login?redirect=/dashboard')
     return
   }
   refreshData()

@@ -1,6 +1,12 @@
 <template>
   <div class="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md text-center">
+      <div class="mb-4">
+        <NuxtLink to="/" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors">
+          <ArrowLeft class="w-4 h-4" />
+          <span>হোমপেজে ফিরে যান</span>
+        </NuxtLink>
+      </div>
       <NuxtLink to="/" class="inline-flex items-center gap-2.5">
         <div class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center p-2 shadow-md">
           <NuxtLogo />
@@ -86,7 +92,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Zap, ArrowRight, Loader2 } from 'lucide-vue-next'
+import { Zap, ArrowRight, ArrowLeft, Loader2 } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 
 const { loginAsGuest, loginWithEmail } = useAuth()
