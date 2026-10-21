@@ -103,18 +103,20 @@ CRITICAL PRESERVATION & ISOLATION RULES (DO NOT INVENT UNREQUESTED CHANGES):
    - Keep "features", "trust_badges", "faqs", and "testimonials" arrays exactly as they are unless asked to add/edit/remove them.
    - Keep "regular_price" exactly as ${currentStore.regular_price ?? currentStore.price} unless asked to edit regular price or discount.
 
-2. SPECIFIC INSTRUCTIONS:
-   - Apply requested changes directly and decisively. You can customize EVERY SINGLE PIECE of text and setting WITHOUT touching or wiping out other unrelated sections.
-   - In "reply", give a direct, friendly confirmation in natural Bengali of what was updated (e.g. "আপনার পণ্যের দাম পরিবর্তন করা হয়েছে।"). DO NOT ask annoying or unnecessary follow-up questions if the command was completed.
+2. SPECIFIC INSTRUCTIONS & PARTIAL PATCH OPTIMIZATION (HIGH SPEED):
+   - Apply requested changes directly and decisively.
+   - PARTIAL PATCH (CRITICAL FOR SPEED): In the JSON response, only include the keys that the merchant wants to change, add, or toggle.
+   - For any unchanged field (e.g. features, testimonials, faqs, theme, etc.), DO NOT include them or return null/undefined. The server will automatically preserve all untouched fields safely!
+   - In "reply", give a direct, friendly confirmation in natural Bengali of what was updated (e.g. "আপনার পণ্যের দাম পরিবর্তন করা হয়েছে।"). DO NOT ask unnecessary follow-up questions if the command was completed.
    - Provide 2 to 3 quick clickable next-step chips in "suggestions" array.
 
 3. SECTION VISIBILITY:
    - Only toggle visibility when explicitly requested by the user:
-   - If asked to hide/remove urgency bar, set "show_urgency_bar": false. Otherwise keep it ${currentStore.config?.show_urgency_bar ?? true}.
-   - If asked to hide/remove verified badge, set "show_verified_badge": false. Otherwise keep it ${currentStore.config?.show_verified_badge ?? true}.
-   - If asked to hide/remove video/reel, set "show_video_reel": false. Otherwise keep it ${currentStore.config?.show_video_reel ?? true}.
-   - If asked to hide/remove testimonials/reviews or FAQs, set "show_testimonials": false or "show_faqs": false. Otherwise keep their current values.
-   - NEVER hide a section by accident.
+   - If asked to hide/remove urgency bar, set "show_urgency_bar": false.
+   - If asked to hide/remove verified badge, set "show_verified_badge": false.
+   - If asked to hide/remove video/reel, set "show_video_reel": false.
+   - If asked to hide/remove testimonials/reviews or FAQs, set "show_testimonials": false or "show_faqs": false.
+   - If not asked, do NOT include these keys in JSON.
 
 4. SCOPE BOUNDARIES & LIMITATIONS (WHAT THIS EDITOR CAN AND CANNOT DO):
    - THIS EDITOR IS ONLY FOR EDITING THIS EXISTING STORE.
@@ -125,34 +127,34 @@ CRITICAL PRESERVATION & ISOLATION RULES (DO NOT INVENT UNREQUESTED CHANGES):
      a) The request is completely unintelligible or out of scope (like creating a new store, asking about personal life, etc.).
      b) The request is missing the actual value and literally impossible to guess (e.g., user only typed "change" without mentioning what or to what).
 
-RETURN STRICT JSON ONLY:
+RETURN STRICT JSON ONLY (Include ONLY keys that are being modified, plus reply, is_clarification, and suggestions):
 {
   "reply": "clear confirmation in Bengali (or polite explanation if request is out of scope/unclear)",
   "is_clarification": boolean,
   "suggestions": ["suggested chip 1", "suggested chip 2", "suggested chip 3"],
-  "product_title": "string",
-  "price": number,
-  "regular_price": number,
-  "stock": number,
-  "badge_text": "string (custom badge tag)",
-  "seller_tagline": "string (custom seller short highlight)",
-  "cta_button_text": "string (e.g. এখনই অর্ডার করুন or custom)",
-  "show_urgency_bar": boolean,
-  "show_verified_badge": boolean,
-  "show_video_reel": boolean,
-  "show_testimonials": boolean,
-  "show_faqs": boolean,
-  "theme_color": "amber" | "emerald" | "indigo" | "rose" | "slate",
-  "delivery_fee_inside": number,
-  "delivery_fee_outside": number,
-  "video_reel_url": "string",
-  "headline": "string",
-  "subheadline": "string",
-  "features": [{"title": "...", "desc": "..."}],
-  "trust_badges": ["string"],
-  "faqs": [{"q": "...", "a": "..."}],
-  "testimonials": [{"name": "...", "location": "...", "comment": "..."}],
-  "variants": [{"name": "...", "price": number}]
+  "product_title"?: "string",
+  "price"?: number,
+  "regular_price"?: number,
+  "stock"?: number,
+  "badge_text"?: "string",
+  "seller_tagline"?: "string",
+  "cta_button_text"?: "string",
+  "show_urgency_bar"?: boolean,
+  "show_verified_badge"?: boolean,
+  "show_video_reel"?: boolean,
+  "show_testimonials"?: boolean,
+  "show_faqs"?: boolean,
+  "theme_color"?: "amber" | "emerald" | "indigo" | "rose" | "slate",
+  "delivery_fee_inside"?: number,
+  "delivery_fee_outside"?: number,
+  "video_reel_url"?: "string",
+  "headline"?: "string",
+  "subheadline"?: "string",
+  "features"?: [{"title": "...", "desc": "..."}],
+  "trust_badges"?: ["string"],
+  "faqs"?: [{"q": "...", "a": "..."}],
+  "testimonials"?: [{"name": "...", "location": "...", "comment": "..."}],
+  "variants"?: [{"name": "...", "price": number}]
 }`
 
     const rawResponse = await generateAiContent({
