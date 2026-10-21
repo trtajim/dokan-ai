@@ -150,7 +150,7 @@ begin
     )
     values (
       'store_demo_smartwatch',
-      't900-ultra-smartwatch',
+      'demo-store',
       demo_user_id,
       'T900 Ultra 2 Max Smartwatch (অরিজিনাল)',
       1350,
