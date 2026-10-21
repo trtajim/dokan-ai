@@ -811,10 +811,12 @@ const submitAiEdit = async () => {
       scrollToEditorBottom()
     }
   } catch (err) {
+    const errorMsg = err?.data?.message || err?.message || 'AI এডিট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।'
+    console.error('AI edit error details:', err)
     if (editLogs.value[activeLogIndex]) {
-      editLogs.value[activeLogIndex].response = 'AI এডিট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।'
+      editLogs.value[activeLogIndex].response = errorMsg
     }
-    toast.error('AI এডিট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।')
+    toast.error(errorMsg)
     scrollToEditorBottom()
   } finally {
     isAiEditing.value = false
