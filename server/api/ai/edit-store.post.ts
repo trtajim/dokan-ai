@@ -85,6 +85,7 @@ Current Store Data:
 - Regular Price: ${currentStore.regular_price ?? currentStore.price}
 - Stock: ${existingStock}
 - Current Images (${existingImages.length} total): ${JSON.stringify(existingImages.map((img, i) => `Image ${i + 1}`))}${existingImages.length > 0 ? ` (First image is currently hero/cover)` : ' (No images yet)'}
+- Secondary / Feature Section Image: "${currentStore.config?.secondary_image || ''}"
 - Variants: ${JSON.stringify(existingVariants)}
 - Current Theme Color: "${currentStore.theme_color || 'emerald'}" (Themes: amber, emerald, indigo, rose, slate)
 - Show Urgency Top Bar: ${currentStore.config?.show_urgency_bar ?? true}
@@ -119,10 +120,12 @@ CRITICAL PRESERVATION & ISOLATION RULES (DO NOT INVENT UNREQUESTED CHANGES):
    - Existing image indices are 1-based: Image 1, Image 2, etc.
    - If merchant attached new images (${newAttachedImages.length} attached):
      • If instruction asks to make it the hero / cover / main image (e.g., "কভার ছবি করো", "মেইন ছবি করো"), set "make_new_hero": true.
+     • If instruction asks to use it for the feature section / "কেন সেরা" section (e.g. "ফিচার সেকশনের ছবি করো", "কেন সেরা ছবির জায়গায় দাও", "secondary image"), set "set_as_secondary_image": true.
      • Otherwise default to adding them to the gallery or updating images.
    - If merchant asks to remove an image (e.g. "২ নম্বর ছবিটা বাদ দাও", "ছবি ডিলিট করো", "remove image 1"):
      • Set "remove_image_indices": [1-based numbers of images to remove], e.g. [2] to remove Image 2.
      • Or if asked to remove all images, set "remove_image_indices": "all" or [1, 2, ...].
+   - If merchant asks to remove the feature section image or clear it: set "clear_secondary_image": true.
    - If no image action is requested, DO NOT return image keys.
 
 3. SPECIFIC INSTRUCTIONS & PARTIAL PATCH OPTIMIZATION (HIGH SPEED):
@@ -178,6 +181,8 @@ RETURN STRICT JSON ONLY (Include ONLY keys that are being modified, plus reply, 
   "testimonials"?: [{"name": "...", "location": "...", "comment": "..."}],
   "variants"?: [{"name": "...", "price": number}],
   "make_new_hero"?: boolean,
+  "set_as_secondary_image"?: boolean,
+  "clear_secondary_image"?: boolean,
   "remove_image_indices"?: number[]
 }`
 
@@ -265,8 +270,16 @@ RETURN STRICT JSON ONLY (Include ONLY keys that are being modified, plus reply, 
       }
     }
 
+    let finalSecondaryImage = currentStore.config?.secondary_image || null
+    if (parsed.clear_secondary_image) {
+      finalSecondaryImage = null
+    }
+
     if (newAttachedImages.length > 0) {
-      if (parsed.make_new_hero) {
+      if (parsed.set_as_secondary_image) {
+        finalSecondaryImage = newAttachedImages[0]
+        finalImages = [...finalImages, ...newAttachedImages]
+      } else if (parsed.make_new_hero) {
         finalImages = [...newAttachedImages, ...finalImages]
       } else {
         finalImages = [...finalImages, ...newAttachedImages]
@@ -279,6 +292,7 @@ RETURN STRICT JSON ONLY (Include ONLY keys that are being modified, plus reply, 
       ...currentStore.config,
       images: finalImages,
       hero_image: finalHeroImage,
+      secondary_image: finalSecondaryImage,
       show_urgency_bar: finalShowUrgencyBar,
       show_verified_badge: finalShowVerifiedBadge,
       show_video_reel: finalShowVideoReel,
