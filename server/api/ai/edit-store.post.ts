@@ -84,8 +84,8 @@ Current Store Data:
 - Price: ${currentStore.price}
 - Regular Price: ${currentStore.regular_price ?? currentStore.price}
 - Stock: ${existingStock}
-- Current Images (${existingImages.length} total): ${JSON.stringify(existingImages.map((img, i) => `Image ${i + 1}`))}${existingImages.length > 0 ? ` (First image is currently hero/cover)` : ' (No images yet)'}
-- Secondary / Feature Section Image: "${currentStore.config?.secondary_image || ''}"
+- Current Images (${existingImages.length} total): ${JSON.stringify(existingImages.map((_, i) => `Image ${i + 1}`))}${existingImages.length > 0 ? ` (First image is currently hero/cover)` : ' (No images yet)'}
+- Secondary / Feature Section Image: ${currentStore.config?.secondary_image ? '(Image set)' : '(No image set)'}
 - Variants: ${JSON.stringify(existingVariants)}
 - Current Theme Color: "${currentStore.theme_color || 'emerald'}" (Themes: amber, emerald, indigo, rose, slate)
 - Show Urgency Top Bar: ${currentStore.config?.show_urgency_bar ?? true}
