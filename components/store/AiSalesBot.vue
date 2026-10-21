@@ -1,15 +1,62 @@
 <template>
   <div class="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-40">
-    <!-- Chat Trigger Bubble -->
-    <button 
-      v-if="!isOpen"
-      @click="isOpen = true"
-      class="flex items-center gap-2 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full text-white shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 font-bold text-xs sm:text-sm cursor-pointer"
-      :class="primaryBgClass"
-    >
-      <Bot class="w-4 h-4 sm:w-5 sm:h-5" />
-      <span>AI সহায়ক</span>
-    </button>
+    <!-- Unopened State: Proactive Floating Greeting Bubble + Action Button -->
+    <div v-if="!isOpen" class="flex flex-col items-end gap-2.5">
+      <!-- Proactive Speech Bubble Notification -->
+      <transition
+        enter-active-class="transition duration-300 ease-out transform"
+        enter-from-class="opacity-0 translate-y-3 scale-95"
+        enter-to-class="opacity-100 translate-y-0 scale-100"
+        leave-active-class="transition duration-200 ease-in transform"
+        leave-from-class="opacity-100 translate-y-0 scale-100"
+        leave-to-class="opacity-0 translate-y-2 scale-95"
+      >
+        <div 
+          v-if="showGreetingBubble"
+          class="relative bg-white/95 backdrop-blur-md text-slate-800 px-3.5 py-2.5 rounded-2xl shadow-xl border border-slate-200/90 max-w-[240px] sm:max-w-[270px] cursor-pointer hover:shadow-2xl transition-all group"
+          @click="openChat"
+        >
+          <!-- Dismiss button -->
+          <button 
+            type="button"
+            @click.stop="showGreetingBubble = false" 
+            class="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition-colors shadow-xs"
+            title="বন্ধ করুন"
+          >
+            <X class="w-3 h-3" />
+          </button>
+
+          <!-- Speech bubble tail pointing to the trigger button -->
+          <div class="absolute -bottom-1.5 right-6 w-3 h-3 bg-white rotate-45 border-r border-b border-slate-200"></div>
+
+          <div class="flex items-start gap-2">
+            <span class="text-base sm:text-lg animate-bounce leading-none select-none">👋</span>
+            <div class="text-[11px] sm:text-xs leading-snug">
+              <p class="font-bold text-slate-900 flex items-center gap-1.5">
+                <span>হ্যালো! আমি Dokan AI</span>
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              </p>
+              <p class="text-slate-600 mt-0.5">কীভাবে সাহায্য করতে পারি? কোনো ছাড় বা তথ্যের দরকার?</p>
+            </div>
+          </div>
+        </div>
+      </transition>
+
+      <!-- Chat Trigger Floating Button -->
+      <button 
+        @click="openChat"
+        class="relative flex items-center gap-2 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full text-white shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 font-bold text-xs sm:text-sm cursor-pointer"
+        :class="primaryBgClass"
+      >
+        <!-- Ping indicator badge -->
+        <span class="absolute -top-1 -right-1 flex h-3 w-3">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-400 border-2 border-white"></span>
+        </span>
+        <Bot class="w-4 h-4 sm:w-5 sm:h-5" />
+        <span>AI সহায়ক</span>
+      </button>
+    </div>
 
     <!-- Chat Modal Window (Mobile Fullscreen Sheet / Desktop floating) -->
     <div 
@@ -108,7 +155,7 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, onMounted } from 'vue'
 import { Bot, X, Send, ShoppingBag } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -119,9 +166,27 @@ const props = defineProps({
 })
 
 const isOpen = ref(false)
+const showGreetingBubble = ref(false)
 const loading = ref(false)
 const inputQuery = ref('')
 const chatScroll = ref(null)
+
+onMounted(() => {
+  // Show the proactive floating greeting bubble after 1.5 seconds to attract attention
+  const timer = setTimeout(() => {
+    if (!isOpen.value) {
+      showGreetingBubble.value = true
+    }
+  }, 1500)
+
+  return () => clearTimeout(timer)
+})
+
+const openChat = () => {
+  showGreetingBubble.value = false
+  isOpen.value = true
+  scrollToBottom()
+}
 
 const quickChips = [
   'দাম কত?',
@@ -133,7 +198,7 @@ const quickChips = [
 const messages = ref([
   {
     role: 'model',
-    text: `আসসালামু আলাইকুম! ${props.store.product_title} সম্পর্কে কোনো প্রশ্ন থাকলে জানান!`
+    text: `আসসালামু আলাইকুম! আমি Dokan AI সেলস সহকারী। ${props.store.product_title} সম্পর্কে কোনো তথ্য বা সাহায্য লাগলে জানান!`
   }
 ])
 
