@@ -191,7 +191,26 @@ RETURN STRICT JSON ONLY (Include ONLY keys that are being modified, plus reply, 
       jsonMode: true
     })
 
-    const parsed = JSON.parse(rawResponse || '{}')
+    // Clean any markdown code blocks or extra text wrapper before parsing JSON
+    let cleanedResponse = (rawResponse || '{}').trim()
+    if (cleanedResponse.startsWith('```')) {
+      cleanedResponse = cleanedResponse.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim()
+    }
+    const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      cleanedResponse = jsonMatch[0]
+    }
+
+    let parsed: any = {}
+    try {
+      parsed = JSON.parse(cleanedResponse)
+    } catch (parseErr) {
+      console.warn('JSON parse fallback warning:', parseErr, 'Raw was:', rawResponse)
+      parsed = {
+        reply: 'আপনার নির্দেশনা বুঝতে পেরেছি, তবে ডাটা প্রসেস করতে সাময়িক সমস্যা হয়েছে। অনুগ্রহ করে আবার বলুন।',
+        is_clarification: true
+      }
+    }
 
     // Safeguard intent filters to prevent accidental deletion/overwriting
     const hasVariantIntent = /variant|ভ্যারিয়েন্ট|ভ্যারিয়েন্ট|সাইজ|ওজন|প্যাক|রং|color|size|weight|package|pack/i.test(instruction)

@@ -114,7 +114,16 @@ Respond ONLY with a strictly valid JSON matching this schema:
       jsonMode: true
     })
 
-    generatedConfig = JSON.parse(rawResponse || '{}')
+    let cleaned = (rawResponse || '{}').trim()
+    if (cleaned.startsWith('```')) {
+      cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim()
+    }
+    const match = cleaned.match(/\{[\s\S]*\}/)
+    if (match) {
+      cleaned = match[0]
+    }
+
+    generatedConfig = JSON.parse(cleaned)
   } catch (err: any) {
     console.warn('AI Generate Provider error, using fallback:', err?.message || err)
   }
