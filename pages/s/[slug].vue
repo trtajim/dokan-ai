@@ -178,9 +178,9 @@
               </div>
 
               <!-- Available Variant Chips if exists -->
-              <div v-if="store.variants?.length" class="grid grid-cols-2 gap-2 pt-1">
+              <div v-if="(store.variants?.length || store.config?.variants?.length)" class="grid grid-cols-2 gap-2 pt-1">
                 <button
-                  v-for="(v, vIdx) in store.variants"
+                  v-for="(v, vIdx) in (store.variants?.length ? store.variants : (store.config?.variants || []))"
                   :key="vIdx"
                   @click="scrollToForm"
                   class="text-left bg-white border-2 rounded-xl p-2.5 hover:border-amber-500 transition-all cursor-pointer"
@@ -851,18 +851,37 @@ const submitAiEdit = async () => {
   isAiEditing.value = true
 
   try {
+    // Send recent conversation history (excluding the current turn which was just pushed)
+    const historyPayload = editLogs.value.slice(0, activeLogIndex).map(log => ({
+      prompt: log.prompt,
+      response: log.response
+    })).filter(log => log.prompt && log.response)
+
     const res = await $fetch('/api/ai/edit-store', {
       method: 'POST',
       body: {
         slug: store.value.slug,
-        instruction
+        instruction,
+        history: historyPayload
       }
     })
 
     if (res && res.success) {
       // 1. Immediately sync the authoritative state returned by the server
       if (res.store && data.value) {
-        data.value.store = { ...data.value.store, ...res.store }
+        const activeVariants = (Array.isArray(res.store.variants) && res.store.variants.length > 0)
+          ? res.store.variants
+          : (res.store.config?.variants || data.value.store?.variants || [])
+        data.value.store = {
+          ...data.value.store,
+          ...res.store,
+          variants: activeVariants,
+          config: {
+            ...(data.value.store?.config || {}),
+            ...(res.store.config || {}),
+            variants: activeVariants
+          }
+        }
       }
       
       // 2. Update the chat log with AI reply and actionable suggestions
