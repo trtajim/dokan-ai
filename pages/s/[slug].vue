@@ -497,8 +497,16 @@
           </div>
 
           <div v-for="(log, lIdx) in editLogs" :key="lIdx" class="space-y-1.5">
-            <div class="bg-slate-900 text-white p-2.5 sm:p-3 rounded-2xl rounded-br-none ml-auto max-w-[85%] text-xs shadow-xs">
-              {{ log.prompt }}
+            <div class="bg-slate-900 text-white p-2.5 sm:p-3 rounded-2xl rounded-br-none ml-auto max-w-[85%] text-xs shadow-xs space-y-1.5">
+              <div v-if="log.images && log.images.length" class="flex flex-wrap gap-1">
+                <img 
+                  v-for="(img, imgIdx) in log.images" 
+                  :key="imgIdx" 
+                  :src="img" 
+                  class="w-12 h-12 object-cover rounded-lg border border-slate-700 shrink-0" 
+                />
+              </div>
+              <div v-if="log.prompt">{{ log.prompt }}</div>
             </div>
             <div v-if="log.response" class="bg-white border border-slate-200 p-3 rounded-2xl rounded-bl-none mr-auto max-w-[90%] text-xs text-slate-800 space-y-2 shadow-xs">
               <div class="flex items-start gap-2">
@@ -529,18 +537,41 @@
 
         <!-- Editor Prompt Input Bar (Pinned at bottom, accounting for mobile safe area) -->
         <div class="p-3 pb-6 sm:pb-3 border-t border-slate-100 bg-white shrink-0 shadow-lg z-20">
-          <form @submit.prevent="submitAiEdit" class="flex items-center gap-2">
+          <!-- Pending Attached Images Preview -->
+          <div v-if="pendingImages.length > 0" class="flex items-center gap-1.5 pb-2 overflow-x-auto">
+            <div v-for="(img, pIdx) in pendingImages" :key="pIdx" class="relative group w-12 h-12 rounded-lg overflow-hidden border border-slate-300 shrink-0">
+              <img :src="img" class="w-full h-full object-cover" />
+              <button 
+                type="button"
+                @click="removePendingImage(pIdx)" 
+                class="absolute top-0.5 right-0.5 bg-slate-900/80 hover:bg-red-600 text-white rounded-full p-0.5 transition-colors cursor-pointer"
+              >
+                <X class="w-2.5 h-2.5" />
+              </button>
+            </div>
+          </div>
+
+          <form @submit.prevent="submitAiEdit" class="flex items-center gap-1.5">
+            <label 
+              class="cursor-pointer p-2 text-slate-400 hover:text-amber-600 rounded-full transition-colors flex items-center justify-center shrink-0" 
+              title="ছবি আপলোড করুন"
+            >
+              <Paperclip class="w-4 h-4 sm:w-5 sm:h-5" />
+              <input type="file" accept="image/*" multiple @change="handleFileUpload" class="hidden" :disabled="isAiEditing" />
+            </label>
+
             <input 
               v-model="aiInstruction" 
+              @paste="handlePaste"
               type="text" 
-              placeholder="কী পরিবর্তন করতে চান বলুন..." 
-              class="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-amber-500 font-medium"
+              placeholder="কী পরিবর্তন করতে চান বলুন বা ছবি পেস্ট করুন..." 
+              class="flex-1 px-3 py-2 sm:px-3.5 sm:py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-amber-500 font-medium"
               :disabled="isAiEditing"
             />
             <button 
               type="submit" 
-              :disabled="!aiInstruction.trim() || isAiEditing"
-              class="px-3.5 py-2.5 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all active:scale-95 shrink-0 cursor-pointer"
+              :disabled="(!aiInstruction.trim() && pendingImages.length === 0) || isAiEditing"
+              class="px-3.5 py-2 sm:py-2.5 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all active:scale-95 shrink-0 cursor-pointer"
             >
               <span>আপডেট</span>
               <Send class="w-3.5 h-3.5" />
@@ -555,8 +586,8 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, onMounted } from 'vue'
-import { Flame, ShoppingBag, ArrowDown, Check, Sparkles, Star, HelpCircle, X, Video, ShieldCheck, CheckCircle2, Loader2, Send, LayoutDashboard, ChevronDown } from 'lucide-vue-next'
+import { ref, computed, nextTick, onMounted, watch } from 'vue'
+import { Flame, ShoppingBag, ArrowDown, Check, Sparkles, Star, HelpCircle, X, Video, ShieldCheck, CheckCircle2, Loader2, Send, LayoutDashboard, ChevronDown, Paperclip } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 import { useMetaPixel } from '~/composables/useMetaPixel'
 
@@ -645,10 +676,59 @@ const selectVariant = (v) => {
 const isEditingStore = ref(false)
 const isAiEditing = ref(false)
 const aiInstruction = ref('')
+const pendingImages = ref([])
 const editLogs = ref([])
 const activeHeroImage = ref('')
 const editorScroll = ref(null)
 const toast = useAppToast()
+
+const handlePaste = (e) => {
+  const clipboardData = e.clipboardData || window.clipboardData
+  if (!clipboardData) return
+  const items = clipboardData.items
+  if (!items) return
+
+  const imageFiles = []
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].type && items[i].type.startsWith('image/')) {
+      const file = items[i].getAsFile()
+      if (file) {
+        imageFiles.push(file)
+      }
+    }
+  }
+
+  if (imageFiles.length > 0) {
+    processFiles(imageFiles)
+    toast.success(`${imageFiles.length}টি ছবি পেস্ট করা হয়েছে!`)
+  }
+}
+
+const handleFileUpload = (e) => {
+  const files = e.target.files
+  if (!files || files.length === 0) return
+  processFiles(Array.from(files))
+  e.target.value = ''
+}
+
+const processFiles = (files) => {
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i]
+    if (file && file.type && file.type.startsWith('image/')) {
+      const reader = new FileReader()
+      reader.onload = (uploadEvent) => {
+        if (uploadEvent.target?.result) {
+          pendingImages.value.push(uploadEvent.target.result)
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+}
+
+const removePendingImage = (index) => {
+  pendingImages.value.splice(index, 1)
+}
 
 const productImages = computed(() => {
   if (store.value?.config?.images && Array.isArray(store.value.config.images) && store.value.config.images.length > 0) {
@@ -859,14 +939,17 @@ watch(() => editLogs.value.length, () => {
 
 const submitAiEdit = async () => {
   const instruction = aiInstruction.value.trim()
-  if (!instruction) return
+  const attached = [...pendingImages.value]
+  if (!instruction && attached.length === 0) return
 
   aiInstruction.value = ''
+  pendingImages.value = []
   
   // Optimistically append the user message immediately before waiting for response
   const activeLogIndex = editLogs.value.length
   editLogs.value.push({
-    prompt: instruction,
+    prompt: instruction || 'নতুন ছবি যুক্ত করেছি',
+    images: attached,
     response: '',
     suggestions: []
   })
@@ -886,7 +969,8 @@ const submitAiEdit = async () => {
       method: 'POST',
       body: {
         slug: store.value.slug,
-        instruction,
+        instruction: instruction || 'নতুন ছবি যুক্ত করেছি',
+        attached_images: attached,
         history: historyPayload
       }
     })

@@ -11,10 +11,10 @@ import { getSupabaseClient } from '../../utils/supabase'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { slug, instruction, history } = body
+  const { slug, instruction, history, attached_images } = body
 
-  if (!slug || !instruction) {
-    throw createError({ statusCode: 400, message: 'Slug and instruction are required' })
+  if (!slug || (!instruction && (!Array.isArray(attached_images) || attached_images.length === 0))) {
+    throw createError({ statusCode: 400, message: 'Slug and instruction or images are required' })
   }
 
   // 1. Fetch current store state
@@ -39,6 +39,16 @@ export default defineEventHandler(async (event) => {
   currentStore.stock = existingStock
 
   const currentReelUrl = currentStore.config?.video_reel_url || currentStore.video_reel_url || ''
+
+  // Normalize existing images
+  const existingImages: string[] = Array.isArray(currentStore.config?.images) && currentStore.config.images.length > 0
+    ? currentStore.config.images
+    : (Array.isArray(currentStore.images) && currentStore.images.length > 0
+      ? currentStore.images
+      : (currentStore.image_url ? [currentStore.image_url] : []))
+
+  // New attached images from the user
+  const newAttachedImages: string[] = Array.isArray(attached_images) ? attached_images.filter(Boolean) : []
 
   // Format recent chat history if provided (last 4-6 turns) to provide conversational continuity
   let conversationContext = ''
@@ -66,13 +76,15 @@ export default defineEventHandler(async (event) => {
     const prompt = `You are "DokanAI Master Store Editor & Consultant".
 The merchant is asking for modifications, design feedback, or questions about their live store.
 ${conversationContext}
-Merchant's Current Message: "${instruction}"
+Merchant's Current Message: "${instruction || (newAttachedImages.length > 0 ? 'নতুন ছবি যুক্ত করেছি' : '')}"
+${newAttachedImages.length > 0 ? `New Attached Images: ${newAttachedImages.length} image(s) uploaded by the merchant.` : ''}
 
 Current Store Data:
 - Product Title: "${currentStore.product_title}"
 - Price: ${currentStore.price}
 - Regular Price: ${currentStore.regular_price ?? currentStore.price}
 - Stock: ${existingStock}
+- Current Images (${existingImages.length} total): ${JSON.stringify(existingImages.map((img, i) => `Image ${i + 1}`))}${existingImages.length > 0 ? ` (First image is currently hero/cover)` : ' (No images yet)'}
 - Variants: ${JSON.stringify(existingVariants)}
 - Current Theme Color: "${currentStore.theme_color || 'emerald'}" (Themes: amber, emerald, indigo, rose, slate)
 - Show Urgency Top Bar: ${currentStore.config?.show_urgency_bar ?? true}
@@ -103,14 +115,24 @@ CRITICAL PRESERVATION & ISOLATION RULES (DO NOT INVENT UNREQUESTED CHANGES):
    - Keep "features", "trust_badges", "faqs", and "testimonials" arrays exactly as they are unless asked to add/edit/remove them.
    - Keep "regular_price" exactly as ${currentStore.regular_price ?? currentStore.price} unless asked to edit regular price or discount.
 
-2. SPECIFIC INSTRUCTIONS & PARTIAL PATCH OPTIMIZATION (HIGH SPEED):
+2. IMAGE MANAGEMENT (UPLOAD, REMOVE, REPLACE):
+   - Existing image indices are 1-based: Image 1, Image 2, etc.
+   - If merchant attached new images (${newAttachedImages.length} attached):
+     • If instruction asks to make it the hero / cover / main image (e.g., "কভার ছবি করো", "মেইন ছবি করো"), set "make_new_hero": true.
+     • Otherwise default to adding them to the gallery or updating images.
+   - If merchant asks to remove an image (e.g. "২ নম্বর ছবিটা বাদ দাও", "ছবি ডিলিট করো", "remove image 1"):
+     • Set "remove_image_indices": [1-based numbers of images to remove], e.g. [2] to remove Image 2.
+     • Or if asked to remove all images, set "remove_image_indices": "all" or [1, 2, ...].
+   - If no image action is requested, DO NOT return image keys.
+
+3. SPECIFIC INSTRUCTIONS & PARTIAL PATCH OPTIMIZATION (HIGH SPEED):
    - Apply requested changes directly and decisively.
    - PARTIAL PATCH (CRITICAL FOR SPEED): In the JSON response, only include the keys that the merchant wants to change, add, or toggle.
    - For any unchanged field (e.g. features, testimonials, faqs, theme, etc.), DO NOT include them or return null/undefined. The server will automatically preserve all untouched fields safely!
-   - In "reply", give a direct, friendly confirmation in natural Bengali of what was updated (e.g. "আপনার পণ্যের দাম পরিবর্তন করা হয়েছে।"). DO NOT ask unnecessary follow-up questions if the command was completed.
+   - In "reply", give a direct, friendly confirmation in natural Bengali of what was updated (e.g. "আপনার পণ্যের দাম পরিবর্তন করা হয়েছে।" or "নতুন ছবি যুক্ত করা হয়েছে।"). DO NOT ask unnecessary follow-up questions if the command was completed.
    - Provide 2 to 3 quick clickable next-step chips in "suggestions" array.
 
-3. SECTION VISIBILITY:
+4. SECTION VISIBILITY:
    - Only toggle visibility when explicitly requested by the user:
    - If asked to hide/remove urgency bar, set "show_urgency_bar": false.
    - If asked to hide/remove verified badge, set "show_verified_badge": false.
@@ -118,7 +140,7 @@ CRITICAL PRESERVATION & ISOLATION RULES (DO NOT INVENT UNREQUESTED CHANGES):
    - If asked to hide/remove testimonials/reviews or FAQs, set "show_testimonials": false or "show_faqs": false.
    - If not asked, do NOT include these keys in JSON.
 
-4. SCOPE BOUNDARIES & LIMITATIONS (WHAT THIS EDITOR CAN AND CANNOT DO):
+5. SCOPE BOUNDARIES & LIMITATIONS (WHAT THIS EDITOR CAN AND CANNOT DO):
    - THIS EDITOR IS ONLY FOR EDITING THIS EXISTING STORE.
    - CANNOT create a new store: If the merchant asks to create a brand new store/product (e.g., "নতুন স্টোর বানিয়ে দাও", "create a new store"), set "is_clarification": true. Explain politely in Bengali that this editor only modifies the current live store, and guide them to create a new store from the homepage (https://dokan.express or "/") or dashboard.
    - CANNOT process orders/dispatch couriers directly here: Explain politely where to find that in the dashboard.
@@ -154,7 +176,9 @@ RETURN STRICT JSON ONLY (Include ONLY keys that are being modified, plus reply, 
   "trust_badges"?: ["string"],
   "faqs"?: [{"q": "...", "a": "..."}],
   "testimonials"?: [{"name": "...", "location": "...", "comment": "..."}],
-  "variants"?: [{"name": "...", "price": number}]
+  "variants"?: [{"name": "...", "price": number}],
+  "make_new_hero"?: boolean,
+  "remove_image_indices"?: number[]
 }`
 
     const rawResponse = await generateAiContent({
@@ -228,8 +252,33 @@ RETURN STRICT JSON ONLY (Include ONLY keys that are being modified, plus reply, 
       ? Number(parsed.regular_price)
       : (currentStore.regular_price || currentStore.price)
 
+    // Image logic: calculate final images array & hero image
+    let finalImages = [...existingImages]
+    const hasImageRemoval = parsed.remove_image_indices !== undefined
+    if (hasImageRemoval) {
+      if (parsed.remove_image_indices === 'all') {
+        finalImages = []
+      } else if (Array.isArray(parsed.remove_image_indices)) {
+        // 1-based indices to remove
+        const indicesToRemove = new Set(parsed.remove_image_indices.map((idx: any) => Number(idx)))
+        finalImages = finalImages.filter((_, idx) => !indicesToRemove.has(idx + 1))
+      }
+    }
+
+    if (newAttachedImages.length > 0) {
+      if (parsed.make_new_hero) {
+        finalImages = [...newAttachedImages, ...finalImages]
+      } else {
+        finalImages = [...finalImages, ...newAttachedImages]
+      }
+    }
+
+    const finalHeroImage = finalImages[0] || null
+
     const updatedConfig = {
       ...currentStore.config,
+      images: finalImages,
+      hero_image: finalHeroImage,
       show_urgency_bar: finalShowUrgencyBar,
       show_verified_badge: finalShowVerifiedBadge,
       show_video_reel: finalShowVideoReel,
@@ -272,6 +321,8 @@ RETURN STRICT JSON ONLY (Include ONLY keys that are being modified, plus reply, 
       currentStore.theme_color = parsed.theme_color || currentStore.theme_color
       currentStore.stock = updatedConfig.stock
       currentStore.variants = finalVariants
+      currentStore.images = finalImages
+      currentStore.image_url = finalHeroImage
       currentStore.config = updatedConfig
 
       const newSnapshot = JSON.stringify({
@@ -281,6 +332,8 @@ RETURN STRICT JSON ONLY (Include ONLY keys that are being modified, plus reply, 
         theme_color: currentStore.theme_color,
         stock: currentStore.stock,
         variants: currentStore.variants,
+        images: currentStore.images,
+        image_url: currentStore.image_url,
         config: currentStore.config
       })
 
@@ -293,6 +346,8 @@ RETURN STRICT JSON ONLY (Include ONLY keys that are being modified, plus reply, 
             price: currentStore.price,
             regular_price: currentStore.regular_price,
             theme_color: currentStore.theme_color,
+            image_url: currentStore.image_url,
+            images: currentStore.images,
             config: currentStore.config
           }).eq('slug', slug)
         } catch (dbErr) {
