@@ -100,7 +100,7 @@
             </NuxtLink>
 
             <NuxtLink 
-              to="/s/t900-ultra-smartwatch" 
+              to="/s/demo-store" 
               target="_blank" 
               class="w-full sm:w-auto px-7 py-4 text-sm sm:text-base font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-2xl shadow-xs transition-all flex items-center justify-center gap-2"
             >
