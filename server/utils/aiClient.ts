@@ -139,7 +139,7 @@ async function callGeminiContent(apiKey: string, options: AiTextOptions): Promis
   }
   contents.push({ role: 'user', parts: [{ text: options.prompt }] })
 
-  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash'
+  const model = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite'
   const response = await ai.models.generateContent({
     model,
     contents,
@@ -162,7 +162,7 @@ async function callGeminiChat(apiKey: string, options: AiChatOptions): Promise<s
     })
   })
 
-  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash'
+  const model = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite'
   const response = await ai.models.generateContent({
     model,
     contents,
