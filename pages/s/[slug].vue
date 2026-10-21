@@ -429,7 +429,7 @@
     <Transition name="slide-right">
       <aside 
         v-if="isEditingStore" 
-        class="fixed inset-y-0 right-0 w-full sm:w-[420px] md:w-[460px] h-screen h-[100dvh] max-h-screen bg-white z-50 shadow-2xl flex flex-col border-l border-slate-200 overflow-hidden font-sans-bn"
+        class="fixed inset-0 sm:inset-y-0 sm:left-auto sm:right-0 w-full sm:w-[420px] md:w-[460px] h-[100dvh] max-h-[100dvh] bg-white z-50 shadow-2xl flex flex-col border-l border-slate-200 overflow-hidden font-sans-bn"
       >
         <!-- Editor Drawer Header -->
         <div class="p-3.5 sm:p-4 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white shrink-0">
@@ -533,10 +533,13 @@
             <Loader2 class="w-4 h-4 animate-spin text-amber-600" />
             <span class="text-xs font-bold text-slate-700">AI আপডেট করছে...</span>
           </div>
+
+          <!-- Pinned bottom scroll anchor -->
+          <div ref="scrollBottomAnchor" class="h-1 w-full shrink-0"></div>
         </div>
 
-        <!-- Editor Prompt Input Bar (Pinned at bottom, accounting for mobile safe area) -->
-        <div class="p-3 pb-6 sm:pb-3 border-t border-slate-100 bg-white shrink-0 shadow-lg z-20">
+        <!-- Editor Prompt Input Bar (Sticky at bottom, accounting for mobile virtual keyboard and safe area) -->
+        <div class="sticky bottom-0 z-30 p-2.5 sm:p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t border-slate-200 bg-white shrink-0 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
           <!-- Pending Attached Images Preview -->
           <div v-if="pendingImages.length > 0" class="flex items-center gap-1.5 pb-2 overflow-x-auto">
             <div v-for="(img, pIdx) in pendingImages" :key="pIdx" class="relative group w-12 h-12 rounded-lg overflow-hidden border border-slate-300 shrink-0">
@@ -563,6 +566,7 @@
             <input 
               v-model="aiInstruction" 
               @paste="handlePaste"
+              @focus="onInputFocus"
               type="text" 
               placeholder="কী পরিবর্তন করতে চান বলুন বা ছবি পেস্ট করুন..." 
               class="flex-1 px-3 py-2 sm:px-3.5 sm:py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-amber-500 font-medium"
@@ -680,7 +684,14 @@ const pendingImages = ref([])
 const editLogs = ref([])
 const activeHeroImage = ref('')
 const editorScroll = ref(null)
+const scrollBottomAnchor = ref(null)
 const toast = useAppToast()
+
+const onInputFocus = () => {
+  setTimeout(() => {
+    scrollToEditorBottom(true)
+  }, 250)
+}
 
 const handlePaste = (e) => {
   const clipboardData = e.clipboardData || window.clipboardData
@@ -908,32 +919,34 @@ const scrollToForm = () => {
   }
 }
 
-const scrollToEditorBottom = () => {
-  nextTick(() => {
-    if (editorScroll.value) {
-      editorScroll.value.scrollTo({
-        top: editorScroll.value.scrollHeight,
-        behavior: 'smooth'
+const scrollToEditorBottom = (immediate = false) => {
+  const doScroll = () => {
+    if (scrollBottomAnchor.value) {
+      scrollBottomAnchor.value.scrollIntoView({
+        behavior: immediate ? 'auto' : 'smooth',
+        block: 'end'
       })
+    } else if (editorScroll.value) {
+      editorScroll.value.scrollTop = editorScroll.value.scrollHeight
     }
-  })
-  // Secondary microtask to guarantee layout reflow after reactive render
-  setTimeout(() => {
-    if (editorScroll.value) {
-      editorScroll.value.scrollTo({
-        top: editorScroll.value.scrollHeight,
-        behavior: 'smooth'
-      })
-    }
-  }, 60)
+  }
+
+  nextTick(doScroll)
+  // Double-shot timeouts guarantee layout reflow on mobile keyboards and image loading
+  setTimeout(doScroll, 80)
+  setTimeout(doScroll, 220)
 }
 
-// Auto-scroll when editor opens or logs mutate
+// Auto-scroll when editor opens, state updates, or AI starts/stops typing
 watch(isEditingStore, (open) => {
-  if (open) scrollToEditorBottom()
+  if (open) scrollToEditorBottom(true)
 })
 
 watch(() => editLogs.value.length, () => {
+  scrollToEditorBottom()
+})
+
+watch(isAiEditing, () => {
   scrollToEditorBottom()
 })
 
