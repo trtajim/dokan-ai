@@ -136,16 +136,16 @@
               <!-- Price display with save calculation -->
               <div class="flex items-baseline gap-3 flex-wrap">
                 <span class="font-serif-bn font-extrabold text-3xl sm:text-4xl text-[#12372a]">
-                  ৳{{ store.price }}
+                  ৳{{ currentDisplayPrice }}
                 </span>
-                <s v-if="store.regular_price && store.regular_price > store.price" class="text-slate-400 text-lg sm:text-xl font-serif-bn">
+                <s v-if="store.regular_price && store.regular_price > currentDisplayPrice" class="text-slate-400 text-lg sm:text-xl font-serif-bn">
                   ৳{{ store.regular_price }}
                 </s>
                 <span 
-                  v-if="store.regular_price && store.regular_price > store.price" 
+                  v-if="store.regular_price && store.regular_price > currentDisplayPrice" 
                   class="ml-auto bg-[#12372a] text-[#fff6e0] rounded-lg px-2.5 py-0.5 text-xs font-bold font-serif-bn"
                 >
-                  ৳{{ store.regular_price - store.price }} ছাড়
+                  ৳{{ store.regular_price - currentDisplayPrice }} ছাড়
                 </span>
               </div>
 
@@ -154,9 +154,9 @@
                 <button
                   v-for="(v, vIdx) in (store.variants?.length ? store.variants : (store.config?.variants || []))"
                   :key="vIdx"
-                  @click="scrollToForm"
+                  @click="selectVariant(v)"
                   class="text-left bg-white border-2 rounded-xl p-2.5 hover:border-amber-500 transition-all cursor-pointer"
-                  :class="vIdx === 0 ? 'border-amber-500 bg-[#fff9ea]' : 'border-[#e6e0cf]'"
+                  :class="selectedVariant?.name === v.name ? 'border-amber-500 bg-[#fff9ea] ring-2 ring-amber-500/20' : 'border-[#e6e0cf]'"
                 >
                   <span class="block text-xs text-slate-500">{{ v.name }}</span>
                   <b class="text-sm font-serif-bn text-slate-900">৳{{ v.price }}</b>
@@ -322,7 +322,7 @@
 
       <!-- COD CHECKOUT FORM -->
       <div v-if="currentStock > 0" class="max-w-2xl mx-auto bg-[#fff6e0] rounded-3xl p-2 sm:p-4 shadow-sm border border-amber-200/60">
-        <StoreCodForm :store="store" />
+        <StoreCodForm :store="store" v-model:selectedVariant="selectedVariant" />
       </div>
       <div v-else class="max-w-2xl mx-auto p-6 sm:p-8 bg-white border border-red-200 rounded-3xl text-center space-y-2">
         <h3 class="text-base sm:text-lg font-bold text-red-600 font-serif-bn">বর্তমানে এই পণ্যটির স্টক খালি</h3>
@@ -524,6 +524,29 @@ const currentStock = computed(() => {
   if (typeof store.value?.config?.stock === 'number') return store.value.config.stock
   return 15
 })
+
+const availableVariants = computed(() => {
+  return store.value?.variants || store.value?.config?.variants || []
+})
+
+const selectedVariant = ref(null)
+
+watch(availableVariants, (vars) => {
+  if (vars && vars.length > 0 && !selectedVariant.value) {
+    selectedVariant.value = vars[0]
+  }
+}, { immediate: true })
+
+const currentDisplayPrice = computed(() => {
+  if (selectedVariant.value && typeof selectedVariant.value.price === 'number') {
+    return selectedVariant.value.price
+  }
+  return store.value?.price || 0
+})
+
+const selectVariant = (v) => {
+  selectedVariant.value = v
+}
 
 const isEditingStore = ref(false)
 const isAiEditing = ref(false)

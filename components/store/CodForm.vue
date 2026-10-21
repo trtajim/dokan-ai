@@ -193,8 +193,14 @@ const props = defineProps({
   store: {
     type: Object,
     required: true
+  },
+  selectedVariant: {
+    type: Object,
+    default: null
   }
 })
+
+const emit = defineEmits(['update:selectedVariant'])
 
 const pixelId = computed(() => props.store?.config?.pixel_id)
 const { trackLead } = useMetaPixel(pixelId)
@@ -208,7 +214,17 @@ const availableVariants = computed(() => {
   return props.store.variants || props.store.config?.variants || []
 })
 
-const selectedVariant = ref(null)
+const selectedVariant = ref(props.selectedVariant || null)
+
+watch(() => props.selectedVariant, (newVal) => {
+  if (newVal) {
+    selectedVariant.value = newVal
+  }
+})
+
+watch(selectedVariant, (newVal) => {
+  emit('update:selectedVariant', newVal)
+})
 
 watch(availableVariants, (vars) => {
   if (vars && vars.length > 0 && !selectedVariant.value) {
