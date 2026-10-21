@@ -336,7 +336,9 @@
       <div class="max-w-md mx-auto space-y-2">
         <p class="font-serif-bn text-base text-[#fff6e0] font-bold">{{ store.product_title }}</p>
         <p class="text-xs text-slate-400">ক্যাশ অন ডেলিভারি সার্ভিস। পণ্য হাতে পেয়ে মূল্য পরিশোধ করুন।</p>
-        <p class="text-[11px] text-slate-500 pt-2">Powered by DokanAI</p>
+        <p class="text-[11px] text-slate-500 pt-2">
+          Powered by <NuxtLink to="/" class="underline hover:text-slate-300 transition-colors">DokanAI</NuxtLink> — Developed by <a href="https://tajimz.xyz" target="_blank" rel="noopener noreferrer" class="underline hover:text-slate-300 transition-colors">Tajim</a>
+        </p>
       </div>
     </footer>
 
