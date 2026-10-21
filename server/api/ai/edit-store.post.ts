@@ -129,10 +129,14 @@ CRITICAL PRESERVATION & ISOLATION RULES (DO NOT INVENT UNREQUESTED CHANGES):
    - If no image action is requested, DO NOT return image keys.
 
 3. SPECIFIC INSTRUCTIONS & PARTIAL PATCH OPTIMIZATION (HIGH SPEED):
-   - Apply requested changes directly and decisively.
+   - Apply requested changes directly, creatively, and decisively.
+   - PROACTIVE GENERATION: If the merchant asks to add reviews, FAQs, features, or modify theme without specifying the exact text (e.g. clicking suggested chip "নতুন রিভিউ যুক্ত করো" or "থিম কালার পরিবর্তন করতে চাই"):
+     • Reviews/Testimonials ("নতুন রিভিউ যুক্ত করো"): DO NOT ask for names or details! Proactively write and append 1-2 authentic, compelling customer reviews in natural Bengali mentioning quick delivery and quality for this product.
+     • FAQs: Proactively write and add relevant customer Q&As if asked to add FAQs.
+     • Theme ("থিম কালার পরিবর্তন করতে চাই"): Pick an alternative vibrant matching theme (e.g. if current is emerald, switch to amber or rose) and apply it immediately!
    - PARTIAL PATCH (CRITICAL FOR SPEED): In the JSON response, only include the keys that the merchant wants to change, add, or toggle.
    - For any unchanged field (e.g. features, testimonials, faqs, theme, etc.), DO NOT include them or return null/undefined. The server will automatically preserve all untouched fields safely!
-   - In "reply", give a direct, friendly confirmation in natural Bengali of what was updated (e.g. "আপনার পণ্যের দাম পরিবর্তন করা হয়েছে।" or "নতুন ছবি যুক্ত করা হয়েছে।"). DO NOT ask unnecessary follow-up questions if the command was completed.
+   - In "reply", give a direct, friendly confirmation in natural Bengali of what was updated (e.g. "নতুন কাস্টমার রিভিউ যুক্ত করা হয়েছে।" or "আপনার পণ্যের দাম পরিবর্তন করা হয়েছে।"). DO NOT ask unnecessary follow-up questions if the command was completed.
    - Provide 2 to 3 quick clickable next-step chips in "suggestions" array.
 
 4. SECTION VISIBILITY:
@@ -256,6 +260,19 @@ RETURN STRICT JSON ONLY (Include ONLY keys that are being modified, plus reply, 
       ? parsed.show_testimonials
       : (currentStore.config?.show_testimonials ?? true)
 
+    // Handle testimonials merging: if user asked to add reviews, append new reviews to existing array
+    let finalTestimonials = currentStore.config?.testimonials || []
+    if (Array.isArray(parsed.testimonials) && parsed.testimonials.length > 0) {
+      if (hasTestimonialIntent && /add|যুক্ত|নতুন|আরেকটি/i.test(instruction)) {
+        // Merge without duplicating existing reviews by name
+        const existingNames = new Set((currentStore.config?.testimonials || []).map((t: any) => t.name?.toLowerCase()))
+        const newOnes = parsed.testimonials.filter((t: any) => !existingNames.has(t.name?.toLowerCase()))
+        finalTestimonials = [...(currentStore.config?.testimonials || []), ...newOnes]
+      } else {
+        finalTestimonials = parsed.testimonials
+      }
+    }
+
     const finalShowFaqs = hasFaqIntent && typeof parsed.show_faqs === 'boolean'
       ? parsed.show_faqs
       : (currentStore.config?.show_faqs ?? true)
@@ -328,7 +345,7 @@ RETURN STRICT JSON ONLY (Include ONLY keys that are being modified, plus reply, 
       features: (Array.isArray(parsed.features) && parsed.features.length > 0) ? parsed.features : currentStore.config?.features,
       trust_badges: (Array.isArray(parsed.trust_badges) && parsed.trust_badges.length > 0) ? parsed.trust_badges : currentStore.config?.trust_badges,
       faqs: (Array.isArray(parsed.faqs) && parsed.faqs.length > 0) ? parsed.faqs : currentStore.config?.faqs,
-      testimonials: (Array.isArray(parsed.testimonials) && parsed.testimonials.length > 0) ? parsed.testimonials : currentStore.config?.testimonials,
+      testimonials: finalTestimonials,
       variants: finalVariants,
       stock: (parsed.stock !== undefined && parsed.stock !== null) ? Number(parsed.stock) : existingStock,
       pixel_id: parsed.pixel_id !== undefined ? parsed.pixel_id : currentStore.config?.pixel_id
