@@ -150,9 +150,9 @@
               </div>
 
               <!-- Available Variant Chips if exists -->
-              <div v-if="store.variants?.length" class="grid grid-cols-2 gap-2 pt-1">
+              <div v-if="(store.variants?.length || store.config?.variants?.length)" class="grid grid-cols-2 gap-2 pt-1">
                 <button
-                  v-for="(v, vIdx) in store.variants"
+                  v-for="(v, vIdx) in (store.variants?.length ? store.variants : (store.config?.variants || []))"
                   :key="vIdx"
                   @click="scrollToForm"
                   class="text-left bg-white border-2 rounded-xl p-2.5 hover:border-amber-500 transition-all cursor-pointer"

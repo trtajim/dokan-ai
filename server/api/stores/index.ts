@@ -25,12 +25,22 @@ export default defineEventHandler(async (event) => {
           if (data) {
             // Merge freshest memory updates if available
             if (memStore) {
+              const activeVariants = (Array.isArray(memStore.variants) && memStore.variants.length > 0)
+                ? memStore.variants
+                : (Array.isArray(memStore.config?.variants) && memStore.config.variants.length > 0
+                  ? memStore.config.variants
+                  : (data.config?.variants ?? []))
+              const activeStock = memStore.stock ?? memStore.config?.stock ?? data.config?.stock ?? 25
               const merged = {
                 ...data,
                 ...memStore,
+                stock: activeStock,
+                variants: activeVariants,
                 config: {
                   ...(data.config || {}),
-                  ...(memStore.config || {})
+                  ...(memStore.config || {}),
+                  variants: activeVariants,
+                  stock: activeStock
                 }
               }
               return { success: true, store: merged }
@@ -61,12 +71,22 @@ export default defineEventHandler(async (event) => {
           const mergedList = filtered.map((s: any) => {
             const mem = memoryStore.getStore(s.slug)
             if (mem) {
+              const activeVariants = (Array.isArray(mem.variants) && mem.variants.length > 0)
+                ? mem.variants
+                : (Array.isArray(mem.config?.variants) && mem.config.variants.length > 0
+                  ? mem.config.variants
+                  : (s.config?.variants ?? []))
+              const activeStock = mem.stock ?? mem.config?.stock ?? s.config?.stock ?? 25
               return {
                 ...s,
                 ...mem,
+                stock: activeStock,
+                variants: activeVariants,
                 config: {
                   ...(s.config || {}),
-                  ...(mem.config || {})
+                  ...(mem.config || {}),
+                  variants: activeVariants,
+                  stock: activeStock
                 }
               }
             }
