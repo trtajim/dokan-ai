@@ -1,75 +1,41 @@
-# Nuxt Minimal Starter
+# Dokan AI (দোকান এআই) 🛍️🤖
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+> **Product-এর নাম দিন, AI বানিয়ে দেবে আপনার অনলাইন স্টোর।**
+> The simplest, fastest way to launch and operate single-product Cash on Delivery (COD) stores in Bangladesh.
 
-## Setup
+---
 
-Make sure to install dependencies:
+## 💡 What is Dokan AI?
 
-```bash
-# npm
-npm install
+**Dokan AI** empowers micro-merchants and Facebook sellers to turn product ideas into high-converting, ad-ready online stores in under **30 seconds**—simply through chat. 
 
-# pnpm
-pnpm install
+No technical knowledge, no expensive hosting, no complicated WordPress or Shopify setup required.
 
-# yarn
-yarn install
+---
 
-# bun
-bun install
-```
+## ⚡ The Tri-AI Engine
 
-## Development Server
+Dokan AI runs on three purpose-built conversational AI agents tailored for emerging social commerce:
 
-Start the development server on `http://localhost:3000`:
+1. **🛠️ Builder AI (দোকান বানান)**
+   - Merchants share their product name, price, and photos in chat.
+   - The AI automatically designs and publishes a mobile-optimized landing page with localized Bengali copy, trust badges, urgency elements, and a streamlined COD order form.
 
-```bash
-# npm
-npm run dev
+2. **✏️ Edit AI (দোকান বদলান)**
+   - Want to update copy, change prices, or tweak page styling?
+   - Just tell the AI in chat, and your live store updates instantly.
 
-# pnpm
-pnpm dev
+3. **💬 Sales AI (২৪/৭ সেলস এজেন্ট)**
+   - An intelligent on-page conversational assistant that chats with buyers in natural Bengali 24/7.
+   - Answers FAQs (delivery time, quality, usage, pricing) and directly converts curious visitors into completed Cash on Delivery orders.
 
-# yarn
-yarn dev
+---
 
-# bun
-bun run dev
-```
+## 🚀 Key Features for Merchants
 
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+- **⚡ 30-Second Live Stores**: Instant public link (`/s/[store-slug]`) ready to plug directly into Facebook & Instagram ads.
+- **🔔 Real-Time Telegram Order Alerts**: Instant sound pings the moment an order is placed, delivering customer name, phone number, and address straight to your phone.
+- **📦 1-Click Courier Dispatch**: Direct integrations with leading local logistics partners (**Pathao**, **Steadfast**, **RedX**) to book deliveries in one click.
+- **📊 Unified Merchant Dashboard**: Track total sales value, live stock count, pending orders, and manage multiple product funnels from a single screen.
+- **🎯 Meta Pixel Integration**: Built-in automatic event tracking (`ViewContent`, `InitiateCheckout`, `Purchase`) for optimized Facebook ad performance.
+- **৳০ Startup Cost**: 100% free hosting and instant deployment.
